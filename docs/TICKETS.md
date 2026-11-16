@@ -5,7 +5,7 @@ Status is written only after a ticket's check has passed. "Done" means `python -
 | # | Ticket | Due | Status |
 |---|---|---|---|
 | 1 | Fixtures and answer key | Nov 15 | done |
-| 2 | Streaming parser and data checks | Nov 16 AM | open |
+| 2 | Streaming parser and data checks | Nov 16 AM | done |
 | 3 | Manual-work analysis and independent recount | Nov 16 | open |
 | 4 | Candidate ranking, target, locked held-out set | Nov 16 18:00 (pivot point) | open |
 | 5 | Rules baseline and eval | Nov 16 PM | open |

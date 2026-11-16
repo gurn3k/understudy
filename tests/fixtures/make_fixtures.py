@@ -96,6 +96,21 @@ PLANTED = [
         (GR, "user_001", "2018-10-10T10:00:00", 800.0),
         (CLR, "batch_02", "2018-10-15T10:00:00", 800.0),
     ]),
+    # P9: a person removed the payment block and no goods receipt ever came.
+    case("4500000009_00001", IBG, "vendor_0009", [
+        (CREATE, "user_001", "2018-11-01T10:00:00", 900.0),
+        (IR, "user_002", "2018-11-02T10:00:00", 900.0),
+        (RPB, "user_004", "2018-11-03T10:00:00", 900.0),
+        (CLR, "batch_02", "2018-11-20T10:00:00", 900.0),
+    ]),
+    # P10: early block removal outside the invoice-before-GR flow (not flagged).
+    case("4500000010_00001", IAG, "vendor_0010", [
+        (CREATE, "user_001", "2018-11-05T10:00:00", 1000.0),
+        (RPB, "batch_01", "2018-11-06T10:00:00", 1000.0),
+        (GR, "user_001", "2018-11-07T10:00:00", 1000.0),
+        (IR, "user_002", "2018-11-08T10:00:00", 1000.0),
+        (CLR, "batch_02", "2018-11-25T10:00:00", 1000.0),
+    ]),
 ]
 
 CLEAN = [
