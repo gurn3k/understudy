@@ -21,3 +21,6 @@ In a real rollout you learn an invoice needed correcting only later. Promotion h
 
 ## Consequences
 The first promotion comes weeks into the replay, by design.
+
+## Amendment 1 (2026-11-15, before any replay ran)
+Timing comes from a separate file, `heldout_timing.jsonl`, keyed by invoice ID. It holds the first invoice receipt time, the first clearing time and the count of manual touches. The locked held-out file is unchanged, and the contenders never see timing.

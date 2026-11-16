@@ -16,3 +16,8 @@ It turns the build's central idea into a measured comparison. The parameters are
 
 ## Consequences
 It shows how the mechanism behaves, not how often it happens in practice.
+
+## Amendment 1 (2026-11-15, before any replay ran)
+- **Demotion:** the agreement gate demotes on outcomes, the same rule as the outcome gate, so the comparison isolates the promotion signal.
+- **When evidence counts:** agreement is known in the week of the review; outcomes are known in the week of clearing.
+- **Calls a reviewer sees:** the contender's straight-through calls only. Calls to leave an invoice to a person aren't reviewed for promotion.
