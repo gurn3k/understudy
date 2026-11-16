@@ -1,5 +1,6 @@
 """Hostile or malformed input is treated as bad input, never as a crash."""
 import tempfile
+from pathlib import Path
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -49,3 +50,19 @@ class LogValues(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LimitMessageIsNotAnAnswer(unittest.TestCase):
+    """A usage-limit or error reply from the CLI must stop the run and never be saved as an answer."""
+
+    def test_error_reply_stops_and_saves_nothing(self):
+        import tempfile
+        from unittest import mock
+        from understudy.claude_call import Caller, StopRun
+        with tempfile.TemporaryDirectory() as d:
+            c = Caller("live", Path(d), "sys", max_live_calls=1, workdir=d)
+            fake = mock.Mock(stdout='{"is_error": true, "subtype": "success", "result": "Usage limit reached"}', stderr="", returncode=1)
+            with mock.patch("understudy.claude_call.subprocess.run", return_value=fake):
+                with self.assertRaises(StopRun):
+                    c.ask("k1", "prompt")
+            self.assertEqual(list(Path(d).iterdir()), [])

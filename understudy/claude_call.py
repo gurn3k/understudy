@@ -111,6 +111,8 @@ class Caller:
         except json.JSONDecodeError:
             raise StopRun(f"{key}: unreadable CLI output (exit {proc.returncode}): {proc.stderr[:300]}")
         text = out.get("result", "") or ""
+        if out.get("is_error") or out.get("subtype", "success") != "success":
+            raise StopRun(f"{key}: the CLI reported an error ({str(text)[:120]!r}); nothing saved, stopping")
         if not text.strip():
             raise StopRun(f"{key}: empty reply (possible usage limit); stopping with saved work kept")
         usage = out.get("usage", {})
