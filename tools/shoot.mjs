@@ -1,5 +1,6 @@
 // Screenshots through Chrome's DevTools protocol, so phone widths are emulated exactly.
 // Usage: node tools/shoot.mjs <url> <outdir> [width:height:scheme[:full]] ...
+// Optional 5th field: a y offset; captures one viewport-sized slice from there.
 // e.g.   node tools/shoot.mjs http://127.0.0.1:8765/ .impeccable/review 390:844:light:full 1440:900:dark
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -43,7 +44,7 @@ await send("Runtime.enable");
 await send("Page.enable");
 await send("Network.setCacheDisabled", { cacheDisabled: true });
 for (const spec of shots) {
-  const [w, h, scheme, full] = spec.split(":");
+  const [w, h, scheme, full, y] = spec.split(":");
   await send("Emulation.setDeviceMetricsOverride", { width: +w, height: +h, deviceScaleFactor: 1, mobile: +w < 700 });
   await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: scheme }, { name: "prefers-reduced-motion", value: "reduce" }] });
   await send("Page.navigate", { url });
@@ -55,9 +56,9 @@ for (const spec of shots) {
   await sleep(300);
   const m = await send("Runtime.evaluate", { expression: "JSON.stringify({sw: document.documentElement.scrollWidth, iw: innerWidth, h: document.documentElement.scrollHeight, fonts: [...document.fonts].filter((f) => f.status !== 'loaded').map((f) => f.family + ' ' + f.weight + ' ' + f.status)})", returnByValue: true });
   const dims = JSON.parse(m.result.result.value);
-  const clip = full ? { x: 0, y: 0, width: +w, height: dims.h, scale: 1 } : undefined;
-  const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: !!full, ...(clip ? { clip } : {}) });
-  const name = `${w}-${scheme}${full ? "-full" : ""}.png`;
+  const clip = y ? { x: 0, y: +y, width: +w, height: +h, scale: 1 } : full ? { x: 0, y: 0, width: +w, height: dims.h, scale: 1 } : undefined;
+  const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: !!(full || y), ...(clip ? { clip } : {}) });
+  const name = `${w}-${scheme}${full ? "-full" : ""}${y ? "-y" + y : ""}.png`;
   writeFileSync(join(outdir, name), Buffer.from(shot.result.data, "base64"));
   console.log(`${name} scrollWidth=${dims.sw} innerWidth=${dims.iw} height=${dims.h}${dims.sw > dims.iw ? "  OVERFLOW" : ""}${dims.fonts.length ? "  FONTS NOT LOADED: " + dims.fonts.join(", ") : ""}`);
 }

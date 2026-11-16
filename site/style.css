@@ -209,3 +209,14 @@ footer.end { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--ru
 .drawer-body table { font-size: 15px; }
 .drawer-body td:first-child { font-family: var(--display); letter-spacing: .02em; }
 .more { margin-top: 12px; }
+
+/* Plain layer: the account a non-specialist reads first; statistics sit in the fold below it. */
+.plainlist { margin: 0 0 18px; padding-left: 1.4em; }
+.plainlist li { padding: 3px 0; }
+table.score td:first-child { text-align: left; }
+.budget li.hit .fill { background: var(--standby); }
+.budget .fill.ok { background: var(--go); }
+details.detail { margin-top: 32px; }
+details.detail summary { font-size: 17px; }
+ul.fine { font-size: 15px; line-height: 1.55; color: var(--ink-2); margin: 18px 0 0; padding: 0; list-style: none; }
+ul.fine li { padding: 8px 0; border-top: 1px solid var(--rule); }
