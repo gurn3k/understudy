@@ -113,6 +113,11 @@ function q1(d) {
 }
 
 /* ---------- Q2: the work ---------- */
+const PLAIN_DECISION = {
+  invoice_triage: "Pay this invoice now, or hold it for a check?",
+  quantity_change_risk: "Will this new order need its quantity changed?",
+  price_change_risk: "Will this new order need its price changed?",
+};
 function q2(d) {
   const max = Math.max(...d.work.map((w) => w.events));
   const triage = new Set(["Clear Invoice", "Remove Payment Block"]);
@@ -124,7 +129,11 @@ function q2(d) {
   const plain = `<p>The records hold ${int(k.events)} steps. People did ${pct(k.manual / k.events, 0)} of them by hand. Below are the ten biggest jobs. Two of them are the "pay or check" decision (in bold).</p>
   <ul class="bars" aria-label="Steps done by hand, top ten jobs">${bars}</ul>
   <p class="small">Dark: done by a person. Blue: done automatically. Number: steps done by hand.</p>
-  <p>We picked this decision because people make it very often, and past records already predict it fairly well. That makes it a fair first test for an AI.</p>`;
+  <h3>Why this decision, and what else could be tested</h3>
+  <p>We compared three decisions that staff make over and over. Each one has a clear outcome in the records, so an AI's call can be checked against what really happened.</p>
+  <div class="tablewrap"><table class="score"><caption>Decisions we sized</caption><thead><tr><th>Decision</th><th>Times done by hand</th><th>Tested here?</th></tr></thead><tbody>${cand.map((c, i) => `<tr class="${i === 0 ? "chosen" : ""}"><td>${esc(PLAIN_DECISION[c.name] || c.name.replace(/_/g, " "))}</td><td>${int(c.manual_events)}</td><td>${i === 0 ? "Yes" : "Not yet"}</td></tr>`).join("")}</tbody></table></div>
+  <p>The invoice decision came first because it is made about ${int(Math.floor(cand[0].manual_events / cand[1].manual_events))} times as often as the next one, and past records predict it about as well. The other two were sized but not tested. The same test would work for them: the same bar, and the same proof before any trust.</p>
+  <p>The biggest jobs in the chart, such as creating orders and recording deliveries, are data entry, not decisions. These records hold no document text, so they cannot show whether an AI could do that work.</p>`;
   const detail = `<p>Of ${int(k.events)} recorded events, ${int(k.manual)} (${pct(k.manual / k.events, 0)}) were done by people's own accounts, ${int(k.batch)} by batch jobs, and ${int(k.unclassified)} by accounts that are neither. ${int(d.log.users.manual)} people did the manual work.</p>
   <p>Each candidate is a decision people make over and over. They are ranked by manual volume and by how rule-like the decision already is: how well one field, chosen on earlier months, predicts the outcome in later months.</p>
   <div class="tablewrap"><table><caption>Candidates</caption><thead><tr><th>Decision</th><th>Manual events</th><th>Rule-likeness</th><th>Best single field</th></tr></thead><tbody>${rows}</tbody></table></div>`;
