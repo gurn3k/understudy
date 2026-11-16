@@ -32,17 +32,18 @@ Every size and every accuracy figure on the page opens the real cases behind it.
 - **Held-out split.** Split by time. Rules and prompts are built only on cases created in earlier months, and tested only on later months. The test set is locked before the first helper run.
 - **Metrics.** Precision, recall and coverage per case type, each shown as a count over a count.
 - **Error trade-off.** Precision comes first. A wrong automated action costs more than a case left with a person, so the helper may answer "leave to a person".
-- **Trust rule.** A case type is helper-ready only if the lower bound of its 95% Wilson interval for precision is at least 90%. That means at least 35 held-out cases with 0 errors, 53 with 1, 69 with 2, or 84 with 3. Case types with fewer cases are shown as "not enough evidence", never as passing.
-- **Claude vs baseline (rule fixed before any run).** The Claude helper ships only if:
-  1. it makes more case types helper-ready than the baseline, or covers at least 10 percentage points more held-out cases at the trust bar,
-  2. no case type's precision drops below the baseline's, and
-  3. its answers are valid JSON in every case, with "leave to a person" allowed.
-  Ties go to the baseline (cheaper, explainable). If the baseline wins, the page says so.
+- **Trust rule** (raised from 90% to 99% on 2026-11-15, ADR 0010). A case type (item category / spend area) is helper-ready only if the lower bound of its 95% Wilson interval for straight-through precision is at least 99%. That means at least 381 calls with 0 errors, 563 with 1, or 726 with 2. Smaller types show "not enough evidence". A pass-everything reference is shown, and it fails.
+- **Claude vs baseline (fixed before any run, ADR 0010).** Both judge the same stratified sample of 1,500 held-out invoices. Claude ships only if:
+  1. its pooled coverage at the 99% bar is at least 10 points higher
+  2. no case type with 100 or more sampled calls loses precision against the baseline
+  3. every answer is valid JSON
+  Ties go to the baseline. The baseline is also scored on all held-out invoices.
 - **Expected false readings, checked in code:**
   - "Done by batch means done right": batch actions are never used as correct labels without their own check.
   - "High volume means a good candidate": already-automated activities can't rank as candidates.
   - "A repeat means rework": partial deliveries and invoices are separated from true repeats where the fields allow.
   - "Agreement means accuracy": no metric compares the helper with humans who saw its output.
+  - "No correction yet means clean": unfinished cases are never labelled. The held-out months are chosen so outcomes are observable (ADR 0006, amendment 1).
 - **Tiny sample first.** 50 held-out cases against these bars, with pass/fail and numbers reported, before the full eval.
 
 ## Out of scope, on purpose

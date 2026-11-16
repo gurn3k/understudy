@@ -6,8 +6,8 @@ Status is written only after a ticket's check has passed. "Done" means `python -
 |---|---|---|---|
 | 1 | Fixtures and answer key | Nov 15 | done |
 | 2 | Streaming parser and data checks | Nov 16 AM | done |
-| 3 | Manual-work analysis and independent recount | Nov 16 | open |
-| 4 | Candidate ranking, target, locked held-out set | Nov 16 18:00 (pivot point) | open |
+| 3 | Manual-work analysis and independent recount | Nov 16 | done |
+| 4 | Candidate ranking, target, locked held-out set | Nov 16 18:00 (pivot point) | done |
 | 5 | Rules baseline and eval | Nov 16 PM | open |
 | 6 | Claude helper: stub, replay, sample, full run | Nov 17 AM | open |
 | 7 | Report page | Nov 17 AM | open |

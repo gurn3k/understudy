@@ -17,3 +17,4 @@ An interval stops small case types from passing on luck. Fixing the rule first s
 
 ## Consequences
 Some case types will show "not enough evidence". The baseline may win, and the page will say so.
+Note: ADR 0010 replaces this ADR's 90% trust bar with 99% and moves the model comparison to a shared sample.

@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1849.2016" xes.features="">
+<global scope="event"><string key="concept:name" value="UNKNOWN"></string><date key="time:timestamp" value="1970-01-01T00:00:00.000Z"></date><string key="org:resource" value="UNKNOWN"></string><string key="User" value="UNKNOWN"></string><float key="Cumulative net worth (EUR)" value="0.0"></float></global>
+<string key="concept:name" value="BPI Challenge 2019"></string>
+
+<trace>
+<string key="Purchasing Document" value="T01"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T01_00001"></string>
+<string key="Item Category" value="3-way match, invoice before GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_A"></string>
+<string key="Name" value="va"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="false"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="10.0"></float>
+<date key="time:timestamp" value="2018-03-01T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="10.0"></float>
+<date key="time:timestamp" value="2018-03-02T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Record Goods Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="10.0"></float>
+<date key="time:timestamp" value="2018-03-03T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="batch_01"></string>
+<string key="org:resource" value="batch_01"></string>
+<string key="concept:name" value="Remove Payment Block"></string>
+<float key="Cumulative net worth (EUR)" value="10.0"></float>
+<date key="time:timestamp" value="2018-03-04T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="10.0"></float>
+<date key="time:timestamp" value="2018-03-10T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T02"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T02_00001"></string>
+<string key="Item Category" value="3-way match, invoice before GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_B"></string>
+<string key="Name" value="vb"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="false"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="20.0"></float>
+<date key="time:timestamp" value="2018-04-01T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="20.0"></float>
+<date key="time:timestamp" value="2018-04-02T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_004"></string>
+<string key="org:resource" value="user_004"></string>
+<string key="concept:name" value="Change Price"></string>
+<float key="Cumulative net worth (EUR)" value="25.0"></float>
+<date key="time:timestamp" value="2018-04-03T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="25.0"></float>
+<date key="time:timestamp" value="2018-04-10T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T03"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T03_00001"></string>
+<string key="Item Category" value="3-way match, invoice after GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_B"></string>
+<string key="Name" value="vb"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="true"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="30.0"></float>
+<date key="time:timestamp" value="2018-05-01T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="30.0"></float>
+<date key="time:timestamp" value="2018-05-02T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Cancel Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="30.0"></float>
+<date key="time:timestamp" value="2018-05-03T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="30.0"></float>
+<date key="time:timestamp" value="2018-05-04T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="30.0"></float>
+<date key="time:timestamp" value="2018-05-10T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T09"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T09_00001"></string>
+<string key="Item Category" value="3-way match, invoice after GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_A"></string>
+<string key="Name" value="va"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="true"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="90.0"></float>
+<date key="time:timestamp" value="2018-02-01T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Record Goods Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="90.0"></float>
+<date key="time:timestamp" value="2018-02-02T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="90.0"></float>
+<date key="time:timestamp" value="2018-02-10T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T04"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T04_00001"></string>
+<string key="Item Category" value="3-way match, invoice after GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_A"></string>
+<string key="Name" value="va"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="true"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="40.0"></float>
+<date key="time:timestamp" value="2018-06-01T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Record Goods Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="40.0"></float>
+<date key="time:timestamp" value="2018-06-02T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="40.0"></float>
+<date key="time:timestamp" value="2018-06-03T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="40.0"></float>
+<date key="time:timestamp" value="2018-06-10T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_004"></string>
+<string key="org:resource" value="user_004"></string>
+<string key="concept:name" value="Change Price"></string>
+<float key="Cumulative net worth (EUR)" value="41.0"></float>
+<date key="time:timestamp" value="2018-06-12T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T05"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T05_00001"></string>
+<string key="Item Category" value="3-way match, invoice before GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_B"></string>
+<string key="Name" value="vb"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="false"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="50.0"></float>
+<date key="time:timestamp" value="2018-07-01T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="50.0"></float>
+<date key="time:timestamp" value="2018-07-02T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="NONE"></string>
+<string key="org:resource" value="NONE"></string>
+<string key="concept:name" value="Vendor creates debit memo"></string>
+<float key="Cumulative net worth (EUR)" value="50.0"></float>
+<date key="time:timestamp" value="2018-07-03T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="50.0"></float>
+<date key="time:timestamp" value="2018-07-10T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T06"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T06_00001"></string>
+<string key="Item Category" value="3-way match, invoice before GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_A"></string>
+<string key="Name" value="va"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="false"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="60.0"></float>
+<date key="time:timestamp" value="2018-08-01T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="60.0"></float>
+<date key="time:timestamp" value="2018-08-02T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T07"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T07_00001"></string>
+<string key="Item Category" value="3-way match, invoice before GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_A"></string>
+<string key="Name" value="va"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="false"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="70.0"></float>
+<date key="time:timestamp" value="2018-07-05T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_004"></string>
+<string key="org:resource" value="user_004"></string>
+<string key="concept:name" value="Change Price"></string>
+<float key="Cumulative net worth (EUR)" value="75.0"></float>
+<date key="time:timestamp" value="2018-07-06T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="75.0"></float>
+<date key="time:timestamp" value="2018-07-07T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Record Goods Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="75.0"></float>
+<date key="time:timestamp" value="2018-07-08T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="75.0"></float>
+<date key="time:timestamp" value="2018-07-15T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T10"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T10_00001"></string>
+<string key="Item Category" value="3-way match, invoice before GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_B"></string>
+<string key="Name" value="vb"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="false"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="100.0"></float>
+<date key="time:timestamp" value="2018-08-05T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="100.0"></float>
+<date key="time:timestamp" value="2018-08-06T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_005"></string>
+<string key="org:resource" value="user_005"></string>
+<string key="concept:name" value="Set Payment Block"></string>
+<float key="Cumulative net worth (EUR)" value="100.0"></float>
+<date key="time:timestamp" value="2018-08-07T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="100.0"></float>
+<date key="time:timestamp" value="2018-08-20T10:00:00.000Z"></date>
+</event>
+</trace>
+<trace>
+<string key="Purchasing Document" value="T08"></string>
+<string key="Item" value="00001"></string>
+<string key="concept:name" value="T08_00001"></string>
+<string key="Item Category" value="3-way match, invoice before GR"></string>
+<string key="Document Type" value="Standard PO"></string>
+<string key="Spend area text" value="Packaging"></string>
+<string key="Company" value="companyID_0000"></string>
+<string key="Vendor" value="vendor_A"></string>
+<string key="Name" value="va"></string>
+<boolean key="Goods Receipt" value="true"></boolean>
+<boolean key="GR-Based Inv. Verif." value="false"></boolean>
+<event>
+<string key="User" value="user_001"></string>
+<string key="org:resource" value="user_001"></string>
+<string key="concept:name" value="Create Purchase Order Item"></string>
+<float key="Cumulative net worth (EUR)" value="80.0"></float>
+<date key="time:timestamp" value="2018-09-03T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_002"></string>
+<string key="org:resource" value="user_002"></string>
+<string key="concept:name" value="Record Invoice Receipt"></string>
+<float key="Cumulative net worth (EUR)" value="80.0"></float>
+<date key="time:timestamp" value="2018-09-04T10:00:00.000Z"></date>
+</event>
+<event>
+<string key="User" value="user_003"></string>
+<string key="org:resource" value="user_003"></string>
+<string key="concept:name" value="Clear Invoice"></string>
+<float key="Cumulative net worth (EUR)" value="80.0"></float>
+<date key="time:timestamp" value="2018-09-10T10:00:00.000Z"></date>
+</event>
+</trace>
+</log>

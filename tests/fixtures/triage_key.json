@@ -1,0 +1,18 @@
+{
+  "_note": "Worked out by hand from make_triage.py. Split: fit Jan-May 2018, held out Jun-Aug 2018, left out from Sep 2018.",
+  "labels": {
+    "T01_00001": {"split": "fit", "straight_through": true},
+    "T02_00001": {"split": "fit", "straight_through": false},
+    "T03_00001": {"split": "fit", "straight_through": false},
+    "T04_00001": {"split": "heldout", "straight_through": true, "gr_before_invoice": true},
+    "T05_00001": {"split": "heldout", "straight_through": false},
+    "T07_00001": {"split": "heldout", "straight_through": true, "corrections_before_invoice": 1},
+    "T10_00001": {"split": "heldout", "straight_through": false}
+  },
+  "unlabelled": {
+    "no_invoice": ["T09_00001"],
+    "not_finished": ["T06_00001"],
+    "outside_months": ["T08_00001"]
+  },
+  "vendor_fit_rate": {"vendor_A": [1, 1], "vendor_B": [0, 2]}
+}
