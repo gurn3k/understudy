@@ -56,6 +56,15 @@ class OutcomeGate(unittest.TestCase):
         self.assertEqual(res["totals"]["passed"], 200)
         self.assertEqual(res["totals"]["touches_removed"], 380)
 
+    def test_log_lists_autonomous_passes_without_changing_results(self):
+        recs, timing = merge(batch("a", 381, "Y", 23, 24), batch("b", 10, "Y", 25, 26, bad=10),
+                             batch("c", 190, "Y", 25, 27, touches=2))
+        log = []
+        with_log = replay(recs, timing, lambda r: True, log=log)
+        self.assertEqual(with_log, replay(recs, timing, lambda r: True))
+        self.assertEqual(len(log), with_log["totals"]["passed"])
+        self.assertEqual(sum(not x["correct"] for x in log), with_log["totals"]["wrong"])
+
     def test_leave_to_person_calls_are_not_evidence(self):
         recs, timing = batch("x", 400, "X", 23, 24)
         self.assertIsNone(replay(recs, timing, lambda r: False)["first_promotion"])

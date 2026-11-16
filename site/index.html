@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understudy: can an AI pass invoices straight to payment?</title>
+<meta name="description" content="Three AI understudies auditioned for invoice triage on a real purchase-to-pay log, against a 99% trust bar, with an earned-autonomy replay.">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#q1">Skip to the answer</a>
+<header class="bar">
+  <span class="mark">Understudy</span>
+  <nav aria-label="Sections" class="tabs">
+    <a href="#q1">Answer</a><a href="#q3">Audition</a><a href="#q5">Earned autonomy</a><a href="#q6">Rubber stamp</a><a href="#method">Method</a>
+  </nav>
+  <button class="theme" type="button" aria-label="Switch light or dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 3a7 7 0 0 1 0 14z" fill="currentColor"/></svg></button>
+</header>
+
+<div class="stage">
+  <nav class="cues" aria-label="Cue sheet">
+    <ol>
+      <li><a href="#q1"><i class="lamp"></i><span>Q1</span> The answer</a></li>
+      <li><a href="#q2"><i class="lamp"></i><span>Q2</span> The work</a></li>
+      <li><a href="#q3"><i class="lamp"></i><span>Q3</span> The audition</a></li>
+      <li><a href="#q4"><i class="lamp"></i><span>Q4</span> The bar</a></li>
+      <li><a href="#q5"><i class="lamp"></i><span>Q5</span> Earned autonomy</a></li>
+      <li><a href="#q6"><i class="lamp"></i><span>Q6</span> The rubber stamp</a></li>
+      <li><a href="#q7"><i class="lamp"></i><span>Q7</span> Cost at volume</a></li>
+      <li><a href="#method"><i class="lamp"></i><span>M</span> Method</a></li>
+    </ol>
+  </nav>
+
+  <main class="script" id="main">
+    <p class="loading" data-loading>Loading the findings…</p>
+    <noscript><p class="loading">This page draws its figures from data with JavaScript. Please enable it.</p></noscript>
+  </main>
+</div>
+
+<aside class="drawer" id="drawer" aria-labelledby="drawer-title" hidden tabindex="-1">
+  <div class="drawer-head">
+    <h2 id="drawer-title">Invoices</h2>
+    <button type="button" class="close" data-close>Close</button>
+  </div>
+  <p class="drawer-note" id="drawer-note"></p>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<script src="app.js" defer></script>
+</body>
+</html>

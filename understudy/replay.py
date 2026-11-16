@@ -55,9 +55,10 @@ def reviewer(alpha, catch=0.8, false_flag=0.02, seed=20261115):
     return agree
 
 
-def replay(records, timing, decide, gate="outcome", agree=None):
+def replay(records, timing, decide, gate="outcome", agree=None, log=None):
     """records: labelled held-out invoices. timing: {id: {invoice_ts, clear_ts, manual_touches}}.
-    decide(record) -> bool. gate: "outcome" or "agreement" (needs agree)."""
+    decide(record) -> bool. gate: "outcome" or "agreement" (needs agree).
+    log: optional list; each autonomous pass is appended as {id, type, week, correct}."""
     arrivals = defaultdict(list)
     for r in records:
         arrivals[week(timing[r["id"]]["invoice_ts"])].append(r)
@@ -82,6 +83,8 @@ def replay(records, timing, decide, gate="outcome", agree=None):
             if mode[t] == "autonomous":
                 autonomous[t].append(item)
                 passed += 1
+                if log is not None:
+                    log.append({"id": r["id"], "type": t, "week": w, "correct": bool(r["straight_through"])})
                 if r["straight_through"]:
                     removed += timing[r["id"]]["manual_touches"]
                 else:

@@ -22,3 +22,10 @@
 - The 1.8% rests on 15 errors, mostly from one case type.
 - The simulation's low error rate comes from a policy that is about 99% right. On ADR 0014's parameters, a helper wrong 5% of the time would still show about 99.4% agreement at 0.9. This is arithmetic, not a run.
 - The simulated gate still demotes on outcomes.
+
+## Erratum (2026-11-16)
+The packet behind this ruling misreported the agreement gate's first-promotion weeks. The builder misread a sorted list in which runs with no promotion sorted first. The same reviewer corrected the sentences:
+- "Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about 9 weeks sooner (median week 26 against week 35; range 8–10 weeks across 20 runs) and passed 19,815.5 invoices, 150.5 of them wrong (medians of 20 runs; range 114–170), against 844 and 15 on outcomes. That is ten times the wrong payments, at a lower rate per pass (0.76% against 1.8%)."
+- "At 0.7 it promoted in 17 of 20 runs, the earliest in week 26, and passed 6,031.5 invoices, 45.5 of them wrong (medians of 20 runs; range 0–86). At 0.5 it promoted in 1 of 20 runs."
+
+These replace the 0.9 and 0.7/0.5 sentences above. "No earlier promotion" at 0.7, "6,031" and "about 10 weeks" (that was the example run, not the median) were wrong.
