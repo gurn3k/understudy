@@ -8,14 +8,21 @@ Status is written only after a ticket's check has passed. "Done" means `python -
 | 2 | Streaming parser and data checks | Nov 16 AM | done |
 | 3 | Manual-work analysis and independent recount | Nov 16 | done |
 | 4 | Candidate ranking, target, locked held-out set | Nov 16 18:00 (pivot point) | done |
-| 5 | Rules baseline and eval | Nov 16 PM | open |
-| 6 | Claude helper: stub, replay, sample, full run | Nov 17 AM | open |
-| 7 | Report page | Nov 17 AM | open |
-| 8 | Visual route and browser checks | Nov 17 AM | open |
-| 9 | Checks: hostile input, security, independent review, audit | Nov 18 AM | open |
-| 10 | README, packaging, CI, deploy (with approval) | Nov 18 15:00 | open |
+| 5 | Contender A, pass-everything reference, eval and trust table | Nov 16 AM | open |
+| 6 | Contender B (Claude per case): stub, replay, 50-case sample, 1,500 run | Nov 16 PM | open |
+| 7 | Contender C (Claude policy author): rule language, checks, 3 policies, full scoring | Nov 16 PM | open |
+| 8 | Earned-autonomy replay (A, C) and agreement-gate simulation | Nov 17 AM | open |
+| 9 | Design: product brief, mockups for a direction round, design notes | Nov 16 AM (mockups) | open |
+| 10 | Findings page, generated from data | Nov 17 | open |
+| 11 | Visual route and browser checks | Nov 17 | open |
+| 12 | Checks: hostile input, security, independent review, audit | Nov 18 AM | open |
+| 13 | README, packaging, deploy (with approval) | Nov 18 15:00 | open |
 
-**Owner's look:** Nov 17 by 12:00, on the output of tickets 7 and 8.
+**Owner's look:** mockups Nov 16 morning (direction round); first usable page Nov 17 by 12:00.
+
+**Cut line:** if the build is behind at Nov 17 12:00, the agreement-gate simulation (part of 8) is dropped and the page says so.
+
+The briefs below for 5 to 10 were written for the earlier two-helper plan and are replaced by docs/PRD.md v2 and ADRs 0011 to 0014. Each new ticket's acceptance is its bar in the PRD, plus a deliberate break that makes its check fail.
 
 ---
 
