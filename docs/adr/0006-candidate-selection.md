@@ -30,3 +30,6 @@ The reason is censoring. The log ends in January 2019. The share of cases that r
 3. **Quantity-change risk at item creation.** The volume is manual Change Quantity events.
 
 **Rule-likeness** is the balanced accuracy, on the held-out months, of the best single-field lookup rule fitted on the earlier months. Balanced accuracy is the mean of the true-positive and true-negative rates, so 0.5 means no signal. The ranking is manual events × (2 × rule-likeness − 1).
+
+## Amendment 2 (2026-11-16, after all runs; a clarification only)
+The Decision says both ranking inputs are measured on the earlier months only. That was not what ran. Amendment 1 scores rule-likeness on the held-out months, and the code does so. Manual volume is counted over the whole log. So held-out outcomes were used to choose which decision to study, before any contender ran. Nothing is rerun. The page and README no longer say the held-out invoices were held back from the builder until every rule was written.

@@ -27,3 +27,6 @@ Timing comes from a separate file, `heldout_timing.jsonl`, keyed by invoice ID. 
 
 ## Amendment 2 (2026-11-16, after the replay ran; a clarification only)
 "The last 200 resolved autonomous calls" is counted in **arrival order**: of the calls that have resolved by that week, the 200 that arrived most recently. Ordering by clearing date was considered after the review. It isn't adopted, because changing a rule after its results are known is the forking path ADR 0015 guards against. The published replay uses arrival order.
+
+## Amendment 3 (2026-11-16, after the replay ran; a correction to the code, not the rule)
+Manual touches are the manual Clear Invoice and Remove Payment Block events from the invoice's first receipt to its first clearing. The first build counted the whole order line, which added 3 events. The total is 785.

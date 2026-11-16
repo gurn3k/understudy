@@ -16,7 +16,7 @@ No contender earned trust at the 99% bar. The fixed rule passes nothing. The pol
 
 ## How it was kept honest
 
-- **Held-out data.** Scoring months (June to August 2018) were locked with a hash before any contender ran. Contenders saw only earlier-month data.
+- **Held-out data.** Order lines created June to August 2018 were locked with a checksum before any contender ran. No contender saw their outcomes. The builder used held-out outcomes three times before the last rule was written: to rank the candidate decisions, to set the 99% bar, and to score the first policy. Each use is recorded in `docs/adr/`.
 - **Rules written first.** Every rule was written down before the run it governs, in `docs/adr/`. Rules that were later replaced stay on the record, with the reason and timing.
 - **Checks that fail.** Every check was shown to fail on purpose before it was trusted. Fixtures with hand-worked answers are in `tests/fixtures/`.
 - **Independent recount.** A second program with no shared code recounts the raw log, and its totals match.
@@ -54,4 +54,4 @@ The log is the **BPI Challenge 2019** dataset by van Dongen, B.F., published by 
 
 ## Limits
 
-The data is from 2018 and contains no free text. "Straight through" means no correction between the first invoice receipt and payment, so corrections after payment aren't seen. B was scored on a 1,500-invoice sample, which can't show a 99% lower bound at a 1% error rate. The agreement-gate section is a simulation with assumed reviewer behaviour.
+The data is from 2018 and contains no free text. "Straight through" means no correction between the first invoice receipt and payment, so corrections after payment aren't seen. B was scored on a 1,500-invoice sample, which can't show a 99% lower bound at a 1% error rate. The agreement-gate section is a simulation with assumed reviewer behaviour. Earlier-month rates are split by order-line creation month, so 53% of them rest on outcomes that landed after the first held-out invoice arrived. Results were not recomputed with only the rates known at the time.

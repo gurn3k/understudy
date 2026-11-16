@@ -163,6 +163,7 @@ def main():
                       "example_first": ex["first_promotion"]},
         "drawer": drawer,
         "adrs": adrs(),
+        "lookahead": load_json(DATA / "lookahead.json"),
     }
     OUT.parent.mkdir(exist_ok=True)
     save_json(data, OUT, separators=(",", ":"))

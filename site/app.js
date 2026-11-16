@@ -62,7 +62,7 @@ function q1(d) {
   const cs = wilson(d.c_sample.passed - d.c_sample.errors, d.c_sample.passed)[0];
   const body = `<h1 id="q1-h">Which invoices can an AI pass straight to payment, and how do you prove it first?</h1>
   <p class="headline">${esc(headline)}</p>
-  <p class="lede">In one real purchase-to-pay process (${int(d.log.kept.cases)} order lines), people decided ${int(d.candidates[0].manual_events)} times whether an invoice could be paid or needed someone to look. Three understudies auditioned for that call: a plain rule, Claude judging each invoice, and Claude writing a policy that code runs. Each was tested against what actually happened, on invoices held back from the builder.</p>
+  <p class="lede">In one real purchase-to-pay process (${int(d.log.kept.cases)} order lines), people decided ${int(d.candidates[0].manual_events)} times whether an invoice could be paid or needed someone to look. Three understudies auditioned for that call: a plain rule, Claude judging each invoice, and Claude writing a policy that code runs. Each was tested against what actually happened, on later invoices whose outcomes no understudy saw.</p>
   ${boundPlot(d)}
   <div class="verdict">
   <p class="say"><b><s>Rule set first</s> <em>replaced, kept on the record</em></b><span>No contender reaches a 99% lower bound on the shared sample (C ${pct(cs, 1)}, B ${pct(d.b.lower, 1)}), so the fixed rule wins by default.</span></p>
@@ -70,7 +70,7 @@ function q1(d) {
   <p class="struck small">The comparison rule was changed after the first policy's held-out result was known and before any other contender ran; under the original rule no contender clears the bar and the fixed rule wins by default, and both verdicts are shown.</p>
   ${openButton("c_wrong_held_out", `Open the ${int(cn - ck)} invoices the chosen policy passed wrongly`)}</div>`;
   return section("q1", "Q1", "<h1", body, [
-    `${int(d.held_out_n)} invoices held back from the builder until every rule was written`,
+    `${int(d.held_out_n)} later invoices, locked by checksum before any understudy ran. No understudy saw their outcomes`,
     `Bar: the 95% lower bound on straight-through calls being right must be at least 99%`,
     `Three policies written independently all landed between ${pct(Math.min(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} and ${pct(Math.max(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} right`,
   ]);
@@ -109,7 +109,7 @@ function q3(d) {
   }).join("");
   const bvc = d.b_vs_c, bLow = d.b.lower;
   const p1 = d.policies.find((p) => p.policy === 1);
-  const body = `<p>Every understudy saw only what was known when the invoice arrived, plus rates from earlier months (January to May 2018). They were scored on June to August 2018, which no one looked at while writing the rules.</p>
+  const body = `<p>Every understudy saw the invoice's own facts as they stood when it arrived, plus straight-through rates from order lines created in earlier months (January to May 2018). They were scored on order lines created June to August 2018. No understudy saw an outcome from those lines. The earlier-month rates use every outcome in the log, including ones that landed after held-out invoices began to arrive.</p>
   <ul>
   <li><strong>A, a plain rule.</strong> Pass an invoice if its group, in earlier months, was clean often enough to clear the bar on its own. No group was, so A passes nothing.</li>
   <li><strong>B, Claude judging each invoice.</strong> One model call per batch of invoices is too costly to run on every invoice, so B judged the ${int(d.sample_n)}-invoice shared sample, ${int(d.cost.b.calls)} calls of 25. Answers that failed code checks count as "leave to a person".</li>
@@ -208,6 +208,7 @@ function q5(d) {
     `Replayed on the chosen policy over the held-out months, ${esc(d.replay.weeks[0])} to ${esc(d.replay.weeks[d.replay.weeks.length - 1])}`,
     `The window is too short for the outcome lag: the second promotion came in ${wk(d.replay.events.filter((e) => e.event === "promoted").slice(-1)[0].week)} with few invoices left, so ${int(t.passed)} understates steady-state volume`,
     `The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} errors, mostly from one case type`,
+    `The policy was written from earlier-month rates, about half of which rest on outcomes that landed after the replay's first week`,
     `This replay cannot overturn the verdict above`,
   ], true);
 }
@@ -247,6 +248,7 @@ function q7(d) {
   ]);
 }
 
+const dayLong = (iso) => { const [y, m, dd] = iso.split("-").map(Number); return `${dd} ${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][m - 1]} ${y}`; };
 const STATES = new Set(["unlit", "standby", "go", "cut"]);
 
 /* ---------- Method ---------- */
@@ -265,7 +267,9 @@ function method(d) {
   <li>The data is from 2018 and has no free text, so no invoice wording was read.</li>
   <li>"Straight through" means no correction between the first invoice receipt and payment; corrections after payment are not seen.</li>
   <li>The agreement gate is a simulation with assumed reviewer behaviour.</li>
-  <li>B was scored on a ${int(d.sample_n)}-invoice sample, which cannot show a 99% lower bound at a 1% error rate.</li></ul></details>
+  <li>B was scored on a ${int(d.sample_n)}-invoice sample, which cannot show a 99% lower bound at a 1% error rate.</li>
+  <li>The builder saw held-out outcomes three times before the last rule was written: when ranking the candidate decisions, when the held-out base rate (${ratio(d.bar.pass_everything.full.precision, 2)}) showed the first bar was too low, and when the first policy was scored before the comparison rule was replaced. Each is in the decision records.</li>
+  <li>Earlier months are split by when the order line was created, not by when its outcome was known. ${int(d.lookahead.landed_on_or_after)} of the ${int(d.lookahead.fit_outcomes)} earlier-month outcomes (${pct(d.lookahead.landed_on_or_after / d.lookahead.fit_outcomes, 0)}) landed on or after ${dayLong(d.lookahead.first_heldout_day)}, the day the first held-out invoice arrived. So every understudy, and every week of the replay, used some rates a live system would not yet have had. No held-out outcome was used. The results were not recomputed with only the rates known at the time.</li></ul></details>
   <p class="small">Built from data on ${esc(d.built)}.</p>`;
   return section("method", "M", "How this was done", body, null);
 }

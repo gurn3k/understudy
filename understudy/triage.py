@@ -103,10 +103,11 @@ def fit_rates(records, field, label="straight_through"):
 def timing(case):
     """Replay timing for a labelled triage case: when the invoice arrived, when
     it cleared, and how many manual Clear Invoice / Remove Payment Block events
-    the case had. Not given to any contender."""
+    fell between the first invoice receipt and that clearing (later invoices on
+    the same order line were never judged). Not given to any contender."""
     evs = case["events"]
     first_ir = next(i for i, e in enumerate(evs) if e["act"] == IR)
     clear = next(i for i in range(first_ir + 1, len(evs)) if evs[i]["act"] == CLR)
-    touches = sum(1 for e in evs if e["act"] in (CLR, "Remove Payment Block") and e["kind"] == "manual")
+    touches = sum(1 for e in evs[first_ir:clear + 1] if e["act"] in (CLR, "Remove Payment Block") and e["kind"] == "manual")
     return {"id": case["id"], "invoice_ts": evs[first_ir]["ts"], "clear_ts": evs[clear]["ts"],
             "manual_touches": touches}

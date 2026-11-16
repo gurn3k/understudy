@@ -29,3 +29,9 @@ The packet behind this ruling misreported the agreement gate's first-promotion w
 - "At 0.7 it promoted in 17 of 20 runs, the earliest in week 26, and passed 6,031.5 invoices, 45.5 of them wrong (medians of 20 runs; range 0–86). At 0.5 it promoted in 1 of 20 runs."
 
 These replace the 0.9 and 0.7/0.5 sentences above. "No earlier promotion" at 0.7, "6,031" and "about 10 weeks" (that was the example run, not the median) were wrong.
+
+## Erratum 2 (2026-11-16)
+The touches figure counted every manual Clear Invoice and Remove Payment Block event on the order line, including clearings of later invoices the policy never judged. ADR 0013 counts the events on the passed invoice. Counted from the first invoice receipt to its clearing, the figure is 785, not 788. Three later clearings on three order lines were removed. The corrected sentence:
+- "While autonomous it passed 844 invoices, 15 of them wrong (1.8%, worse than the 99% bar), and removed 785 manual touches."
+
+This replaces the 788 sentence above. No other figure changes.

@@ -10,7 +10,7 @@ const root = new URL("..", import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), "utf8");
 
 // Quoted sentences from the records that fix the page's wording. Superseded ones are named in the erratum.
-const SUPERSEDED = ["about 10 weeks sooner", "with no earlier promotion"];
+const SUPERSEDED = ["about 10 weeks sooner", "with no earlier promotion", "removed 788 manual touches"];
 const sources = ["docs/adr/0015-comparison-rule-replaced.md", "docs/adr/0016-verdict.md", "docs/adr/0017-replay-claims.md"];
 const want = [];
 for (const s of sources) {

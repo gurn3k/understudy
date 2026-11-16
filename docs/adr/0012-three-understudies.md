@@ -37,3 +37,6 @@ A fixed rule is the honest thing to beat. C tests whether a model's value at sca
 B's result rests on a sample of 1,500. C's policy is only as good as the aggregates it was given.
 
 Note: ADR 0015 replaces this ADR's rule for comparing the contenders on the shared sample.
+
+## Amendment 1 (2026-11-16, after all runs; a limit, not a rule change)
+"Earlier months" means order lines created January to May 2018, whatever the date of their outcome. 51,882 of 97,602 earlier-month outcomes (53%) landed on or after 2018-06-04, when the first held-out invoice arrived. A, B and C therefore used rates a live system would not yet have had, and the replay's early weeks rely on them. No held-out outcome leaked. The results are not recomputed, because changing the fitting data after results are known is the forking path ADR 0015 guards against. The page states this as a limit.

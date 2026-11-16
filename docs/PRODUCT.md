@@ -4,7 +4,7 @@
 - **First reader:** someone deciding where AI should go in an operational process. They skim. In 30 seconds they need:
   1. the question, in one line
   2. the answer, as one or two numbers they can repeat
-  3. why to trust it: real data, results held back from the builder, failures shown
+  3. why to trust it: real data, outcomes no contender saw, failures shown
 - **Second reader:** someone checking the work. They need the method, the rules written before the runs, the misses, and a way to open the cases behind any number.
 
 ## The one-line question
