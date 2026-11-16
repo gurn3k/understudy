@@ -38,10 +38,17 @@ const send = (method, params = {}) => new Promise((r) => { const i = ++id; pendi
 await send("Page.enable");
 await send("Network.setCacheDisabled", { cacheDisabled: true });
 await send("Page.navigate", { url });
-for (let i = 0; i < 60; i++) {
+let loaded = false;
+for (let i = 0; i < 120 && !loaded; i++) {
   await sleep(250);
   const r = await send("Runtime.evaluate", { expression: "!document.querySelector('[data-loading]') && !!document.querySelector('main section')", returnByValue: true });
-  if (r.result.result.value) break;
+  loaded = r.result.result.value;
+}
+if (!loaded) {
+  console.log("PAGE DID NOT LOAD within 30 s: no sentences checked");
+  ws.close();
+  proc.kill();
+  process.exit(2);
 }
 const res = await send("Runtime.evaluate", { expression: "document.querySelector('main').textContent", returnByValue: true });
 ws.close();
