@@ -78,11 +78,12 @@ PLANTED = [
         (CLR, "batch_02", "2018-08-10T10:00:00", 600.0),
     ]),
     # P7: partial deliveries and invoices: repeats that are not rework.
+    #     The file lists one goods receipt out of time order.
     case("4500000007_00001", IAG, "vendor_0007", [
         (CREATE, "user_001", "2018-09-01T10:00:00", 300.0),
+        (GR, "user_001", "2018-09-05T10:00:00", 300.0),  # out of time order in the file
         (GR, "user_001", "2018-09-02T10:00:00", 100.0),
         (IR, "user_002", "2018-09-03T10:00:00", 100.0),
-        (GR, "user_001", "2018-09-05T10:00:00", 300.0),
         (IR, "user_002", "2018-09-06T10:00:00", 300.0),
         (CLR, "batch_02", "2018-09-20T10:00:00", 300.0),
     ]),

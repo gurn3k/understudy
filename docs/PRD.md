@@ -27,7 +27,7 @@ Every size and every accuracy figure on the page opens the real cases behind it.
 - **Value range:** manual events per year × minutes per event (low 2, base 5, high 10). The minutes are stated assumptions shown on the page, not measured.
 
 ## Measurement bars (each a test that can fail)
-- **Data check before counting.** Events dated outside 2017-01-01 to 2019-12-31, exact duplicate events (same case, activity, time, user and value), and cases with no creation event are counted, shown and excluded. No published figure includes them. Events dated before their item's creation are kept and flagged, not excluded, because invoices before orders happen in real purchasing (amended 2026-11-15, ADR 0007).
+- **Data check before counting.** Events dated outside 2017-01-01 to 2019-12-31, and cases with no creation event are counted, shown and excluded. Same-minute identical events (same case, activity, minute, user and value) are collapsed to one and reported by activity (ADR 0008). No published figure includes them. Events dated before their item's creation are kept and flagged, not excluded, because invoices before orders happen in real purchasing (amended 2026-11-15, ADR 0007).
 - **Recount.** A separate recount script reproduces every published count exactly. A typed number on the page fails the build.
 - **Held-out split.** Split by time. Rules and prompts are built only on cases created in earlier months, and tested only on later months. The test set is locked before the first helper run.
 - **Metrics.** Precision, recall and coverage per case type, each shown as a count over a count.
