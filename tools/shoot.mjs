@@ -41,6 +41,7 @@ const send = (method, params = {}) => new Promise((r) => { const i = ++id; pendi
 
 await send("Runtime.enable");
 await send("Page.enable");
+await send("Network.setCacheDisabled", { cacheDisabled: true });
 for (const spec of shots) {
   const [w, h, scheme, full] = spec.split(":");
   await send("Emulation.setDeviceMetricsOverride", { width: +w, height: +h, deviceScaleFactor: 1, mobile: +w < 700 });
@@ -52,13 +53,13 @@ for (const spec of shots) {
     if (r.result.result.value) break;
   }
   await sleep(300);
-  const m = await send("Runtime.evaluate", { expression: "JSON.stringify({sw: document.documentElement.scrollWidth, iw: innerWidth, h: document.documentElement.scrollHeight})", returnByValue: true });
+  const m = await send("Runtime.evaluate", { expression: "JSON.stringify({sw: document.documentElement.scrollWidth, iw: innerWidth, h: document.documentElement.scrollHeight, fonts: [...document.fonts].filter((f) => f.status !== 'loaded').map((f) => f.family + ' ' + f.weight + ' ' + f.status)})", returnByValue: true });
   const dims = JSON.parse(m.result.result.value);
   const clip = full ? { x: 0, y: 0, width: +w, height: dims.h, scale: 1 } : undefined;
   const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: !!full, ...(clip ? { clip } : {}) });
   const name = `${w}-${scheme}${full ? "-full" : ""}.png`;
   writeFileSync(join(outdir, name), Buffer.from(shot.result.data, "base64"));
-  console.log(`${name} scrollWidth=${dims.sw} innerWidth=${dims.iw} height=${dims.h}${dims.sw > dims.iw ? "  OVERFLOW" : ""}`);
+  console.log(`${name} scrollWidth=${dims.sw} innerWidth=${dims.iw} height=${dims.h}${dims.sw > dims.iw ? "  OVERFLOW" : ""}${dims.fonts.length ? "  FONTS NOT LOADED: " + dims.fonts.join(", ") : ""}`);
 }
 console.log(errors.length ? "page errors: " + errors.join(" | ") : "no page errors");
 ws.close();

@@ -100,6 +100,9 @@ def validate(policy):
                 errs.append(f"rule {i}: condition is not an object")
                 continue
             f, op, v = c.get("field"), c.get("op"), c.get("value")
+            if not isinstance(f, str) or not isinstance(op, str):
+                errs.append(f"rule {i}: field and op must be strings")
+                continue
             if f not in FIELDS:
                 errs.append(f"rule {i}: unknown field {f!r}")
                 continue

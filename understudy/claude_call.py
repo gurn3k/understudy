@@ -58,9 +58,13 @@ def extract_json(text):
     if start < 0 or end <= start:
         return None
     try:
-        return json.loads(text[start:end + 1])
-    except json.JSONDecodeError:
+        return json.loads(text[start:end + 1], parse_constant=_reject_constant)
+    except (ValueError, RecursionError):  # JSONDecodeError is a ValueError
         return None
+
+
+def _reject_constant(name):
+    raise ValueError(f"non-finite number {name} in reply")
 
 
 class Caller:
@@ -74,6 +78,8 @@ class Caller:
         self.store.mkdir(parents=True, exist_ok=True)
 
     def path(self, key):
+        if not key or any(c in key for c in "/\\:") or key.startswith("."):
+            raise ValueError(f"bad cache key {key!r}")
         return self.store / f"{key}.json"
 
     def ask(self, key, prompt):

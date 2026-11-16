@@ -35,7 +35,7 @@ function boundPlot(d) {
   const rows = [];
   d.policies.forEach((p) => {
     const [k, n] = p.held_out.precision;
-    rows.push({ lab: `C, policy ${p.policy}${p.chosen ? (narrow ? "*" : " (chosen)") : ""}`, k, n, chosen: p.chosen, where: "all held-out" });
+    rows.push({ lab: `C, policy ${esc(p.policy)}${p.chosen ? (narrow ? "*" : " (chosen)") : ""}`, k, n, chosen: p.chosen, where: "all held-out" });
   });
   rows.push({ lab: narrow ? "B, per invoice" : "B, Claude per invoice", k: d.b.sample.passed - d.b.sample.errors, n: d.b.sample.passed, where: "sample" });
   const pe = d.bar.pass_everything.full.precision;
@@ -104,7 +104,7 @@ function q3(d) {
   const a = d.a.held_out;
   const pols = d.policies.map((p) => {
     const h = p.held_out;
-    return row(`C, policy ${p.policy}`, `${p.rules} rules${p.chosen ? ", chosen on earlier months" : ""}${p.seen_when_rule_written ? "; seen" : "; unseen"}`,
+    return row(`C, policy ${esc(p.policy)}`, `${int(p.rules)} rules${p.chosen ? ", chosen on earlier months" : ""}${p.seen_when_rule_written ? "; seen" : "; unseen"}`,
       ratio(h.precision, 2), ratio(h.coverage, 1), pct(h.precision_lower, 2), h.precision_lower >= 0.99, p.chosen ? "chosen" : "");
   }).join("");
   const bvc = d.b_vs_c, bLow = d.b.lower;
@@ -116,8 +116,8 @@ function q3(d) {
   <li><strong>C, Claude writing a policy.</strong> Claude saw earlier-month tables only and wrote rules in a small language that code checks and then runs. Three policies were written independently; the one chosen is the one with the most earlier-month coverage that still cleared the bar there.</li>
   </ul>
   <div class="tablewrap"><table><caption>Scored on all ${int(d.held_out_n)} held-out invoices</caption><thead><tr><th>Understudy</th><th>Notes</th><th>Passed</th><th>Right</th><th>Lower bound</th><th>State</th></tr></thead><tbody>
-  ${row("A, plain rule", `${d.a.cells} groups qualified`, "none", ratio(a.coverage, 1), "none", false)}${pols}</tbody></table></div>
-  <p class="small">One of the three policies (policy ${p1.policy}) does clear the bar on held-out invoices (lower bound ${pct(p1.held_out.precision_lower, 2)}), but its result had been seen before the rule was rewritten and the earlier-month selection did not choose it, so it does not count towards the verdict; all three are shown.</p>
+  ${row("A, plain rule", `${int(d.a.cells)} groups qualified`, "none", ratio(a.coverage, 1), "none", false)}${pols}</tbody></table></div>
+  <p class="small">One of the three policies (policy ${esc(p1.policy)}) does clear the bar on held-out invoices (lower bound ${pct(p1.held_out.precision_lower, 2)}), but its result had been seen before the rule was rewritten and the earlier-month selection did not choose it, so it does not count towards the verdict; all three are shown.</p>
   <h3>B against C, on the same ${int(d.sample_n)} invoices</h3>
   <p>B passed ${int(bvc.B_passed)} and was wrong ${bvc.B_errors === 1 ? "once" : int(bvc.B_errors) + " times"} (lower bound ${pct(bLow, 1)}). C's chosen policy passed ${int(bvc.C_passed)} and was wrong ${int(bvc.C_errors)} times. Of the wrong passes only one of them made, ${int(bvc.C_only_errors)} were C's and ${int(bvc.B_only_errors)} were B's (exact sign test, p = ${bvc.p_B_better.toFixed(3)}). B made fewer wrong passes, but it passed far fewer invoices, so under the written rule the two are not separated and cost decides: C.</p>
   ${openButton("b_passes_sample", `Open B's ${int(bvc.B_passed)} straight-through calls`)} ${openButton("c_only_errors_sample", `Open the ${int(bvc.C_only_errors)} errors only C made`)}`;
@@ -150,7 +150,7 @@ function cueSheet(id, d, states, opts) {
   g += `<span role="columnheader" class="rowstate small">Now</span></div>`;
   types.forEach((t, r) => {
     g += `<div role="row" style="display:contents"><span role="rowheader" class="rowlab" title="${esc(t)}">${esc(t.replace("3-way match, invoice ", "").replace(" GR / ", " GR \u00B7 "))}</span>`;
-    states[t].forEach((s, i) => (g += `<span role="cell" class="cell ${s}" data-r="${r}" data-i="${i}" aria-label="${esc(weeks[i])}: ${s.toUpperCase()}"><i></i></span>`));
+    states[t].forEach((s, i) => (s = STATES.has(s) ? s : "unlit", g += `<span role="cell" class="cell ${s}" data-r="${r}" data-i="${i}" aria-label="${esc(weeks[i])}: ${s.toUpperCase()}"><i></i></span>`));
     g += `<span role="cell" class="rowstate state" data-now="${r}"></span></div>`;
   });
   g += "</div>";
@@ -205,7 +205,7 @@ function q5(d) {
   <p>Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion.</p>
   ${openButton("replay_autonomous", `Open the ${int(t.passed)} invoices passed on their own`)}`;
   return section("q5", "Q5 GO", "Trust earned per case type, week by week", body, [
-    `Replayed on the chosen policy over the held-out months, ${d.replay.weeks[0]} to ${d.replay.weeks[d.replay.weeks.length - 1]}`,
+    `Replayed on the chosen policy over the held-out months, ${esc(d.replay.weeks[0])} to ${esc(d.replay.weeks[d.replay.weeks.length - 1])}`,
     `The window is too short for the outcome lag: the second promotion came in ${wk(d.replay.events.filter((e) => e.event === "promoted").slice(-1)[0].week)} with few invoices left, so ${int(t.passed)} understates steady-state volume`,
     `The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} errors, mostly from one case type`,
     `This replay cannot overturn the verdict above`,
@@ -247,9 +247,11 @@ function q7(d) {
   ]);
 }
 
+const STATES = new Set(["unlit", "standby", "go", "cut"]);
+
 /* ---------- Method ---------- */
 function method(d) {
-  const adrs = d.adrs.map((a) => `<li><span class="n">${esc(a.n)}</span><span class="${a.replaced ? "replaced" : ""}">${esc(a.title)}${a.amendments ? ` <em>${a.amendments} amendment${a.amendments > 1 ? "s" : ""}</em>` : ""}${a.replaced ? " <em>replaced</em>" : ""}</span></li>`).join("");
+  const adrs = d.adrs.map((a) => `<li><span class="n">${esc(a.n)}</span><span class="${a.replaced ? "replaced" : ""}">${esc(a.title)}${a.amendments ? ` <em>${int(a.amendments)} amendment${a.amendments > 1 ? "s" : ""}</em>` : ""}${a.replaced ? " <em>replaced</em>" : ""}</span></li>`).join("");
   const body = `<p>The data is the ${esc(d.source.name)} event log (DOI ${esc(d.source.doi)}, ${esc(d.source.licence)}). The log was parsed in one pass and every total recounted by a second, independent program; both match the published counts.</p>
   <details><summary>The rules, in the order they were written</summary>
   <p class="small">Every rule was written down before the run it governs. Rules replaced later stay on the record, struck through, with the reason in the decision record.</p>
@@ -264,7 +266,7 @@ function method(d) {
   <li>"Straight through" means no correction between the first invoice receipt and payment; corrections after payment are not seen.</li>
   <li>The agreement gate is a simulation with assumed reviewer behaviour.</li>
   <li>B was scored on a ${int(d.sample_n)}-invoice sample, which cannot show a 99% lower bound at a 1% error rate.</li></ul></details>
-  <footer class="end">Built from data on ${esc(d.built)}. Source data: ${esc(d.source.name)}, ${esc(d.source.licence)}.</footer>`;
+  <p class="small">Built from data on ${esc(d.built)}.</p>`;
   return section("method", "M", "How this was done", body, null);
 }
 
@@ -294,7 +296,7 @@ function closeDrawer() { $("#drawer").hidden = true; if (lastFocus) lastFocus.fo
 
 /* ---------- Boot ---------- */
 async function boot() {
-  const main = $("#main");
+  const main = $("#content");
   try {
     const res = await fetch("data.json");
     if (!res.ok) throw new Error(res.status);

@@ -36,6 +36,7 @@ const pending = new Map();
 ws.addEventListener("message", (m) => { const x = JSON.parse(m.data); if (pending.has(x.id)) { pending.get(x.id)(x); pending.delete(x.id); } });
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 await send("Page.enable");
+await send("Network.setCacheDisabled", { cacheDisabled: true });
 await send("Page.navigate", { url });
 for (let i = 0; i < 60; i++) {
   await sleep(250);

@@ -91,6 +91,9 @@ def gate(ids, reply):
             issues.append("non-object entry")
             continue
         i, dec = d.get("id"), d.get("decision")
+        if not isinstance(i, str) or not isinstance(dec, str):
+            issues.append("id or decision is not a string")
+            continue
         if i not in out:
             issues.append(f"unknown id {i!r}")
             continue

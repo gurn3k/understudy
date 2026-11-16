@@ -33,18 +33,20 @@ CASE_FIELDS = {
 def to_utc(text):
     """Parse an XES timestamp to UTC. Missing or unreadable -> None.
     A timestamp with no zone is taken as UTC."""
-    if not text:
+    if not text or not isinstance(text, str):
         return None
     try:
         ts = datetime.fromisoformat(text)
-    except ValueError:
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        return ts.astimezone(timezone.utc)
+    except (ValueError, TypeError, OverflowError):
         return None
-    if ts.tzinfo is None:
-        ts = ts.replace(tzinfo=timezone.utc)
-    return ts.astimezone(timezone.utc)
 
 
 def resource_kind(user):
+    if not isinstance(user, str):
+        return "unclassified"
     if user.startswith("batch_"):
         return "batch"
     if user.startswith("user_"):
@@ -57,7 +59,10 @@ def _value(el):
     if tag == "boolean":
         return v == "true"
     if tag == "float":
-        return float(v)
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
     return v
 
 
@@ -88,6 +93,8 @@ def iter_raw_cases(path):
                     "user": d.get("User") or d.get("org:resource") or "UNKNOWN",
                     "worth": d.get("Cumulative net worth (EUR)"),
                 })
+            if not isinstance(attrs.get("id"), str):
+                attrs["id"] = "<no id>"
             yield attrs, events
             el.clear()
             root.clear()  # drop the finished trace so memory stays flat

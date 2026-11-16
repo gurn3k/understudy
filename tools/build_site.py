@@ -122,7 +122,7 @@ def main():
     ex = rep["agreement"]["0.9_example"]
 
     def inv(r, **extra):
-        return {"id": r["id"], "type": case_type(r), "value": r.get("invoice_value"), "vendor": r.get("vendor"),
+        return {"id": r["id"], "type": case_type(r), "value": r.get("invoice_value"),
                 "straight_through": bool(r["straight_through"]), **extra}
 
     b_err = {r["id"] for r in sample if b_dec[r["id"]] and not r["straight_through"]}
