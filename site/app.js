@@ -35,7 +35,7 @@ function boundPlot(d) {
   const rows = [];
   d.policies.forEach((p) => {
     const [k, n] = p.held_out.precision;
-    rows.push({ lab: `C, policy ${esc(p.policy)}${p.chosen ? (narrow ? "*" : " (chosen)") : ""}`, k, n, chosen: p.chosen, where: "all held-out" });
+    rows.push({ lab: `C, policy ${p.policy}${p.chosen ? (narrow ? "*" : " (chosen)") : ""}`, k, n, chosen: p.chosen, where: "all held-out" });
   });
   rows.push({ lab: narrow ? "B, per invoice" : "B, Claude per invoice", k: d.b.sample.passed - d.b.sample.errors, n: d.b.sample.passed, where: "sample" });
   const pe = d.bar.pass_everything.full.precision;
@@ -44,7 +44,7 @@ function boundPlot(d) {
   const x = (v) => L + (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (W - L - R);
   const H = top + rows.length * rowH + 26;
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="plot-t plot-d"><title id="plot-t">95% interval for how often each contender's straight-through calls were right</title>
-  <desc id="plot-d">${rows.map((r) => { const [a, b] = wilson(r.k, r.n); return `${r.lab}: ${pct(r.k / r.n, 2)} right, interval ${pct(a, 2)} to ${pct(b, 2)}`; }).join("; ")}. The bar is a lower bound of 99%.</desc>`;
+  <desc id="plot-d">${rows.map((r) => { const [a, b] = wilson(r.k, r.n); return `${esc(r.lab)}: ${pct(r.k / r.n, 2)} right, interval ${pct(a, 2)} to ${pct(b, 2)}`; }).join("; ")}. The bar is a lower bound of 99%.</desc>`;
   for (let v = 0.95; v <= 1.0001; v += narrow ? 0.025 : 0.01) s += `<line class="tick" x1="${x(v)}" x2="${x(v)}" y1="${top - 8}" y2="${H - 22}"/><text x="${x(v)}" y="${H - 6}" text-anchor="middle">${(v * 100).toFixed(narrow ? 1 : 0).replace(".0", "")}%</text>`;
   s += `<line class="barline" x1="${x(0.99)}" x2="${x(0.99)}" y1="${top - 22}" y2="${H - 22}"/><text class="barlab" x="${x(0.99) - 6}" y="${top - 12}" text-anchor="end">BAR 99%</text>`;
   rows.forEach((r, i) => {
@@ -204,7 +204,7 @@ function q5(d) {
   <p>While autonomous it passed ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar), and removed ${int(t.touches_removed)} manual touches.</p>
   <p>Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion.</p>
   ${openButton("replay_autonomous", `Open the ${int(t.passed)} invoices passed on their own`)}`;
-  return section("q5", "Q5 GO", "Trust earned per case type, week by week", body, [
+  return section("q5", `Q5 ${endState(d.replay.states).toUpperCase()}`, "Trust earned per case type, week by week", body, [
     `Replayed on the chosen policy over the held-out months, ${esc(d.replay.weeks[0])} to ${esc(d.replay.weeks[d.replay.weeks.length - 1])}`,
     `The window is too short for the outcome lag: the second promotion came in ${wk(d.replay.events.filter((e) => e.event === "promoted").slice(-1)[0].week)} with few invoices left, so ${int(t.passed)} understates steady-state volume`,
     `The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} errors, mostly from one case type`,
@@ -249,6 +249,7 @@ function q7(d) {
 }
 
 const dayLong = (iso) => { const [y, m, dd] = iso.split("-").map(Number); return `${dd} ${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][m - 1]} ${y}`; };
+const endState = (states) => { const last = Object.values(states).map((r) => r[r.length - 1]); return last.includes("go") ? "go" : last.includes("cut") ? "cut" : "standby"; };
 const STATES = new Set(["unlit", "standby", "go", "cut"]);
 
 /* ---------- Method ---------- */
@@ -269,7 +270,7 @@ function method(d) {
   <li>The agreement gate is a simulation with assumed reviewer behaviour.</li>
   <li>B was scored on a ${int(d.sample_n)}-invoice sample, which cannot show a 99% lower bound at a 1% error rate.</li>
   <li>The builder saw held-out outcomes three times before the last rule was written: when ranking the candidate decisions, when the held-out base rate (${ratio(d.bar.pass_everything.full.precision, 2)}) showed the first bar was too low, and when the first policy was scored before the comparison rule was replaced. Each is in the decision records.</li>
-  <li>Earlier months are split by when the order line was created, not by when its outcome was known. ${int(d.lookahead.landed_on_or_after)} of the ${int(d.lookahead.fit_outcomes)} earlier-month outcomes (${pct(d.lookahead.landed_on_or_after / d.lookahead.fit_outcomes, 0)}) landed on or after ${dayLong(d.lookahead.first_heldout_day)}, the day the first held-out invoice arrived. So every understudy, and every week of the replay, used some rates a live system would not yet have had. No held-out outcome was used. The results were not recomputed with only the rates known at the time.</li></ul></details>
+  <li>Earlier months are split by when the order line was created, not by when its outcome was known. ${int(d.lookahead.landed_on_or_after)} of the ${int(d.lookahead.fit_outcomes)} earlier-month outcomes (${pct(d.lookahead.landed_on_or_after / d.lookahead.fit_outcomes, 0)}) landed on or after ${dayLong(d.lookahead.first_heldout_day)}, the day the first held-out invoice arrived. So every understudy, and every week of the replay, used some rates a live system would not yet have had. No held-out outcome was used in those rates. The results were not recomputed with only the rates known at the time.</li></ul></details>
   <p class="small">Built from data on ${esc(d.built)}.</p>`;
   return section("method", "M", "How this was done", body, null);
 }
@@ -329,7 +330,6 @@ async function boot() {
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#drawer").hidden) closeDrawer(); });
 
   const verdictGo = d.policies.some((p) => p.chosen && p.held_out.precision_lower >= 0.99);
-  const endState = (states) => { const last = Object.values(states).map((r) => r[r.length - 1]); return last.includes("go") ? "go" : last.includes("cut") ? "cut" : "standby"; };
   const LAMPS = { q1: verdictGo ? "go" : "standby", q3: verdictGo ? "go" : "standby", q5: endState(d.replay.states), q6: endState(d.agreement.example_states) };
   document.querySelectorAll(".cues a").forEach((a) => {
     const st = LAMPS[a.getAttribute("href").slice(1)];

@@ -44,7 +44,7 @@ Requires Python 3.12+ and no third-party packages. The live Claude runs used the
 
 ## Data
 
-The log is the **BPI Challenge 2019** dataset by van Dongen, B.F., published by 4TU.ResearchData under **CC BY 4.0** (DOI [10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1](https://doi.org/10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1)). The data was filtered and aggregated for this analysis. Order-line and vendor identifiers shown on the page are the dataset's own anonymised identifiers.
+The log is the **BPI Challenge 2019** dataset by van Dongen, B.F., published by 4TU.ResearchData under **CC BY 4.0** (DOI [10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1](https://doi.org/10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1)). The data was filtered and aggregated for this analysis. Order-line identifiers shown on the page are the dataset's own anonymised identifiers.
 
 ## Licences
 
