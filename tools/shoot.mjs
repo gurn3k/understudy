@@ -46,7 +46,12 @@ for (const spec of shots) {
   await send("Emulation.setDeviceMetricsOverride", { width: +w, height: +h, deviceScaleFactor: 1, mobile: +w < 700 });
   await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: scheme }, { name: "prefers-reduced-motion", value: "reduce" }] });
   await send("Page.navigate", { url });
-  await sleep(2500);
+  for (let i = 0; i < 60; i++) {
+    await sleep(250);
+    const r = await send("Runtime.evaluate", { expression: "!document.querySelector('[data-loading]') && !!document.querySelector('main section') && document.fonts.status === 'loaded'", returnByValue: true });
+    if (r.result.result.value) break;
+  }
+  await sleep(300);
   const m = await send("Runtime.evaluate", { expression: "JSON.stringify({sw: document.documentElement.scrollWidth, iw: innerWidth, h: document.documentElement.scrollHeight})", returnByValue: true });
   const dims = JSON.parse(m.result.result.value);
   const clip = full ? { x: 0, y: 0, width: +w, height: dims.h, scale: 1 } : undefined;
