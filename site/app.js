@@ -24,8 +24,7 @@ function openButton(set, label) {
 
 function section(id, cue, title, body, note, wide = false) {
   return `<section id="${id}" class="${wide ? "wide" : ""}" aria-labelledby="${id}-h">
-  <div class="col"><span class="marg" aria-hidden="true">${esc(cue)}</span>
-  ${title === "<h1" ? "" : `<h2 id="${id}-h">${title}</h2>`}${body}</div>
+  <div class="col">${title === "<h1" ? body.replace('<h1 id="q1-h">', `<h1 id="q1-h"><span class="marg" aria-hidden="true">${esc(cue)}</span>`) : `<h2 id="${id}-h"><span class="marg" aria-hidden="true">${esc(cue)}</span>${title}</h2>${body}`}</div>
   ${note ? `<aside class="note" aria-label="On this cue"><h3>On this cue</h3><ul>${note.map((x) => `<li>${x}</li>`).join("")}</ul></aside>` : "<div></div>"}
 </section>`;
 }
@@ -225,7 +224,7 @@ function q6(d) {
   <p>Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about ${int(med(gaps9))} weeks sooner (median ${wk(medWeek(a9.first))} against ${wk(d.replay.first)}; range ${int(Math.min(...gaps9))}\u2013${int(Math.max(...gaps9))} weeks across 20 runs) and passed ${half(a9.passed_median)} invoices, ${half(a9.wrong_median)} of them wrong (medians of 20 runs; range ${int(a9.wrong_range[0])}\u2013${int(a9.wrong_range[1])}), against ${int(t.passed)} and ${int(t.wrong)} on outcomes. That is ${word(times)} times the wrong payments, at a lower rate per pass (${pct(a9.wrong_median / a9.passed_median, 2)} against ${pct(t.wrong / t.passed, 1)}).</p>
   <p>At 0.7 it promoted in ${int(a7.promoted_runs)} of 20 runs, the earliest in ${wk(a7.first[0])}, and passed ${half(a7.passed_median)} invoices, ${half(a7.wrong_median)} of them wrong (medians of 20 runs; range ${int(a7.wrong_range[0])}\u2013${int(a7.wrong_range[1])}). At 0.5 it promoted in ${int(a5.promoted_runs)} of 20 runs.</p>
   <p><strong>The agreement it promoted on was mostly copied, so it measured the reviewers, not the helper.</strong></p>`;
-  return section("q6", "Q6 SIMULATED", "What happens when agreement is the gate", body, [
+  return section("q6", "Q6", "What happens when agreement is the gate", body, [
     `This section is a simulation; the copy rates are assumptions, not measurements of real reviewers`,
     `The low error rate per pass comes from a policy that is about 99% right. On these settings, a helper wrong 5% of the time would still show about 99.4% agreement at 0.9 (arithmetic, not a run)`,
     `The simulated gate still withdraws autonomy on outcomes`,

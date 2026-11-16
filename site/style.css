@@ -76,8 +76,8 @@ section:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
 @media (min-width: 1240px) { section { grid-template-columns: minmax(0, 68ch) minmax(200px, 1fr); } section.wide { grid-template-columns: minmax(0, 1fr); } section.wide aside.note { margin-top: 24px; padding-top: 16px; border-top: 2px solid var(--ink); } section.wide aside.note ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 32px; } }
 .col { min-width: 0; }
 .col { position: relative; }
-.marg { display: inline-block; font: 700 16px var(--display); color: var(--pencil); letter-spacing: .06em; transform: rotate(-4deg); margin: 0 0 6px; }
-@media (min-width: 900px) { .marg { position: absolute; right: calc(100% + 14px); top: 10px; margin: 0; white-space: nowrap; } }
+.marg { display: inline-block; font: 700 15px/1 var(--display); color: var(--pencil); letter-spacing: .04em; transform: rotate(-7deg); margin-right: 10px; vertical-align: .35em; white-space: nowrap; }
+@media (min-width: 900px) { h1, h2 { position: relative; } .marg { position: absolute; right: calc(100% + 12px); top: .5em; margin: 0; } }
 h1 { font: 700 clamp(34px, 5.2vw, 56px)/1.04 var(--display); letter-spacing: -.01em; margin: 0 0 22px; text-wrap: balance; max-width: 22ch; }
 h2 { font: 700 clamp(28px, 3.4vw, 38px)/1.1 var(--display); margin: 0 0 16px; text-wrap: balance; }
 h3 { font: 700 21px/1.2 var(--display); margin: 36px 0 10px; letter-spacing: .01em; }
@@ -100,7 +100,7 @@ aside.note li { padding: 8px 0; border-top: 1px solid var(--rule); }
 .say { display: flex; gap: 12px; align-items: baseline; margin: 0 0 10px; }
 .say b em { display: block; font: 500 12px var(--body); letter-spacing: 0; text-transform: none; color: var(--ink-2); font-style: italic; }
 .say b s { text-decoration-color: var(--pencil); text-decoration-thickness: 2px; }
-.say b { flex: none; font: 700 13px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--pencil); min-width: 9.5em; }
+.say b { width: 11em; font: 700 13px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--pencil); min-width: 9.5em; }
 @media (max-width: 480px) { .say { flex-direction: column; gap: 2px; } }
 .struck { color: var(--ink-2); }
 .struck s { text-decoration-color: var(--pencil); text-decoration-thickness: 2px; }
