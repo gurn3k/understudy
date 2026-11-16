@@ -1,0 +1,46 @@
+{
+  "_note": "Worked out by hand from the case list in make_fixtures.py. Never regenerate with code.",
+  "planted.xes": {
+    "raw": {"cases": 8, "events": 40},
+    "kept": {"cases": 7, "events": 35, "manual": 24, "batch": 9, "unclassified": 2},
+    "excluded": {
+      "bad_date_events": {"count": 1, "cases": ["4500000003_00001"]},
+      "duplicate_events": {"count": 1, "cases": ["4500000004_00001"]},
+      "no_creation_cases": {"count": 1, "events": 3, "cases": ["4500000005_00001"]}
+    },
+    "flagged": {
+      "before_creation_events": {"count": 1, "cases": ["4500000008_00001"]},
+      "block_removed_before_goods_receipt": {"count": 1, "by_batch": 1, "cases": ["4500000008_00001"]}
+    },
+    "activities": {
+      "Create Purchase Order Item": {"events": 7, "manual": 6, "batch": 0, "unclassified": 1, "cases": 7, "repeat": null},
+      "Vendor creates invoice": {"events": 1, "manual": 0, "batch": 0, "unclassified": 1, "cases": 1, "repeat": null},
+      "Record Invoice Receipt": {"events": 8, "manual": 8, "batch": 0, "unclassified": 0, "cases": 7, "repeat": "multiple expected"},
+      "Record Goods Receipt": {"events": 7, "manual": 7, "batch": 0, "unclassified": 0, "cases": 6, "repeat": "multiple expected"},
+      "Remove Payment Block": {"events": 3, "manual": 1, "batch": 2, "unclassified": 0, "cases": 3, "repeat": [0, 3]},
+      "Clear Invoice": {"events": 7, "manual": 0, "batch": 7, "unclassified": 0, "cases": 7, "repeat": null},
+      "Change Price": {"events": 2, "manual": 2, "batch": 0, "unclassified": 0, "cases": 1, "repeat": [1, 1], "repeat_cases": ["4500000002_00001"]}
+    },
+    "vendor_name_roundtrip": {"4500000001_00001": "Smith & Sons <Ltd>"}
+  },
+  "clean.xes": {
+    "raw": {"cases": 3, "events": 12},
+    "kept": {"cases": 3, "events": 12, "manual": 8, "batch": 4, "unclassified": 0},
+    "excluded": {
+      "bad_date_events": {"count": 0, "cases": []},
+      "duplicate_events": {"count": 0, "cases": []},
+      "no_creation_cases": {"count": 0, "events": 0, "cases": []}
+    },
+    "flagged": {
+      "before_creation_events": {"count": 0, "cases": []},
+      "block_removed_before_goods_receipt": {"count": 0, "by_batch": 0, "cases": []}
+    },
+    "activities": {
+      "Create Purchase Order Item": {"events": 3, "manual": 3, "batch": 0, "unclassified": 0, "cases": 3, "repeat": null},
+      "Record Goods Receipt": {"events": 2, "manual": 2, "batch": 0, "unclassified": 0, "cases": 2, "repeat": "multiple expected"},
+      "Record Invoice Receipt": {"events": 3, "manual": 3, "batch": 0, "unclassified": 0, "cases": 3, "repeat": "multiple expected"},
+      "Remove Payment Block": {"events": 1, "manual": 0, "batch": 1, "unclassified": 0, "cases": 1, "repeat": [0, 1]},
+      "Clear Invoice": {"events": 3, "manual": 0, "batch": 3, "unclassified": 0, "cases": 3, "repeat": null}
+    }
+  }
+}
