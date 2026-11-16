@@ -24,7 +24,7 @@ function openButton(set, label) {
 
 function section(id, cue, title, body, note, wide = false) {
   return `<section id="${id}" class="${wide ? "wide" : ""}" aria-labelledby="${id}-h">
-  <div class="col"><p class="runhead"><span>${esc(cue)}</span><span class="marg">${esc(id === "method" ? "M" : id.toUpperCase())}</span></p>
+  <div class="col"><span class="marg" aria-hidden="true">${esc(cue)}</span>
   ${title === "<h1" ? "" : `<h2 id="${id}-h">${title}</h2>`}${body}</div>
   ${note ? `<aside class="note" aria-label="On this cue"><h3>On this cue</h3><ul>${note.map((x) => `<li>${x}</li>`).join("")}</ul></aside>` : "<div></div>"}
 </section>`;
@@ -62,14 +62,15 @@ function q1(d) {
   const headline = `No contender earned trust at the 99% bar: ${aPasses === 0 ? "the fixed rule passes nothing" : `the fixed rule passes ${int(aPasses)}`}, and the policy Claude wrote passes ${pct(cn / d.held_out_n, 1)} of held-out invoices at ${pct(ck / cn, 2)} correct, just short of the bar (lower bound ${pct(c.held_out.precision_lower, 2)}).`;
   const cs = wilson(d.c_sample.passed - d.c_sample.errors, d.c_sample.passed)[0];
   const body = `<h1 id="q1-h">Which invoices can an AI pass straight to payment, and how do you prove it first?</h1>
+  <p class="headline">${esc(headline)}</p>
   <p class="lede">In one real purchase-to-pay process (${int(d.log.kept.cases)} order lines), people decided ${int(d.candidates[0].manual_events)} times whether an invoice could be paid or needed someone to look. Three understudies auditioned for that call: a plain rule, Claude judging each invoice, and Claude writing a policy that code runs. Each was tested against what actually happened, on invoices held back from the builder.</p>
   ${boundPlot(d)}
-  <div class="verdict"><p class="headline">${esc(headline)}</p>
-  <p class="say"><b>Rule set first</b><span>No contender reaches a 99% lower bound on the shared sample (C ${pct(cs, 1)}, B ${pct(d.b.lower, 1)}), so the fixed rule wins by default.</span></p>
+  <div class="verdict">
+  <p class="say"><b><s>Rule set first</s> <em>replaced, kept on the record</em></b><span>No contender reaches a 99% lower bound on the shared sample (C ${pct(cs, 1)}, B ${pct(d.b.lower, 1)}), so the fixed rule wins by default.</span></p>
   <p class="say"><b>Rule set later</b><span>On all held-out invoices the chosen policy's lower bound is ${pct(c.held_out.precision_lower, 2)}, below 99%, so the fixed rule wins by default again. Its win is empty: it passes ${int(aPasses)} of ${int(d.held_out_n)} invoices.</span></p>
   <p class="struck small">The comparison rule was changed after the first policy's held-out result was known and before any other contender ran; under the original rule no contender clears the bar and the fixed rule wins by default, and both verdicts are shown.</p>
   ${openButton("c_wrong_held_out", `Open the ${int(cn - ck)} invoices the chosen policy passed wrongly`)}</div>`;
-  return section("q1", "Findings \u203A The answer", "<h1", body, [
+  return section("q1", "Q1", "<h1", body, [
     `${int(d.held_out_n)} invoices held back from the builder until every rule was written`,
     `Bar: the 95% lower bound on straight-through calls being right must be at least 99%`,
     `Three policies written independently all landed between ${pct(Math.min(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} and ${pct(Math.max(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} right`,
@@ -91,7 +92,7 @@ function q2(d) {
   <h3>Choosing the audition</h3>
   <p>Each candidate is a decision people make over and over. They are ranked by manual volume and by how rule-like the decision already is: how well one field, chosen on earlier months, predicts the outcome in later months.</p>
   <div class="tablewrap"><table><caption>Candidates</caption><thead><tr><th>Decision</th><th>Manual events</th><th>Rule-likeness</th><th>Best single field</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  return section("q2", "Findings \u203A The work", "Where people spend their time", body, [
+  return section("q2", "Q2", "Where people spend their time", body, [
     `Source: ${esc(d.source.name)} (${esc(d.source.licence)}), ${int(d.log.raw.events)} events`,
     `${int(d.log.excluded.duplicate_events)} same-minute duplicates and ${int(d.log.excluded.bad_date_events)} out-of-range events removed`,
     `Rule-likeness is balanced accuracy: 0.5 is a coin toss, 1.0 is a perfect rule`,
@@ -121,7 +122,7 @@ function q3(d) {
   <h3>B against C, on the same ${int(d.sample_n)} invoices</h3>
   <p>B passed ${int(bvc.B_passed)} and was wrong ${bvc.B_errors === 1 ? "once" : int(bvc.B_errors) + " times"} (lower bound ${pct(bLow, 1)}). C's chosen policy passed ${int(bvc.C_passed)} and was wrong ${int(bvc.C_errors)} times. Of the wrong passes only one of them made, ${int(bvc.C_only_errors)} were C's and ${int(bvc.B_only_errors)} were B's (exact sign test, p = ${bvc.p_B_better.toFixed(3)}). B made fewer wrong passes, but it passed far fewer invoices, so under the written rule the two are not separated and cost decides: C.</p>
   ${openButton("b_passes_sample", `Open B's ${int(bvc.B_passed)} straight-through calls`)} ${openButton("c_only_errors_sample", `Open the ${int(bvc.C_only_errors)} errors only C made`)}`;
-  return section("q3", "Findings \u203A The audition", "Three understudies, one call", body, [
+  return section("q3", "Q3", "Three understudies, one call", body, [
     `B against A: not shown at the bar (${ratio([bvc.B_passed, d.sample_n], 1)} passed, lower bound ${pct(bLow, 1)})`,
     `No policy or prompt was changed after any held-out figure was seen`,
     `Policy chosen on earlier months only; held-out results of all three are published`,
@@ -136,7 +137,7 @@ function q4(d) {
   <p>Passing every held-out invoice would be right ${ratio(pe.precision, 2)} of the time, with a lower bound of ${pct(pe.precision_lower, 2)}. Mostly right, and still not trustworthy: ${int(pe.precision[1] - pe.precision[0])} payments would have needed correcting.</p>
   <div class="tablewrap" style="max-width:24em"><table><caption>Calls needed to clear the bar</caption><thead><tr><th>Wrong calls</th><th>Fewest calls</th></tr></thead><tbody>${rows}</tbody></table></div>
   <p class="small">The bound is the Wilson score interval at z = ${d.bar.z.toFixed(2)}.</p>`;
-  return section("q4", "Findings \u203A The bar", "Why 99%, and why a lower bound", body, [
+  return section("q4", "Q4", "Why 99%, and why a lower bound", body, [
     `The bar was raised from 90% to 99% before any contender ran, because passing everything cleared 90%`,
     `Leaving an invoice to a person is always safe; it only costs a person's time`,
   ]);
@@ -204,7 +205,7 @@ function q5(d) {
   <p>While autonomous it passed ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar), and removed ${int(t.touches_removed)} manual touches.</p>
   <p>Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion.</p>
   ${openButton("replay_autonomous", `Open the ${int(t.passed)} invoices passed on their own`)}`;
-  return section("q5", "Findings \u203A Earned autonomy", "Trust earned per case type, week by week", body, [
+  return section("q5", "Q5 GO", "Trust earned per case type, week by week", body, [
     `Replayed on the chosen policy over the held-out months, ${d.replay.weeks[0]} to ${d.replay.weeks[d.replay.weeks.length - 1]}`,
     `The window is too short for the outcome lag: the second promotion came in ${wk(d.replay.events.filter((e) => e.event === "promoted").slice(-1)[0].week)} with few invoices left, so ${int(t.passed)} understates steady-state volume`,
     `The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} errors, mostly from one case type`,
@@ -224,7 +225,7 @@ function q6(d) {
   <p>Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about ${int(med(gaps9))} weeks sooner (median ${wk(medWeek(a9.first))} against ${wk(d.replay.first)}; range ${int(Math.min(...gaps9))}\u2013${int(Math.max(...gaps9))} weeks across 20 runs) and passed ${half(a9.passed_median)} invoices, ${half(a9.wrong_median)} of them wrong (medians of 20 runs; range ${int(a9.wrong_range[0])}\u2013${int(a9.wrong_range[1])}), against ${int(t.passed)} and ${int(t.wrong)} on outcomes. That is ${word(times)} times the wrong payments, at a lower rate per pass (${pct(a9.wrong_median / a9.passed_median, 2)} against ${pct(t.wrong / t.passed, 1)}).</p>
   <p>At 0.7 it promoted in ${int(a7.promoted_runs)} of 20 runs, the earliest in ${wk(a7.first[0])}, and passed ${half(a7.passed_median)} invoices, ${half(a7.wrong_median)} of them wrong (medians of 20 runs; range ${int(a7.wrong_range[0])}\u2013${int(a7.wrong_range[1])}). At 0.5 it promoted in ${int(a5.promoted_runs)} of 20 runs.</p>
   <p><strong>The agreement it promoted on was mostly copied, so it measured the reviewers, not the helper.</strong></p>`;
-  return section("q6", "Findings \u203A The rubber stamp", "What happens when agreement is the gate", body, [
+  return section("q6", "Q6 SIMULATED", "What happens when agreement is the gate", body, [
     `This section is a simulation; the copy rates are assumptions, not measurements of real reviewers`,
     `The low error rate per pass comes from a policy that is about 99% right. On these settings, a helper wrong 5% of the time would still show about 99.4% agreement at 0.9 (arithmetic, not a run)`,
     `The simulated gate still withdraws autonomy on outcomes`,
@@ -240,7 +241,7 @@ function q7(d) {
   <div><span class="small">C: Claude writing a policy</span><span class="big">$${(c.usd / c.calls).toFixed(2)}</span><span class="small">per policy, written once (${int(c.calls)} written). Code then ran all ${int(d.held_out_n)} held-out invoices in ${d.cost.c_run_s_all_held_out.toFixed(2)} seconds.</span></div>
   </div>
   <p>At enterprise volume the difference compounds: B's cost and time grow with every invoice; C's are paid once per policy, and the policy can be read, tested and versioned like any other rule.</p>`;
-  return section("q7", "Findings \u203A Cost at volume", "What each understudy costs per 1,000 invoices", body, [
+  return section("q7", "Q7", "What each understudy costs per 1,000 invoices", body, [
     `B: ${int(b.input_tokens)} input and ${int(b.output_tokens)} output tokens for the sample`,
     `C: ${int(c.input_tokens)} input and ${int(c.output_tokens)} output tokens for three policies`,
     `Costs exclude the overhead of the command-line tool used to make the calls`,
@@ -265,7 +266,7 @@ function method(d) {
   <li>The agreement gate is a simulation with assumed reviewer behaviour.</li>
   <li>B was scored on a ${int(d.sample_n)}-invoice sample, which cannot show a 99% lower bound at a 1% error rate.</li></ul></details>
   <footer class="end">Built from data on ${esc(d.built)}. Source data: ${esc(d.source.name)}, ${esc(d.source.licence)}.</footer>`;
-  return section("method", "Method", "How this was done", body, null);
+  return section("method", "M", "How this was done", body, null);
 }
 
 /* ---------- Drawer ---------- */
@@ -322,6 +323,16 @@ async function boot() {
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#drawer").hidden) closeDrawer(); });
 
+  const verdictGo = d.policies.some((p) => p.chosen && p.held_out.precision_lower >= 0.99);
+  const endState = (states) => { const last = Object.values(states).map((r) => r[r.length - 1]); return last.includes("go") ? "go" : last.includes("cut") ? "cut" : "standby"; };
+  const LAMPS = { q1: verdictGo ? "go" : "standby", q3: verdictGo ? "go" : "standby", q5: endState(d.replay.states), q6: endState(d.agreement.example_states) };
+  document.querySelectorAll(".cues a").forEach((a) => {
+    const st = LAMPS[a.getAttribute("href").slice(1)];
+    if (!st) return;
+    const lamp = a.querySelector(".lamp");
+    lamp.classList.add(st);
+    lamp.insertAdjacentHTML("afterend", `<span class="sr">(${st.toUpperCase()})</span>`);
+  });
   const links = [...document.querySelectorAll(".cues a, .tabs a")];
   const obs = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
