@@ -8,7 +8,7 @@ Status is written only after a ticket's check has passed. "Done" means `python -
 | 2 | Streaming parser and data checks | Nov 16 AM | done |
 | 3 | Manual-work analysis and independent recount | Nov 16 | done |
 | 4 | Candidate ranking, target, locked held-out set | Nov 16 18:00 (pivot point) | done |
-| 5 | Contender A, pass-everything reference, eval and trust table | Nov 16 AM | open |
+| 5 | Contender A, pass-everything reference, eval and trust table | Nov 16 AM | done |
 | 6 | Contender B (Claude per case): stub, replay, 50-case sample, 1,500 run | Nov 16 PM | open |
 | 7 | Contender C (Claude policy author): rule language, checks, 3 policies, full scoring | Nov 16 PM | open |
 | 8 | Earned-autonomy replay (A, C) and agreement-gate simulation | Nov 17 AM | open |
