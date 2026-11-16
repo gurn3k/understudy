@@ -6,6 +6,7 @@ Reads %LOCALAPPDATA%/understudy/data; writes site/data.json.
 import json
 import os
 import re
+import statistics
 import sys
 import time
 from collections import Counter
@@ -41,8 +42,8 @@ def adrs():
         text = p.read_text(encoding="utf-8")
         title = re.sub(r"^#\s*\d+\.\s*", "", text.splitlines()[0]).strip()
         amended = len(re.findall(r"^## Amendment", text, re.M))
-        replaced = bool(re.search(r"replaced by|Replaced by", text.split("\n## ")[0]))
-        rows.append({"n": p.name[:4], "title": title, "amendments": amended, "replaced": replaced,
+        by = re.search(r"^Note: ADR (\d{4}) replaces this ADR's", text, re.M)
+        rows.append({"n": p.name[:4], "title": title, "amendments": amended, "replaced_by": by.group(1) if by else None,
                      "file": f"docs/adr/{p.name}"})
     return rows
 
@@ -116,7 +117,7 @@ def main():
         x = rep["agreement"][a]
         passed = sorted(r["passed"] for r in x["reps"])
         agr[a] = {"wrong_median": x["wrong_median"], "wrong_range": x["wrong_range"],
-                  "passed_median": (passed[9] + passed[10]) / 2,
+                  "passed_median": statistics.median(passed),
                   "first": sorted(r["first_promotion"] for r in x["reps"] if r["first_promotion"]),
                   "promoted_runs": sum(1 for r in x["reps"] if r["first_promotion"])}
     ex = rep["agreement"]["0.9_example"]

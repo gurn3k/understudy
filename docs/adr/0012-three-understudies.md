@@ -35,3 +35,5 @@ A fixed rule is the honest thing to beat. C tests whether a model's value at sca
 
 ## Consequences
 B's result rests on a sample of 1,500. C's policy is only as good as the aggregates it was given.
+
+Note: ADR 0015 replaces this ADR's rule for comparing the contenders on the shared sample.

@@ -198,7 +198,7 @@ function eventSentence(d) {
 
 function q5(d) {
   const t = d.replay.totals;
-  const body = `<p>Autonomy is granted per case type, not all at once. Each type starts on STANDBY: the policy makes its call in shadow and a person still decides. Once a type's resolved calls clear the bar, it goes to GO and passes invoices on its own. If the last 200 resolved calls slip below the bar, it is CUT back to STANDBY. A call only counts as evidence in the week its invoice was paid.</p>
+  const body = `<p>Autonomy is granted per case type, not all at once. Each type starts on STANDBY: the policy makes its call in shadow and a person still decides. Once a type's resolved calls clear the bar, it goes to GO and passes invoices on its own. If even the 95% upper bound of its last 200 resolved calls falls below the bar, it is CUT back to STANDBY. A call only counts as evidence in the week its invoice was paid.</p>
   ${cueSheet("sheet-outcome", d, d.replay.states, { label: "Earned autonomy by case type and week, outcome gate" })}
   <p>${esc(eventSentence(d))}</p>
   <p>While autonomous it passed ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar), and removed ${int(t.touches_removed)} manual touches.</p>
@@ -251,7 +251,7 @@ const STATES = new Set(["unlit", "standby", "go", "cut"]);
 
 /* ---------- Method ---------- */
 function method(d) {
-  const adrs = d.adrs.map((a) => `<li><span class="n">${esc(a.n)}</span><span class="${a.replaced ? "replaced" : ""}">${esc(a.title)}${a.amendments ? ` <em>${int(a.amendments)} amendment${a.amendments > 1 ? "s" : ""}</em>` : ""}${a.replaced ? " <em>replaced</em>" : ""}</span></li>`).join("");
+  const adrs = d.adrs.map((a) => `<li><span class="n">${esc(a.n)}</span><span class="${a.replaced_by ? "replaced" : ""}">${esc(a.title)}${a.amendments ? ` <em>${int(a.amendments)} amendment${a.amendments > 1 ? "s" : ""}</em>` : ""}${a.replaced_by ? ` <em>partly replaced by ${esc(a.replaced_by)}</em>` : ""}</span></li>`).join("");
   const body = `<p>The data is the ${esc(d.source.name)} event log (DOI ${esc(d.source.doi)}, ${esc(d.source.licence)}). The log was parsed in one pass and every total recounted by a second, independent program; both match the published counts.</p>
   <details><summary>The rules, in the order they were written</summary>
   <p class="small">Every rule was written down before the run it governs. Rules replaced later stay on the record, struck through, with the reason in the decision record.</p>
