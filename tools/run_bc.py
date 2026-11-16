@@ -5,7 +5,6 @@ Usage:
   python tools/run_bc.py c <mode> <n_policies> <max_live_calls>
 Responses are saved under %LOCALAPPDATA%/understudy/data/responses/<b|c>/.
 """
-import hashlib
 import json
 import os
 import sys
@@ -17,23 +16,17 @@ from understudy import contender_b as B, contender_c as C  # noqa: E402
 from understudy.analyse import iter_jsonl  # noqa: E402
 from understudy.claude_call import CallCap, Caller, StopRun  # noqa: E402
 from understudy.evaluate import evaluate  # noqa: E402
+from understudy.files import verify  # noqa: E402
 
 DATA = Path(os.environ["LOCALAPPDATA"]) / "understudy" / "data"
 SCRATCH = DATA / "claude_cwd"   # empty folder, so the CLI picks up no project files
 SCRATCH.mkdir(parents=True, exist_ok=True)
 
 
-def check(path, name):
-    want = (ROOT / "docs" / name).read_text().split()[0]
-    got = hashlib.sha256(path.read_bytes()).hexdigest()
-    if got != want:
-        sys.exit(f"{path.name} changed: {got} != {want}")
-
-
 def main():
     which, mode, n, cap = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
-    check(DATA / "invoice_triage_heldout.jsonl", "heldout.sha256")
-    check(DATA / "sample.jsonl", "sample.sha256")
+    verify(DATA / "invoice_triage_heldout.jsonl", "heldout.sha256")
+    verify(DATA / "sample.jsonl", "sample.sha256")
     fit = list(iter_jsonl(DATA / "invoice_triage_fit.jsonl"))
     sample = list(iter_jsonl(DATA / "sample.jsonl"))
     out = {"which": which, "mode": mode}

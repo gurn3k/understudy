@@ -4,7 +4,6 @@ agreement-gate simulation.
 Usage: python tools/run_replay.py <data_dir>
 Needs c_live_3.json (C's chosen policy) and the saved C responses.
 """
-import hashlib
 import json
 import statistics
 import sys
@@ -15,14 +14,13 @@ sys.path.insert(0, str(ROOT))
 from understudy import contender_c as C  # noqa: E402
 from understudy.analyse import iter_jsonl  # noqa: E402
 from understudy.contenders import fit_rule_a, rule_a  # noqa: E402
+from understudy.files import load_json, save_json, verify  # noqa: E402
 from understudy.replay import replay, reviewer  # noqa: E402
 from understudy.triage import timing, triage_record  # noqa: E402
 
 data = Path(sys.argv[1])
 held_path = data / "invoice_triage_heldout.jsonl"
-want = (ROOT / "docs" / "heldout.sha256").read_text().split()[0]
-if hashlib.sha256(held_path.read_bytes()).hexdigest() != want:
-    sys.exit("held-out file changed")
+verify(held_path, "heldout.sha256")
 held = list(iter_jsonl(held_path))
 ids = {r["id"] for r in held}
 
@@ -41,9 +39,9 @@ if missing:
 
 fit = list(iter_jsonl(data / "invoice_triage_fit.jsonl"))
 passing, _ = fit_rule_a(fit)
-c_run = json.load(open(data / "c_live_3.json", encoding="utf-8"))
+c_run = load_json(data / "c_live_3.json")
 chosen = c_run["chosen"]
-policy = json.load(open(data / "responses" / "c" / f"c_policy_{chosen + 1}.json", encoding="utf-8"))["reply"]
+policy = load_json(data / "responses" / "c" / f"c_policy_{chosen + 1}.json")["reply"]
 contenders = {"A": rule_a(passing), "C": C.decider(policy)}
 
 out = {"chosen_policy": chosen + 1, "outcome": {}, "agreement": {}}
@@ -61,7 +59,7 @@ for alpha in (0.5, 0.7, 0.9):
     wrongs = [r["wrong"] for r in reps]
     out["agreement"][str(alpha)] = {"reps": reps, "wrong_median": statistics.median(wrongs),
                                      "wrong_range": [min(wrongs), max(wrongs)]}
-json.dump(out, open(data / "replay.json", "w", encoding="utf-8"))
+save_json(out, data / "replay.json")
 for name, r in out["outcome"].items():
     print(name, "outcome gate", r["totals"], "first", r["first_promotion"], "types", len(r["promoted_types"]),
           "demotions", sum(1 for e in r["events"] if e["event"] == "demoted"))

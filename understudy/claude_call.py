@@ -8,6 +8,7 @@ Every live response is saved under <store>/<key>.json before it's used, so
 a rerun only fills keys that are missing. An empty or unreadable reply stops
 the run (it may be a usage limit) with everything so far kept.
 """
+import hashlib
 import json
 import subprocess
 import time
@@ -28,6 +29,14 @@ class StopRun(Exception):
 
 class CallCap(Exception):
     """Raised when a run reaches its live-call cap."""
+
+
+class PromptChanged(Exception):
+    """Raised when a saved response was made from a different prompt than the one asked now."""
+
+
+def prompt_sha(system, prompt):
+    return hashlib.sha256(json.dumps([system, prompt]).encode("utf-8")).hexdigest()
 
 
 def api_equivalent_cost(usage, model=MODEL):
@@ -72,8 +81,13 @@ class Caller:
         p = self.path(key)
         if self.mode == "stub":
             return {"reply": self.stub_fn(prompt), "raw": "", "meta": {"mode": "stub"}}
+        sha = prompt_sha(self.system, prompt)
         if p.exists():
-            return json.loads(p.read_text(encoding="utf-8"))
+            rec = json.loads(p.read_text(encoding="utf-8"))
+            saved = rec.get("meta", {}).get("prompt_sha256")
+            if saved is not None and saved != sha:
+                raise PromptChanged(f"{key}: saved response was made from a different prompt")
+            return rec
         if self.mode == "replay":
             raise FileNotFoundError(f"no saved response for {key}")
         if self.live_calls >= self.max_live_calls:
@@ -99,6 +113,6 @@ class Caller:
                         "api_ms": out.get("duration_api_ms"), "usage": usage,
                         "plan_list_cost_usd": out.get("total_cost_usd"),
                         "api_equivalent": api_equivalent_cost(usage),
-                        "stop_reason": out.get("stop_reason"), "at": time.strftime("%Y-%m-%dT%H:%M:%S")}}
+                        "stop_reason": out.get("stop_reason"), "prompt_sha256": sha, "at": time.strftime("%Y-%m-%dT%H:%M:%S")}}
         p.write_text(json.dumps(rec), encoding="utf-8")
         return rec

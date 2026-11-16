@@ -126,6 +126,18 @@ class CallerModes(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 c.ask("k2", "p")
 
+    def test_saved_response_refused_when_prompt_changed(self):
+        from understudy.claude_call import PromptChanged, prompt_sha
+        with tempfile.TemporaryDirectory() as d:
+            meta = {"prompt_sha256": prompt_sha("sys", "p")}
+            Path(d, "k1.json").write_text(json.dumps({"reply": {"x": 1}, "raw": "", "meta": meta}))
+            c = Caller("replay", d, "sys")
+            self.assertEqual(c.ask("k1", "p")["reply"], {"x": 1})
+            with self.assertRaises(PromptChanged):
+                c.ask("k1", "p changed")
+            with self.assertRaises(PromptChanged):
+                Caller("replay", d, "other system").ask("k1", "p")
+
     def test_live_cap_stops_before_calling(self):
         from understudy.claude_call import CallCap
         with tempfile.TemporaryDirectory() as d:

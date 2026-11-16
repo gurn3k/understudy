@@ -24,3 +24,6 @@ The first promotion comes weeks into the replay, by design.
 
 ## Amendment 1 (2026-11-15, before any replay ran)
 Timing comes from a separate file, `heldout_timing.jsonl`, keyed by invoice ID. It holds the first invoice receipt time, the first clearing time and the count of manual touches. The locked held-out file is unchanged, and the contenders never see timing.
+
+## Amendment 2 (2026-11-16, after the replay ran; a clarification only)
+"The last 200 resolved autonomous calls" is counted in **arrival order**: of the calls that have resolved by that week, the 200 that arrived most recently. Ordering by clearing date was considered after the review. It isn't adopted, because changing a rule after its results are known is the forking path ADR 0015 guards against. The published replay uses arrival order.

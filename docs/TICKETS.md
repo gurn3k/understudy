@@ -133,8 +133,8 @@ The briefs below for 5 to 10 were written for the earlier two-helper plan and ar
 - **GitHub repo and CI:** need the owner's approval.
 - **Deploy:** needs the owner's approval, with the full checks list shown. Deploy from a staging folder, then confirm that non-served paths return 404.
 
-## Follow-ups from the pre-push review (2026-11-15, none blocking)
-- `score_all.py` and `run_replay.py` should verify the held-out and sample hashes, as `run_bc.py` does.
-- Saved Claude responses should store a hash of their prompt and warn on a mismatch.
-- Demotion's "last 200" is taken in arrival order. Consider clearing order, and state which in ADR 0013.
-- Close the files that `run_replay.py` opens.
+## Follow-ups from the pre-push review (2026-11-15, none blocking), all done 2026-11-16
+- [x] `score_all.py` and `run_replay.py` should verify the held-out and sample hashes, as `run_bc.py` does.
+- [x] Saved Claude responses should store a hash of their prompt and warn on a mismatch.
+- [x] Demotion's "last 200" is taken in arrival order. Consider clearing order, and state which in ADR 0013.
+- [x] Close the files that `run_replay.py` opens.
