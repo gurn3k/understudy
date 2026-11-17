@@ -112,6 +112,29 @@ function q1(d) {
   ]);
 }
 
+/* ---------- B follow-up (exact sentences from the decision record) ---------- */
+function followUp(d) {
+  const r = d.b2;
+  if (!r || !r.b_alone) return "";
+  const a = r.b_alone, v = r.b_vs_c, f1 = (x) => (x * 100).toFixed(1);
+  const cCost = `$${(d.cost.c.usd / d.cost.c.calls).toFixed(2)}`, bCost = `$${((r.cost.usd * 1000) / a.n).toFixed(2)}`;
+  const outcome = a.outcome === "proved"
+    ? `On ${int(a.n)} new invoices, Claude judging each one passed ${int(a.passed)} (${f1(a.coverage)}%) and got ${int(a.wrong)} wrong. That proves it is right at least 99% of the time on what it passes (lower bound ${f1(a.lower)}%). It passes too few to count under the rule, which needs 10%.`
+    : `On ${int(a.n)} new invoices, Claude judging each one passed ${int(a.passed)} (${f1(a.coverage)}%) and got ${int(a.wrong)} wrong. That does not prove 99%: the true rate could be as low as ${f1(a.lower)}%. No further run was made.` +
+      (a.outcome === "below_bar" ? ` Even its best case, ${f1(a.upper)}%, is under 99%.` : "");
+  const p = (v.winner === "B" ? v.p_B_better : v.p_C_better).toPrecision(2);
+  const versus = v.winner === "B"
+    ? `On the same invoices, Claude judging each one passed at least as many as the written policy (${int(v.B_passed)} against ${int(v.C_passed)}) and made fewer wrong passes the other avoided (${int(v.B_only)} against ${int(v.C_only)}). A gap this size is unlikely to be chance (p = ${p}).`
+    : v.winner === "C"
+    ? `On the same invoices, the written policy passed at least as many (${int(v.C_passed)} against ${int(v.B_passed)}) and made fewer wrong passes the other avoided (${int(v.C_only)} against ${int(v.B_only)}). A gap this size is unlikely to be chance (p = ${p}).`
+    : `On the same invoices neither clearly beat the other: case-by-case passed ${int(v.B_passed)} with ${int(v.B_wrong)} wrong, the written policy ${int(v.C_passed)} with ${int(v.C_wrong)} wrong. The cheaper one is preferred: ${cCost} once against ${bCost} per 1,000 invoices.`;
+  return `<h3>Follow-up: Claude checking each invoice, on ${int(a.n)} new invoices</h3>
+  <p>This follow-up was run after the first results were seen, because the first sample was too small to settle the question. The prompt, model and settings were unchanged, and the invoices were new.</p>
+  <p>${outcome}</p>
+  <p>${versus}</p>
+  <p class="small">In plain terms: checking each invoice was careful but paid only about ${Math.round(a.coverage * 100)} in 100 invoices, and even on those it could not show 99%. The rulebook paid far more for a fraction of the cost.</p>`;
+}
+
 /* ---------- Q2: the work ---------- */
 const PLAIN_DECISION = {
   invoice_triage: "Pay this invoice now, or hold it for a check?",
@@ -159,10 +182,11 @@ function q3(d) {
   const plain = `<p>Each AI saw only what was known when an invoice arrived. It also saw how often similar invoices had gone through cleanly from January to May 2018. Then it made its call on each June to August invoice.</p>
   <ul>
   <li><strong>The simple rule</strong> pays a kind of invoice only if that kind had a clean enough record in earlier months to clear the bar. No kind did, so it paid nothing.</li>
-  <li><strong>Claude checking each invoice</strong> made fewer wrong payments. On the same ${int(d.sample_n)} invoices, it paid ${int(bvc.B_passed)} and ${bvc.B_errors === 1 ? "1 needed" : int(bvc.B_errors) + " needed"} fixing. The rulebook paid ${int(bvc.C_passed)} and ${int(bvc.C_errors)} needed fixing. But ${int(bvc.B_passed)} invoices are too few to prove 99%, so the test could not call a winner between the two. The rulebook is far cheaper (see below), so it went forward.</li>
+  <li><strong>Claude checking each invoice</strong> made fewer wrong payments. On the same ${int(d.sample_n)} invoices, it paid ${int(bvc.B_passed)} and ${bvc.B_errors === 1 ? "1 needed" : int(bvc.B_errors) + " needed"} fixing. The rulebook paid ${int(bvc.C_passed)} and ${int(bvc.C_errors)} needed fixing. But ${int(bvc.B_passed)} invoices are too few to prove 99%, so the test could not call a winner between the two. The rulebook is far cheaper (see below), so it went forward. A larger follow-up, below, did not change this.</li>
   <li><strong>Claude's rulebook:</strong> Claude wrote three rulebooks separately. We picked one before testing, using only earlier months. All three got between ${pct(Math.min(...rates), 1)} and ${pct(Math.max(...rates), 1)} right on the invoices they paid. That is right at the edge of the bar. One of the other two did prove 99%, but it doesn't count: we had seen its result before the final rules were set, and it wasn't the one picked beforehand.</li>
   </ul>
-  ${openButton("b_passes_sample", `See the ${int(bvc.B_passed)} invoices Claude paid one by one`)}`;
+  ${openButton("b_passes_sample", `See the ${int(bvc.B_passed)} invoices Claude paid one by one`)}
+  ${followUp(d)}`;
   const detail = `<p>Every understudy saw the invoice's own facts as they stood when it arrived, plus straight-through rates from order lines created in earlier months (January to May 2018). They were scored on order lines created June to August 2018. No understudy saw an outcome from those lines. The earlier-month rates use every outcome in the log, including ones that landed after held-out invoices began to arrive.</p>
   <ul>
   <li><strong>A, a plain rule.</strong> Pass an invoice if its group, in earlier months, was clean often enough to clear the bar on its own. No group was, so A passes nothing.</li>
@@ -326,6 +350,7 @@ function q7(d) {
     `B: ${int(b.input_tokens)} input and ${int(b.output_tokens)} output tokens for the sample`,
     `C: ${int(c.input_tokens)} input and ${int(c.output_tokens)} output tokens for three policies`,
     `Costs exclude the overhead of the command-line tool used to make the calls`,
+    ...(d.b2 && d.b2.cost && d.b2.b_alone ? [`Follow-up run of B: ${int(d.b2.cost.calls)} calls for ${int(d.b2.b_alone.n)} invoices, $${d.b2.cost.usd.toFixed(2)} at list prices`] : []),
   ]);
 }
 

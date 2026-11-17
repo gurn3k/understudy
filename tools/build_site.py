@@ -48,6 +48,14 @@ def adrs():
     return rows
 
 
+def b2_summary(cost):
+    """The follow-up run of B (ADR 0018): its scored result and its own cost."""
+    res = load_json(DATA / "b2_result.json")
+    meta = [row["meta"] for b in range(1, res["blocks"] + 1)
+            for row in load_json(DATA / f"b2_live_block_{b:02d}.json")["log"]]
+    return {**res, "cost": cost(meta)}
+
+
 def main():
     verify(DATA / "invoice_triage_heldout.jsonl", "heldout.sha256")
     verify(DATA / "sample.jsonl", "sample.sha256")
@@ -164,6 +172,7 @@ def main():
         "drawer": drawer,
         "adrs": adrs(),
         "lookahead": load_json(DATA / "lookahead.json"),
+        "b2": b2_summary(cost),
     }
     OUT.parent.mkdir(exist_ok=True)
     save_json(data, OUT, separators=(",", ":"))

@@ -20,6 +20,24 @@ for (const s of sources) {
   }
 }
 
+// ADR 0018's sentences are templates: fill the ones that apply from the scored follow-up in site/data.json.
+const b2 = JSON.parse(read("site/data.json")).b2;
+if (b2 && b2.b_alone) {
+  const tpl = {};
+  for (const m of read("docs/adr/0018-b-follow-up-run.md").matchAll(/^\s*- \*\*([^*]+):\*\* "([^"]+)"/gm)) tpl[m[1]] = m[2];
+  const a = b2.b_alone, v = b2.b_vs_c, f1 = (x) => (x * 100).toFixed(1);
+  const n = (x) => x.toLocaleString("en-US");
+  const vals = { n: n(a.n), passed: n(a.passed), coverage_pct: f1(a.coverage), wrong: n(a.wrong), lower_pct: f1(a.lower), upper_pct: f1(a.upper),
+    b_passed: n(v.B_passed), c_passed: n(v.C_passed), b_wrong: n(v.B_wrong), c_wrong: n(v.C_wrong), b_only: n(v.B_only), c_only: n(v.C_only),
+    p: (v.winner === "B" ? v.p_B_better : v.p_C_better).toPrecision(2),
+    c_cost: "$" + (JSON.parse(read("site/data.json")).cost.c.usd / JSON.parse(read("site/data.json")).cost.c.calls).toFixed(2),
+    b_cost: "$" + (b2.cost.usd * 1000 / a.n).toFixed(2) };
+  const keys = ["Disclosure", { proved: "Proved", not_proved: "Not proved", below_bar: "Not proved" }[a.outcome],
+    ...(a.outcome === "below_bar" ? ["If below the bar, add"] : []),
+    { B: "B wins", C: "C wins", not_separated: "Not separated" }[v.winner]];
+  for (const k of keys) want.push({ src: "docs/adr/0018-b-follow-up-run.md", text: tpl[k].replace(/\{(\w+)\}/g, (_, x) => vals[x]) });
+}
+
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
 const proc = spawn(CHROME, ["--headless=new", "--disable-gpu", `--remote-debugging-port=${port}`, `--user-data-dir=${join(tmpdir(), "us-claims")}`, "about:blank"], { stdio: "ignore" });
@@ -36,6 +54,7 @@ const pending = new Map();
 ws.addEventListener("message", (m) => { const x = JSON.parse(m.data); if (pending.has(x.id)) { pending.get(x.id)(x); pending.delete(x.id); } });
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 await send("Page.enable");
+await send("Network.enable");
 await send("Network.setCacheDisabled", { cacheDisabled: true });
 await send("Page.navigate", { url });
 let loaded = false;

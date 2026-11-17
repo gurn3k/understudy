@@ -42,6 +42,7 @@ const send = (method, params = {}) => new Promise((r) => { const i = ++id; pendi
 
 await send("Runtime.enable");
 await send("Page.enable");
+await send("Network.enable");
 await send("Network.setCacheDisabled", { cacheDisabled: true });
 for (const spec of shots) {
   const [w, h, scheme, full, y] = spec.split(":");
