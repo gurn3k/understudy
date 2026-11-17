@@ -92,11 +92,11 @@ function q1(d) {
   const no = (t) => `<span class="state standby">${t}</span>`;
   const plain = `<h1 id="q1-h">Can an AI decide which invoices are safe to pay without a person checking?</h1>
   <p class="headline">Not at the bar we set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, just short of the proof we asked for.</p>
-  <h3>Why this study</h3>
+  <h2 class="sub">Why this study</h2>
   <p>Many companies are deciding where AI should take on work that people do today. The evidence is often a demo, or a pilot that "looked good". We wanted a stricter test on real records: take one decision staff make thousands of times, let an AI make it, and check every call against what really happened.</p>
-  <h3>Why invoices</h3>
+  <h2 class="sub">Why invoices</h2>
   <p>The records are a large multinational company's purchasing for 2018. In them, staff decided ${int(d.candidates[0].manual_events)} times whether an invoice could be paid or needed checking. It is the most repeated of the decisions we sized, and every one has a known outcome: the payment either went through cleanly or someone had to fix it later. That lets us mark each AI call right or wrong. Q2 shows how it was chosen.</p>
-  <h3>The three AI understudies</h3>
+  <h2 class="sub">The three AI understudies</h2>
   <ol class="plainlist understudies">
   <li><strong>A simple rule.</strong> Think of a fixed checklist. It looks at how often each kind of invoice went through cleanly from January to May. If a kind was clean almost every time, it pays that kind; otherwise it holds. There is no AI in it. It is the yardstick the AI must beat.</li>
   <li><strong>Claude checking each invoice.</strong> Think of a new staff member who reads every invoice and decides. Claude, an AI model, is given each invoice's details and the past records, and answers "pay" or "hold". It is careful, but it costs a request to the AI for every invoice.</li>
@@ -220,7 +220,7 @@ const per1k = (x, n) => { const v = (x / n) * 1000; return v === 0 ? "0" : v < 1
 function explorer(d) {
   const ps = paths(d);
   return `<div class="explorer" id="explorer">
-  <p class="ex-title">Follow 1,000 invoices through each approach</p>
+  <h3 class="ex-title">Follow 1,000 invoices through each approach</h3>
   <div class="seg" role="group" aria-label="Choose an approach">${ps.map((p, i) => `<button type="button" data-path="${p.key}" aria-pressed="${i === 3 ? "true" : "false"}">${esc(p.label)}</button>`).join("")}</div>
   <div class="ex-body">
     <div class="waffle" aria-hidden="true">${"<i></i>".repeat(1000)}</div>

@@ -81,7 +81,7 @@ section:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
 h1 { font: 700 clamp(34px, 5.2vw, 56px)/1.04 var(--display); letter-spacing: -.01em; margin: 0 0 22px; text-wrap: balance; max-width: 22ch; }
 h2 { font: 700 clamp(28px, 3.4vw, 38px)/1.1 var(--display); margin: 0 0 16px; text-wrap: balance; }
 h3 { font: 700 21px/1.2 var(--display); margin: 36px 0 10px; letter-spacing: .01em; }
-p { margin: 0 0 16px; max-width: 68ch; }
+p { margin: 0 0 16px; max-width: 36em; text-wrap: pretty; }
 .lede { font-size: 19px; color: var(--ink-2); }
 .small { font-size: 15px; color: var(--ink-2); }
 strong { font-weight: 700; }
@@ -262,3 +262,7 @@ details.words summary { font-size: 17px; }
 .bars.proof .fill { background: var(--pencil); }
 .callout { font-size: 19px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 14px 0; margin: 22px 0; }
 table.scale .sub { display: block; font-size: 13px; color: var(--ink-2); }
+dd, li { text-wrap: pretty; }
+h2.sub { font: 700 21px/1.2 var(--display); margin: 36px 0 10px; letter-spacing: .01em; }
+table.score tr.chosen td:first-child { padding-left: 10px; }
+.ex-title { font: 700 21px/1.2 var(--display); margin: 0 0 12px; }
