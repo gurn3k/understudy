@@ -2,6 +2,8 @@
 
 **Which invoices can an AI pass straight to payment, and how do you prove it first?**
 
+Live report: https://understudy.gurn3k.com
+
 Understudy is a findings report built on a real enterprise purchase-to-pay event log: 251,734 purchase-order lines and 1.6 million events. It finds where people spend their time, picks the most repetitive decision (whether an invoice can be paid with no one checking it), and tests three AI "understudies" for that job against what actually happened:
 
 - **A, a plain rule** fitted on earlier months.
@@ -12,7 +14,7 @@ Each understudy is held to a trust bar: the 95% lower bound on how often its str
 
 ## The result
 
-No contender earned trust at the 99% bar. The fixed rule passes nothing. The policy Claude wrote passes 48.7% of held-out invoices at 99.07% correct, just short of the bar (lower bound 98.95%). Three independently written policies all landed between 99.07% and 99.20%. The page shows the full result, including the verdict under the rule set before any run, and the cost of each approach per 1,000 invoices.
+No contender earned trust at the 99% bar. The fixed rule passes nothing. The policy Claude wrote passes 48.7% of held-out invoices at 99.07% correct, just short of the bar (lower bound 98.95%). Three independently written policies all landed between 99.07% and 99.20%. A follow-up run of B on 10,000 new invoices, pre-registered in `docs/adr/0018-b-follow-up-run.md`, did not prove 99% either: it passed 577 (5.8%) with 6 wrong, a lower bound of 97.8%, and was not separated from the written policy, which is far cheaper. The page shows the full result, including the verdict under the rule set before any run, and the cost of each approach per 1,000 invoices.
 
 ## How it was kept honest
 
