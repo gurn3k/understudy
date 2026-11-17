@@ -4,6 +4,8 @@
 
 Live report: https://understudy.gurn3k.com
 
+![The report's invoice journey, the 1,000-invoice explorer, and the week-by-week race of wrong payments](docs/media/understudy-demo.gif)
+
 Understudy is a findings report built on a real enterprise purchase-to-pay event log: 251,734 purchase-order lines and 1.6 million events. It finds where people spend their time, picks the most repetitive decision (whether an invoice can be paid with no one checking it), and tests three AI "understudies" for that job against what actually happened:
 
 - **A, a plain rule** fitted on earlier months.
