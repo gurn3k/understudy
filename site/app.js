@@ -462,7 +462,12 @@ function q7(d) {
   const minPer1k = d.b2 && d.b2.cost && d.b2.b_alone ? (d.b2.cost.wall_s * 1000) / d.b2.b_alone.n / 60 : (b.wall_s * per) / 60;
   const cOnce = c.usd / c.calls, secPerInv = d.cost.c_run_s_all_held_out / d.held_out_n;
   const money = (x) => (x < 100 ? `$${x.toFixed(2)}` : x < 10000 ? `$${int(Math.round(x / 10) * 10)}` : `$${int(Math.round(x / 1000) * 1000)}`);
-  const hours = (m) => (m < 60 ? `${Math.max(1, Math.round(m))} minutes` : m < 6000 ? `${int(m / 60)} hours` : `${int(Math.round(m / 600) * 10)} hours`);
+  const plural = (n, w) => `${int(n)} ${w}${n === 1 ? "" : "s"}`;
+  const hours = (m) => {
+    if (m < 60) return plural(Math.max(1, Math.round(m)), "minute");
+    const h = Math.round(m / 60), days = Math.floor(h / 24), rest = h % 24;
+    return days ? `${plural(days, "day")}${rest ? `, ${plural(rest, "hour")}` : ""}` : plural(h, "hour");
+  };
   const secs = (s) => (s < 1 ? "under a second" : s < 120 ? `${Math.round(s)} seconds` : `${Math.round(s / 60)} minutes`);
   const vols = [d.candidates[0].manual_events, 1e6, 1e7];
   const rows = vols.map((v, i) => `<tr><td>${int(v)}${i === 0 ? " (pay-or-check decisions made by hand in these records)" : ""}</td><td>${money((bPer1k * v) / 1000)}<span class="sub">${hours((minPer1k * v) / 1000)} of AI time</span></td><td>${money(cOnce * 12)}<span class="sub">${secs(secPerInv * v)} of computer time</span></td></tr>`).join("");
