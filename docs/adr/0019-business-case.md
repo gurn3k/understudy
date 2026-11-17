@@ -41,6 +41,14 @@ Cut by the reviewer: a table of results under other bars (98%, 99.5%). That is t
 ## Second ruling (2026-11-17, on the built section)
 The same independent reviewer accepted the built section with eight wording changes, all applied. The headline now says invoices, not checks; "would have paid" replaces "paid"; the value-limit section is titled "proposed, not tested" and describes where the mistakes' value fell without claiming a limit would help; the recommendation says to consider a value limit set before the pilot, and draws otherwise only on the replay. Removing the largest tenth after the fact would appear to clear the bar; that is exactly the hindsight result this record forbids, and the page does not state it.
 
+## Owner's changes (2026-11-17, late)
+- **Placement:** the business case moves to Q9, after Q8 and before Method. Q1 keeps the page's h1 and gains a link that jumps to Q9.
+- **Stands alone:** Q9 opens with the study in brief (question, data, test, the three approaches, the bar, how it was kept honest), the result strip, the agreement simulation (ADR 0017's 0.9 figures, with the per-pass caveat), and the limits, so a reader who reads only Q9 gets the whole picture.
+- **US dollars:** every money value on the page is in US dollars. Invoice values are converted from euros at 1.1810, the European Central Bank's 2018 average reference rate (stored as `business.eur_usd`), with a footnote in Q9 and a note in the page footer. The hourly-cost input is in US dollars (default $40, an assumption).
+- **Supersedes:** this supersedes item 1's "Hourly cost is in EUR (default €40)", item 3's EUR figures (now shown in US$), and "Where: the first section of the page" (now Q9).
+- **Third ruling:** the independent reviewer accepted these changes with seven fixes, all applied: Q9 says B ran on samples, discloses the one rule changed after a result, gives B's follow-up counts, says the replay was the safer way tested, titles the simulation section "Why agreement is not proof", and gives both gates' invoice counts.
+- **Voice:** the page is written in the first person (the author's), apart from sentences fixed in ADRs 0015 to 0018, which stay verbatim.
+
 ## Not claimed
 - That any approach met the 99% bar, or that a different bar changes the verdict.
 - How the rulebook would score under any bar other than 99%.

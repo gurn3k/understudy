@@ -158,6 +158,8 @@ def main():
         "checks_per_mistake": len(paid) / len(wrong), "checks_per_mistake_lower": 1 / (1 - c_lower),
         "manual_clear_share": 1 - cands["ranked"][0]["batch_share"],
         "touches_paid": sum(tm[r["id"]]["manual_touches"] for r in paid), "months": 3,
+        # Invoice values are recorded in EUR; the page shows USD at the ECB's 2018 average reference rate.
+        "eur_usd": 1.1810,
         "value": {"held": sum(val(held)), "paid": sum(pv), "wrong": sum(val(wrong)),
                   "median_paid": statistics.median(pv), "median_wrong": statistics.median(val(wrong))},
         "top10": {"line": top_line, "wrong": len(top_wrong), "wrong_value": sum(top_wrong),

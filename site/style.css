@@ -342,3 +342,7 @@ table.how td { width: calc((100% - 9em) / 3); }
 .biz-inputs p { margin: 0; grid-column: 1 / -1; }
 @media (min-width: 700px) { .biz-inputs { grid-template-columns: auto auto; justify-content: start; } }
 .biz-tiles { margin-top: 8px; }
+.jump { margin: -8px 0 18px; }
+.jump a { font: 700 15px var(--display); letter-spacing: .04em; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
+.footnote { margin-top: 28px; padding-top: 10px; border-top: 1px solid var(--rule); }
+.money-note { display: block; margin-bottom: 8px; }
