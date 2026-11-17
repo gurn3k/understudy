@@ -164,13 +164,13 @@ function journey(d) {
   const dots = (k, cls) => `<i class="${cls}"></i>`.repeat(k);
   const rows = lanes.map((l) => `<div class="lane${l.faint ? " faint" : ""}">
     <p class="lane-lab"><strong>${esc(l.label)}</strong>${l.note ? ` <span>${esc(l.note)}</span>` : ""}</p>
-    <div class="pile paid"><span class="pile-n">${l.pd * 2} in 100 paid</span><div class="dots">${dots(l.pd - l.wd, "paid")}${dots(l.wd, "fix")}</div></div>
-    <div class="pile held"><span class="pile-n">${(50 - l.pd) * 2} in 100 held</span><div class="dots">${dots(50 - l.pd, "held")}</div></div>
+    <div class="pile paid"><span class="pile-n">${Math.round((l.paid / l.n) * 100)} in 100 paid</span><div class="dots">${dots(l.pd - l.wd, "paid")}${dots(l.wd, "fix")}</div></div>
+    <div class="pile held"><span class="pile-n">${100 - Math.round((l.paid / l.n) * 100)} in 100 held</span><div class="dots">${dots(50 - l.pd, "held")}</div></div>
   </div>`).join("");
   return `<figure class="journey" id="journey" aria-labelledby="journey-cap">
   <div class="journey-head"><p class="j-title">100 invoices, four ways to handle them</p><button type="button" class="replay" data-replay="journey">Play again</button></div>
   <div class="lanes" aria-hidden="true">${rows}</div>
-  <figcaption id="journey-cap" class="small"><span class="sr">${lanes.map((l) => `${l.label}: ${l.pd * 2} in 100 paid without a check.`).join(" ")} </span>Each dot is two invoices. Red dots needed fixing: paying everything gets about ${oneIn(lanes[0].n, lanes[0].wrong)} wrong. The AI approaches' mistakes are too rare to show at this scale; the explorer in Q3 shows them.</figcaption>
+  <figcaption id="journey-cap" class="small"><span class="sr">${lanes.map((l) => `${l.label}: ${Math.round((l.paid / l.n) * 100)} in 100 paid without a check.`).join(" ")} </span>Each dot is two invoices. Red dots needed fixing: paying everything gets about ${oneIn(lanes[0].n, lanes[0].wrong)} wrong. The AI approaches' mistakes are too rare to show at this scale; the explorer in Q3 shows them.</figcaption>
 </figure>`;
 }
 
