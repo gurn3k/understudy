@@ -33,7 +33,7 @@ const oneIn = (n, e) => `1 in ${int(n / e)}`;
 /* Each section: a plain account first, then the full statistics behind a "detail" fold. */
 function section(id, cue, title, plain, detail, notes, wide = false) {
   const mark = `<span class="marg" aria-hidden="true">${esc(cue)}</span>`;
-  const head = title === "<h1" ? plain.replace('<h1 id="q1-h">', `<h1 id="q1-h">${mark}`) : `<h2 id="${id}-h">${mark}${title}</h2>${plain}`;
+  const head = title === "<h1" ? plain.replace(`<h1 id="${id}-h">`, `<h1 id="${id}-h">${mark}`) : `<h2 id="${id}-h">${mark}${title}</h2>${plain}`;
   const fold = detail ? `<details class="detail"><summary>The detail, with the statistics</summary>${detail}${notes ? `<ul class="fine">${notes.map((x) => `<li>${x}</li>`).join("")}</ul>` : ""}</details>` : "";
   return `<section id="${id}" class="${wide ? "wide" : ""}" aria-labelledby="${id}-h">
   <div class="col">${head}${fold}</div>
@@ -54,6 +54,94 @@ const WORDS_USED = [
 ];
 const wordsBox = () => `<details class="words" open><summary>Words used on this page</summary><dl>${WORDS_USED.map(([t, x]) => `<div><dt>${esc(t)}</dt><dd>${esc(x)}</dd></div>`).join("")}</dl></details>`;
 const worst = (x, d = 2) => `${pct(x, d)}`;
+
+/* ---------- The business case (ADR 0019): first on the page, written after the results ---------- */
+const eur = (x) => (x >= 1e6 ? `€${(x / 1e6).toFixed(2)}M` : x >= 1e4 ? `€${int(Math.round(x / 1000))}k` : `€${int(x)}`);
+function biz(d) {
+  const b = d.business, v = b.value, yr = 12 / b.months, perYear = b.touches_paid * yr;
+  const cOnce = d.cost.c.usd / d.cost.c.calls, t = d.replay.totals;
+  const tile = (label, out, sub) => `<div><span class="small">${label}</span><span class="big" ${out}</span><span class="small">${sub}</span></div>`;
+  const plain = `<h1 id="biz-h">The business case: can AI approve routine invoices, and what is it worth?</h1>
+  <p class="headline">On paper, an AI-written rulebook could have paid about half of invoices without a person checking them, for almost nothing to run. It is not yet proven safe enough, and proof takes months.</p>
+  <p>Below: what it could save, what it risks, and how to try it safely.</p>
+  <p>Today people handle nearly every invoice before it is paid: ${pct(b.manual_clear_share, 1)} of the steps that clear an invoice for payment or lift a payment block are done by hand. We tested whether AI could take the routine ones off their desks, using a real company's purchasing records from 2018. The technical evidence follows in Q1 to Q8. This section turns it into money, risk and a next step.</p>
+  <div class="biz-inputs" role="group" aria-label="Your assumptions">
+  <label>Minutes a person spends per check <select id="biz-min"><option value="2">2</option><option value="5" selected>5</option><option value="10">10</option></select></label>
+  <label>Cost of an hour of their time (€) <input id="biz-rate" type="number" min="1" max="500" step="1" value="40" inputmode="numeric"></label>
+  <p class="small">These are assumptions, not measurements: the records show when work happened, not how long it took. Change them to match your business; the figures below update.</p>
+  </div>
+  <div class="cost biz-tiles">
+  ${tile("Checks taken off desks, on paper", `data-out="checks">${int(perYear)}`, `a year (${int(b.touches_paid)} in the ${word(b.months)} test months; assumes no seasonality)`)}
+  ${tile("People's time freed, on paper", `data-out="hours">`, `<span data-out="fte"></span>`)}
+  ${tile("Cost to run the rulebook", `>$${cOnce.toFixed(2)}`, "once, to write it. Nothing per invoice: ordinary software applies it.")}
+  ${tile("Invoices paid that needed fixing", `>${int(b.wrong)} of ${int(b.problems_all)}`, `problem invoices (${pct(b.wrong / b.problems_all, 0)}) would have been paid before the fix, worth ${eur(v.wrong)} in invoice value (not money lost)`)}
+  </div>
+  <h2 class="sub">1. What it would save</h2>
+  <p>In the three test months, the rulebook would have paid ${int(b.paid)} of ${int(d.held_out_n)} invoices (${pct(b.paid / d.held_out_n, 1)}) without a check. Those invoices carried ${int(b.touches_paid)} manual steps people would no longer do: about ${int(perYear)} a year. At your assumptions that is <strong data-out="hours2"></strong> of people's time, worth about <strong data-out="money"></strong> a year. The rulebook costs about $${cOnce.toFixed(2)} to write and nothing per invoice to run.</p>
+  <p class="small">This is the figure on paper, if the rulebook were trusted from day one. Section 4 shows what happened when it had to earn that trust.</p>
+  <h2 class="sub">2. What it risks</h2>
+  <p>Of the ${int(b.paid)} invoices it would have paid, ${int(b.wrong)} (${pct(b.wrong / b.paid, 2)}) later needed a correction, such as a price or quantity change, a block or a cancellation. Today a person catches these before payment. With the rulebook, they would be paid first and fixed after.</p>
+  <p>By value the risk is larger than by count: those ${int(b.wrong)} invoices are ${pct(b.wrong / b.paid, 2)} of the invoices paid but ${pct(v.wrong / v.paid, 1)} of their value (${eur(v.wrong)} of ${eur(v.paid)}). That is the value paid before a needed correction, not money lost; many corrections are small price or quantity changes. Still, it would mean ${int(b.wrong)} of the ${int(b.problems_all)} problem invoices (${pct(b.wrong / b.problems_all, 0)}) slipping past the check, against all ${int(b.problems_all)} if every invoice were paid unchecked.</p>
+  <h2 class="sub">3. How costly can a mistake be before it stops paying off?</h2>
+  <p>Each check the rulebook skips saves <strong data-out="c"></strong> at your assumptions. Each mistake costs whatever it takes to fix an invoice after payment instead of before, including any amount that can't be recovered. The rulebook skips about ${int(Math.round(b.checks_per_mistake))} invoice checks for every mistake it makes, so it pays off as long as a late fix costs less than about ${int(Math.round(b.checks_per_mistake))} checks' worth: <strong data-out="breakeven"></strong>.</p>
+  <p>To be cautious, use the worst likely case: about ${int(Math.round(b.checks_per_mistake_lower))} checks per mistake, or <strong data-out="breakeven-low"></strong>. If a late fix usually costs you less than that, the rulebook is worth piloting. If one bad payment can cost far more, keep a person on those invoices (see section 6).</p>
+  <h2 class="sub">4. What the first months really look like</h2>
+  <p>The figures above assume the rulebook is trusted from day one. In the replay (Q5), it had to earn trust one kind of invoice at a time, from real outcomes, and lost it when results slipped. ${esc(plainEvents(d))}</p>
+  <p class="small">In the decision record's words ("the written policy" is the rulebook):</p>
+  <p>${esc(eventSentence(d))}</p>
+  <p>While autonomous it passed ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar), and removed ${int(t.touches_removed)} manual touches.</p>
+  <p>On the same test invoices, that is ${int(t.passed)} paid by the rulebook on its own, against ${int(b.paid)} on paper. Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion. The test window was too short to show the steady state, so ${int(t.passed)} understates it, and we do not estimate it here.</p>
+  <h2 class="sub">5. What we recommend</h2>
+  <p class="small">A recommendation drawn from the test, not a result of it.</p>
+  <ol class="plainlist">
+  <li><strong>Decide your bar and your cost of a late fix first</strong> (section 3), before any pilot starts, and write them down.</li>
+  <li><strong>Run the rulebook in practice mode on every kind of invoice.</strong> It makes its calls, people still check everything, and every call is scored against what really happened.</li>
+  <li><strong>Let a kind of invoice be paid without a check only once its record proves the bar,</strong> and switch it off automatically when recent results slip, as the replay did.</li>
+  <li><strong>Plan for mistakes in the first months.</strong> In the replay, ${int(t.wrong)} of ${int(t.passed)} (${pct(t.wrong / t.passed, 1)}) were wrong before trust was withdrawn. Expect the first kind of invoice to qualify after months, not weeks.</li>
+  <li><strong>Consider a value limit</strong>, set from your own policy before the pilot (section 6, a proposal, not a result).</li>
+  </ol>
+  <h2 class="sub">6. A value limit to try in the pilot (proposed, not tested)</h2>
+  <p>A common control in accounts payable is a value limit: invoices above a set amount always go to a person, whatever the rules say. The test points the same way. The typical invoice the rulebook paid wrongly was worth ${eur(v.median_wrong)}, against ${eur(v.median_paid)} for a typical invoice it paid. The largest tenth of the invoices it paid (${eur(b.top10.line)} and up) held ${int(b.top10.wrong)} of its ${int(b.wrong)} mistakes, but ${pct(b.top10.wrong_value / v.wrong, 0)} of their value (${eur(b.top10.wrong_value)} of ${eur(v.wrong)}).</p>
+  <p>In these test invoices, then, the money at stake in the mistakes sat mostly in the largest tenth. That is a description of what already happened, not a test: the line was drawn from the same invoices, after the results were known, and it does not change the verdict in Q1. We did not test a value limit, because choosing one after seeing these results would flatter it. A business would set its limit from its own policy or earlier months, before the pilot, and test it there.</p>
+  <h2 class="sub">Where the evidence is</h2>
+  <ul class="plainlist">
+  <li><a href="#q1">Q1 The answer</a>: none of the three approaches proved the 99% bar; the rulebook fell just short.</li>
+  <li><a href="#q3">Q3 The test</a> and <a href="#q4">Q4 The bar</a>: how they were tested, and why 99% with proof.</li>
+  <li><a href="#q5">Q5 Earning trust</a> and <a href="#q6">Q6 The agreement trap</a>: why trust must come from outcomes, not from people agreeing.</li>
+  <li><a href="#q7">Q7 Cost</a> and <a href="#q8">Q8 Running it</a>: what each approach costs and what to watch once it is live.</li>
+  </ul>`;
+  const detail = `<p>This section was added after every result was known (decision record 0019). It changes no result: no approach met the 99% bar (Q1).</p>
+  <ul>
+  <li><strong>Checks taken off desks</strong> = manual steps between the first invoice receipt and clearing, on the ${int(b.paid)} invoices the picked rulebook paid, counted as the replay counts them. Yearly = that × ${yr}, assuming no seasonality.</li>
+  <li><strong>Time</strong> = checks × minutes ÷ 60; full-time equivalents at 1,800 hours a year. <strong>Money</strong> = hours × hourly cost.</li>
+  <li><strong>Break-even</strong>: the rulebook saves ${int(b.paid)} checks and adds ${int(b.wrong)} late fixes, so it pays off while a late fix costs less than ${int(b.paid)} ÷ ${int(b.wrong)} = ${b.checks_per_mistake.toFixed(1)} checks. At the worst likely case (${pct(d.policies.find((p) => p.chosen).held_out.precision_lower, 2)} fine), ${b.checks_per_mistake_lower.toFixed(1)}.</li>
+  <li><strong>Values</strong> are invoice values in euros as recorded: ${eur(v.wrong)} on the ${int(b.wrong)} wrong passes, ${eur(v.paid)} on all ${int(b.paid)} paid, ${eur(v.held)} on all ${int(d.held_out_n)} test invoices.</li>
+  <li><strong>Largest tenth</strong>: the line (${eur(b.top10.line)}) is taken from the paid invoices themselves. It describes where the mistakes fell; it is not a tested limit.</li>
+  </ul>`;
+  return section("biz", "B", "<h1", plain, detail, [
+    `Minutes per check and hourly cost are the reader's assumptions, not measurements`,
+    `Rulebook cost is at API list prices on the run date`,
+    `No figure in this section changes the verdict, which stands as in Q1`,
+  ]);
+}
+function wireBiz(d) {
+  const b = d.business, perYear = b.touches_paid * (12 / b.months), min = $("#biz-min"), rate = $("#biz-rate");
+  if (!min || !rate) return;
+  const set = (k, s) => document.querySelectorAll(`[data-out="${k}"]`).forEach((el) => (el.textContent = s));
+  const draw = () => {
+    const m = Number(min.value), r = Math.min(500, Math.max(1, Number(rate.value) || 40)), c = (m / 60) * r, hrs = (perYear * m) / 60;
+    set("hours", `${int(hrs)} h`);
+    set("hours2", `${int(hrs)} hours a year`);
+    set("fte", `a year, about ${(hrs / 1800).toFixed(1)} full-time people`);
+    set("money", eur(hrs * r));
+    set("c", `€${c.toFixed(2)}`);
+    set("breakeven", `about €${int(c * b.checks_per_mistake)} per late fix`);
+    set("breakeven-low", `about €${int(c * b.checks_per_mistake_lower)}`);
+  };
+  min.addEventListener("change", draw);
+  rate.addEventListener("input", draw);
+  draw();
+}
 
 /* ---------- Q1: the answer ---------- */
 function boundPlot(d) {
@@ -90,13 +178,12 @@ function q1(d) {
   const headline = `No contender earned trust at the 99% bar: ${aPasses === 0 ? "the fixed rule passes nothing" : `the fixed rule passes ${int(aPasses)}`}, and the policy Claude wrote passes ${pct(cn / d.held_out_n, 1)} of held-out invoices at ${pct(ck / cn, 2)} correct, just short of the bar (lower bound ${pct(c.held_out.precision_lower, 2)}).`;
   const cs = wilson(d.c_sample.passed - d.c_sample.errors, d.c_sample.passed)[0];
   const no = (t) => `<span class="state standby">${t}</span>`;
-  const plain = `<h1 id="q1-h">Can an AI decide which invoices are safe to pay without a person checking?</h1>
-  <p class="headline">Not at the bar we set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, just short of the proof we asked for.</p>
+  const plain = `  <p class="headline">Not at the bar we set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, just short of the proof we asked for.</p>
   ${summaryStrip(d)}
   <h2 class="sub">Why this study</h2>
   <p>Many companies are deciding where AI should take on work that people do today. The evidence is often a demo, or a pilot that "looked good". We wanted a stricter test on real records: take one decision staff make thousands of times, let an AI make it, and check every call against what really happened.</p>
   <h2 class="sub">Why invoices</h2>
-  <p>The records are a large multinational company's purchasing for 2018. In them, staff decided ${int(d.candidates[0].manual_events)} times whether an invoice could be paid or needed checking. It is the most repeated of the decisions we sized, and every one has a known outcome: the payment either went through cleanly or someone had to fix it later. That lets us mark each AI call right or wrong. Q2 shows how it was chosen.</p>
+  <p>The records are a large multinational company's purchasing for 2018. In them, staff cleared invoices or removed payment blocks by hand ${int(d.candidates[0].manual_events)} times (manual clearing and block-removal events in the log). It is the most repeated of the decisions we sized, and every one has a known outcome: the payment either went through cleanly or someone had to fix it later. That lets us mark each AI call right or wrong. Q2 shows how it was chosen.</p>
   <h2 class="sub">The three AI understudies</h2>
   <ol class="plainlist understudies">
   <li><strong>A simple rule.</strong> Think of a fixed checklist. It looks at how often each kind of invoice went through cleanly from January to May. If a kind was clean almost every time, it pays that kind; otherwise it holds. There is no AI in it. It is the yardstick the AI must beat.</li>
@@ -128,7 +215,7 @@ function q1(d) {
   <p class="say"><b>Final comparison rule</b><span>On all test invoices the rulebook's worst likely case is ${pct(c.held_out.precision_lower, 2)}, under 99%, so the simple rule wins by default again. It is an empty win: it pays ${int(aPasses)} of ${int(d.held_out_n)} invoices.</span></p>
   <p class="small">Why two rules? We changed how the approaches are compared partway through, after one result was known. To be open about it, both answers are shown, and they agree.</p>
   <p class="struck small">The comparison rule was changed after the first policy's held-out result was known and before any other contender ran; under the original rule no contender clears the bar and the fixed rule wins by default, and both verdicts are shown.</p></div>`;
-  return section("q1", "Q1", "<h1", plain, detail, [
+  return section("q1", "Q1", "Can an AI decide which invoices are safe to pay without a person checking?", plain, detail, [
     `${int(d.held_out_n)} test invoices, locked with a fingerprint (checksum) before any understudy ran. No understudy saw how they turned out`,
     `Bar: the worst likely case (95% lower bound) of paid invoices being fine must be at least 99%`,
     `Three rulebooks written separately all landed between ${pct(Math.min(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} and ${pct(Math.max(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} fine`,
@@ -571,7 +658,7 @@ function q7(d) {
   };
   const secs = (s) => (s < 1 ? "under a second" : s < 120 ? `${Math.round(s)} seconds` : `${Math.round(s / 60)} minutes`);
   const vols = [d.candidates[0].manual_events, 1e6, 1e7];
-  const rows = vols.map((v, i) => `<tr><td>${int(v)}${i === 0 ? " (pay-or-check decisions made by hand in these records)" : ""}</td><td>${money((bPer1k * v) / 1000)}<span class="sub">${hours((minPer1k * v) / 1000)} of AI time</span></td><td>${money(cOnce * 12)}<span class="sub">${secs(secPerInv * v)} of computer time</span></td></tr>`).join("");
+  const rows = vols.map((v, i) => `<tr><td>${int(v)}${i === 0 ? " (manual clearing and block-removal events in these records)" : ""}</td><td>${money((bPer1k * v) / 1000)}<span class="sub">${hours((minPer1k * v) / 1000)} of AI time</span></td><td>${money(cOnce * 12)}<span class="sub">${secs(secPerInv * v)} of computer time</span></td></tr>`).join("");
   const plain = `<p>Both Claude approaches used the same AI model. Prices are what the same work would cost at Claude's standard published rates.</p>
   <div class="cost">
   <div><span class="small">Claude checking each invoice</span><span class="big">$${bPer1k.toFixed(2)}</span><span class="small">and about ${Math.round(minPer1k)} minutes of AI time for every 1,000 invoices, again and again.</span></div>
@@ -726,7 +813,8 @@ async function boot() {
     return;
   }
   const d = DATA;
-  main.innerHTML = [q1, q2, q3, q4, q5, q6, q7, q8, method].map((f) => f(d)).join("");
+  main.innerHTML = [biz, q1, q2, q3, q4, q5, q6, q7, q8, method].map((f) => f(d)).join("");
+  wireBiz(d);
   wireExplorer(d);
   wireJourney();
   wireRace();

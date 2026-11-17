@@ -145,8 +145,28 @@ def main():
         "replay_autonomous": [inv(by_id[x["id"]], week=x["week"]) for x in log],
     }
 
+    # Business case (ADR 0019): written after the verdict, for a business reader. Changes no result.
+    paid = [r for r in held if decide(r)]
+    wrong = [r for r in paid if not r["straight_through"]]
+    val = lambda rs: [r.get("invoice_value") or 0 for r in rs]  # noqa: E731
+    pv = sorted(val(paid))
+    top_line = pv[int(len(pv) * 0.9)]
+    top_wrong = [v for v in val(wrong) if v >= top_line]
+    c_lower = wilson(len(paid) - len(wrong), len(paid))[0]
+    business = {
+        "paid": len(paid), "wrong": len(wrong), "problems_all": sum(1 for r in held if not r["straight_through"]),
+        "checks_per_mistake": len(paid) / len(wrong), "checks_per_mistake_lower": 1 / (1 - c_lower),
+        "manual_clear_share": 1 - cands["ranked"][0]["batch_share"],
+        "touches_paid": sum(tm[r["id"]]["manual_touches"] for r in paid), "months": 3,
+        "value": {"held": sum(val(held)), "paid": sum(pv), "wrong": sum(val(wrong)),
+                  "median_paid": statistics.median(pv), "median_wrong": statistics.median(val(wrong))},
+        "top10": {"line": top_line, "wrong": len(top_wrong), "wrong_value": sum(top_wrong),
+                  "paid_value": sum(v for v in pv if v >= top_line)},
+    }
+
     data = {
         "built": time.strftime("%Y-%m-%d"),
+        "business": business,
         "source": {"name": "BPI Challenge 2019", "licence": "CC BY 4.0",
                    "doi": "10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1"},
         "log": {"raw": checks["raw"], "kept": analysis["kept"], "users": analysis["users"],
