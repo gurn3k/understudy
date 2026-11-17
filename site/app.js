@@ -591,6 +591,77 @@ function q7(d) {
   ]);
 }
 
+/* ---------- Q8: how each approach works, one yardstick, and what to watch live ---------- */
+function q8(d) {
+  const c = d.policies.find((p) => p.chosen), cPaid = c.held_out.coverage[0];
+  const cOnce = d.cost.c.usd / d.cost.c.calls;
+  const b2 = d.b2 && d.b2.b_alone && d.b2.cost ? d.b2 : null;
+  const bPerPaid = b2 ? b2.cost.usd / b2.b_alone.passed : d.cost.b.usd / d.b.sample.passed;
+  const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
+  const row = (label, a, b, cc) => `<tr><th scope="row">${label}</th><td>${a}</td><td>${b}</td><td>${cc}</td></tr>`;
+  const card = (name, wrong, cost, watch) => `<div><h4>${name}</h4><p><strong>How it goes wrong:</strong> ${wrong}</p><p><strong>Cost to run:</strong> ${cost}</p><p><strong>Watch:</strong></p><ul>${watch.map((w) => `<li>${w}</li>`).join("")}</ul></div>`;
+  const plain = `<p>Q3 showed what each approach did. This section shows how each one handled an invoice, why all three were judged by the same measures, and what a company should watch if it ran one for real.</p>
+  <h3>How each approach handled an invoice</h3>
+  <p>All three decided at the same moment: when the invoice arrived. Each could only pay it without a check or hold it for a person, and each saw only what was known at that moment.</p>
+  <div class="tablewrap"><table class="how"><caption>The three approaches side by side</caption><thead><tr><th scope="col"><span class="vh">Question</span></th><th scope="col">Simple rule</th><th scope="col">Claude checking each invoice</th><th scope="col">Claude's rulebook</th></tr></thead><tbody>
+  ${row("What it is", "A fixed checklist built from January to May records", "Claude reads each invoice's details and decides", "Claude writes a short rulebook once; ordinary software applies it")}
+  ${row("What it sees", "How often each kind of invoice went through cleanly in earlier months", "The invoice's details (supplier, spend area, value, whether the goods had arrived, earlier corrections), plus how often similar invoices and the same supplier went through cleanly", "Only summary tables from earlier months, never a single invoice")}
+  ${row("Who makes each call", "Software", "Claude, 25 invoices per request", "Software, following Claude's rules")}
+  ${row("Safety net", "Pays a kind of invoice only if its record already proves 99%", "Any unclear or missing answer counts as \"hold for a person\"", "Software checks the rulebook before it runs; anything the rules don't cover is held")}
+  ${row("Invoices it judged", `All ${int(d.held_out_n)}`, `${int(d.sample_n)}, then ${b2 ? int(b2.b_alone.n) : "more"} new ones`, `All ${int(d.held_out_n)}, in ${d.cost.c_run_s_all_held_out < 1 ? "under a second" : `${Math.round(d.cost.c_run_s_all_held_out)} seconds`}`)}
+  ${row("Paid without a check", "None", b2 ? `${pct(b2.b_alone.coverage, 1)} (follow-up)` : ratio([d.b.sample.passed, d.sample_n], 1), pct(cPaid / d.held_out_n, 1))}
+  ${row("Can a person read its reasoning?", "Yes: a table of kinds of invoice", "A short reason for each invoice, but no rule to approve in advance", `Yes: the picked rulebook has ${int(c.rules)} rules`)}
+  </tbody></table></div>
+  <h3>One yardstick for the test</h3>
+  <p>To compare them fairly, all three were judged on the same things:</p>
+  <ol class="plainlist">
+  <li><strong>Proof of 99%.</strong> Of the invoices it paid, the worst likely case had to be at least 99% fine (Q4).</li>
+  <li><strong>How many it paid.</strong> The share of invoices it took off people's desks. This is where the saving is.</li>
+  <li><strong>Beating the simple rule.</strong> An AI had to pay at least 10 percentage points more invoices while still proving 99%. Between the two Claude approaches, one won only if it paid at least as many invoices as the other and made clearly fewer mistakes. Otherwise they counted as not separated, and the cheaper one was preferred (Q3).</li>
+  <li><strong>Cost and time</strong> per 1,000 invoices, measured, not estimated (Q7).</li>
+  <li><strong>Earning trust over time.</strong> In the week-by-week replay: how soon it earned the right to pay alone, how much work it removed, and how many wrong payments got through (Q5).</li>
+  </ol>
+  <p>On this yardstick, none of the three earned trust at the 99% bar (Q3).</p>
+  <p>One yardstick answers "which approach does this job best?" It does not answer "how do we keep it safe once it is running?" Each approach goes wrong in a different way, so each needs its own extra checks.</p>
+  <h3>What to watch if you ran one for real</h3>
+  <p class="small">These are recommendations, not results from this test.</p>
+  <div class="kpis">
+  ${card("Simple rule", "the business changes, and the checklist goes stale.", "almost nothing.", [
+    "How often each kind of invoice's record is rechecked",
+    "How quickly a kind of invoice that has started to slip is spotted",
+    "Who keeps the checklist up to date",
+  ])}
+  ${card("Claude checking each invoice", "its cost grows with every invoice, its answers can vary, and a new version of the AI can behave differently.", `about $${bPerPaid.toFixed(2)} for each invoice it paid, because it held most of them.`, [
+    "Cost for each invoice taken off people's desks",
+    "Whether the same invoice gets the same answer twice",
+    "How many answers fail the software's checks",
+    "Whether its reasons would satisfy an auditor",
+    "A fresh test every time the AI model changes",
+  ])}
+  ${card("Claude's rulebook", "the rules go stale as suppliers, prices and buying habits change.", `about $${cOnce.toFixed(2)} per rulebook: a tiny fraction of a cent for each invoice it paid.`, [
+    "How often the rulebook is rewritten and tested again",
+    `Whether rewrites agree. Here, three rulebooks written separately landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine`,
+    "That a person reads and signs off each version before it is used",
+  ])}
+  </div>
+  <h4 class="kpis-all">For any of them</h4>
+  <ul>
+  <li><strong>Keep the guardrail on.</strong> Track how many recently paid invoices turned out fine, and switch the AI off automatically when that slips, as the replay does (Q5).</li>
+  <li><strong>Count the saving in hours and money,</strong> not just the share of invoices paid.</li>
+  <li><strong>Time to spot a problem,</strong> and how often the AI has to be switched off.</li>
+  <li><strong>How often people overrule it:</strong> a warning sign worth looking into, never a measure of accuracy. Q6 shows why agreement misleads.</li>
+  </ul>
+  <h3>One limit on every measure</h3>
+  <p>"Fine" means no one corrected the invoice before it was paid. Corrections made after payment are not in the records, so the true share could be lower than shown; this test could not measure by how much. A live system should also count corrections made after payment.</p>`;
+  const detail = `<p>Every approach decided at the first invoice receipt on an order line, using only facts known then and rates from order lines created January to May 2018. A wrong call to pay is an invoice that needed a price or quantity change, a cancellation, a debit memo, a payment block or a deletion before it was cleared.</p>
+  <p>Cost for each invoice paid is measured cost divided by invoices paid. Checking each invoice: $${(b2 ? b2.cost.usd : d.cost.b.usd).toFixed(2)} for ${b2 ? int(b2.b_alone.n) : int(d.sample_n)} invoices, of which it paid ${b2 ? int(b2.b_alone.passed) : int(d.b.sample.passed)}. Rulebook: $${cOnce.toFixed(2)} for the picked rulebook, which paid ${int(cPaid)} test invoices.</p>
+  <p>In the replay, an AI loses the right to pay alone in a kind of invoice when the best likely case (95% upper bound) of its last 200 settled calls falls below 99%.</p>`;
+  return section("q8", "Q8", "How each approach works, and how you'd run it", plain, detail, [
+    `The checks under "What to watch" are recommendations; none was measured in this test`,
+    `This section adds no new result and changes no verdict`,
+  ]);
+}
+
 const dayLong = (iso) => { const [y, m, dd] = iso.split("-").map(Number); return `${dd} ${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][m - 1]} ${y}`; };
 const endState = (states) => { const last = Object.values(states).map((r) => r[r.length - 1]); return last.includes("go") ? "go" : last.includes("cut") ? "cut" : "standby"; };
 const STATES = new Set(["unlit", "standby", "go", "cut"]);
@@ -655,7 +726,7 @@ async function boot() {
     return;
   }
   const d = DATA;
-  main.innerHTML = [q1, q2, q3, q4, q5, q6, q7, method].map((f) => f(d)).join("");
+  main.innerHTML = [q1, q2, q3, q4, q5, q6, q7, q8, method].map((f) => f(d)).join("");
   wireExplorer(d);
   wireJourney();
   wireRace();
