@@ -92,6 +92,7 @@ function q1(d) {
   const no = (t) => `<span class="state standby">${t}</span>`;
   const plain = `<h1 id="q1-h">Can an AI decide which invoices are safe to pay without a person checking?</h1>
   <p class="headline">Not at the bar we set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, just short of the proof we asked for.</p>
+  ${summaryStrip(d)}
   <h2 class="sub">Why this study</h2>
   <p>Many companies are deciding where AI should take on work that people do today. The evidence is often a demo, or a pilot that "looked good". We wanted a stricter test on real records: take one decision staff make thousands of times, let an AI make it, and check every call against what really happened.</p>
   <h2 class="sub">Why invoices</h2>
@@ -102,6 +103,7 @@ function q1(d) {
   <li><strong>Claude checking each invoice.</strong> Think of a new staff member who reads every invoice and decides. Claude, an AI model, is given each invoice's details and the past records, and answers "pay" or "hold". It is careful, but it costs a request to the AI for every invoice.</li>
   <li><strong>Claude writing a rulebook.</strong> Think of a manager writing a policy once. Claude studies the past records and writes a short set of rules. Ordinary software then applies those rules to every invoice, instantly and almost for free. People can read the rules and check them.</li>
   </ol>
+  ${journey(d)}
   <p>Each one made its calls on invoices from June to August 2018 that it had never seen: ${int(d.held_out_n)} in all, or a smaller sample for the costly one-by-one approach. We then compared its calls with what really happened.</p>
   <p><strong>The bar:</strong> of the invoices an AI pays without a check, no more than 1 in 100 may later need fixing. A short test can be lucky, so we judge each AI by its <em>worst likely case</em>: the lowest its true accuracy is likely to be, given how many invoices it handled. To pass, that worst likely case must be at least 99%.</p>
   ${wordsBox()}
@@ -131,6 +133,105 @@ function q1(d) {
     `Bar: the worst likely case (95% lower bound) of paid invoices being fine must be at least 99%`,
     `Three rulebooks written separately all landed between ${pct(Math.min(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} and ${pct(Math.max(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} fine`,
   ]);
+}
+
+/* ---------- Q1 summary strip and invoice journey ---------- */
+function summaryStrip(d) {
+  const c = d.policies.find((p) => p.chosen), [ck, cn] = c.held_out.precision, short = cn - ck - maxErrors(cn);
+  const b2 = d.b2 && d.b2.b_alone ? d.b2.b_alone : null;
+  const items = [
+    ["A simple rule", "Paid nothing", "No kind of invoice had a clean enough record."],
+    ["Claude checking each invoice", "Too few to tell", b2 ? `Paid ${pct(b2.coverage, 1)} of ${int(b2.n)} new invoices; not proven.` : "Paid too few to prove anything."],
+    ["Claude's rulebook", `${int(short)} mistakes short`, `Paid ${pct(cn / d.held_out_n, 0)} of invoices, ${pct(ck / cn, 2)} fine.`],
+  ];
+  return `<ul class="strip" aria-label="The result for each approach">${items.map(([who, what, why], i) => `<li class="${i === 2 ? "near" : ""}"><span class="who">${esc(who)}</span><span class="what">${esc(what)}</span><span class="why">${esc(why)}</span></li>`).join("")}</ul>`;
+}
+
+function journeyLanes(d) {
+  const pe = d.bar.pass_everything.full.precision, c = d.policies.find((p) => p.chosen), [ck, cn] = c.held_out.precision;
+  const b2 = d.b2 && d.b2.b_alone ? d.b2.b_alone : null;
+  const each = b2 ? [b2.passed, b2.wrong, b2.n] : [d.b.sample.passed, d.b.sample.errors, d.sample_n];
+  return [
+    { label: "Pay everything", note: "no AI, for comparison", paid: pe[1], wrong: pe[1] - pe[0], n: pe[1], faint: true },
+    { label: "A simple rule", paid: d.a.held_out.coverage[0], wrong: 0, n: d.held_out_n },
+    { label: "Claude checking each invoice", paid: each[0], wrong: each[1], n: each[2] },
+    { label: "Claude's rulebook", paid: cn, wrong: cn - ck, n: d.held_out_n },
+  ].map((l) => ({ ...l, pd: Math.round((l.paid / l.n) * 50), wd: Math.round((l.wrong / l.n) * 50) }));
+}
+
+function journey(d) {
+  const lanes = journeyLanes(d);
+  const dots = (k, cls) => `<i class="${cls}"></i>`.repeat(k);
+  const rows = lanes.map((l) => `<div class="lane${l.faint ? " faint" : ""}">
+    <p class="lane-lab"><strong>${esc(l.label)}</strong>${l.note ? ` <span>${esc(l.note)}</span>` : ""}</p>
+    <div class="pile paid"><span class="pile-n">${l.pd * 2} in 100 paid</span><div class="dots">${dots(l.pd - l.wd, "paid")}${dots(l.wd, "fix")}</div></div>
+    <div class="pile held"><span class="pile-n">${(50 - l.pd) * 2} in 100 held</span><div class="dots">${dots(50 - l.pd, "held")}</div></div>
+  </div>`).join("");
+  return `<figure class="journey" id="journey" aria-labelledby="journey-cap">
+  <div class="journey-head"><p class="j-title">100 invoices, four ways to handle them</p><button type="button" class="replay" data-replay="journey">Play again</button></div>
+  <div class="lanes" aria-hidden="true">${rows}</div>
+  <figcaption id="journey-cap" class="small"><span class="sr">${lanes.map((l) => `${l.label}: ${l.pd * 2} in 100 paid without a check.`).join(" ")} </span>Each dot is two invoices. Red dots needed fixing: paying everything gets about ${oneIn(lanes[0].n, lanes[0].wrong)} wrong. The AI approaches' mistakes are too rare to show at this scale; the explorer in Q3 shows them.</figcaption>
+</figure>`;
+}
+
+function wireJourney() {
+  const root = document.getElementById("journey");
+  if (!root) return;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const run = () => {
+    if (still) return;
+    root.classList.remove("go");
+    root.querySelectorAll(".lane").forEach((lane, li) => {
+      const left = lane.getBoundingClientRect().left;
+      lane.querySelectorAll(".dots i").forEach((dot, i) => {
+        dot.style.setProperty("--dx", `${left - dot.getBoundingClientRect().left}px`);
+        dot.style.setProperty("--delay", `${li * 260 + i * 14}ms`);
+      });
+    });
+    root.classList.add("ready");
+    void root.offsetWidth;
+    root.classList.add("go");
+  };
+  if (!still) root.classList.add("ready");
+  const obs = new IntersectionObserver((en) => { if (en.some((e) => e.isIntersecting)) { run(); obs.disconnect(); } }, { threshold: 0.35 });
+  obs.observe(root);
+  root.querySelector("[data-replay]").addEventListener("click", run);
+}
+
+/* ---------- Q6 race: wrong payments, week by week ---------- */
+function race(d) {
+  const real = d.replay.timeline, agr = d.agreement.example_timeline;
+  if (!agr) return "";
+  const cum = (tl) => { let s = 0; return tl.map((x) => (s += x.wrong)); };
+  const cr = cum(real), ca = cum(agr), n = Math.min(cr.length, ca.length);
+  const narrow = matchMedia("(max-width: 600px)").matches;
+  const W = narrow ? 360 : 640, H = narrow ? 230 : 260, L = 34, R = narrow ? 96 : 150, T = 18, B = 30;
+  const top = Math.ceil(Math.max(...ca, ...cr) / 50) * 50;
+  const x = (i) => L + (i / (n - 1)) * (W - L - R), y = (v) => T + (1 - v / top) * (H - T - B);
+  const path = (c) => c.slice(0, n).map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+  const wi = (w) => d.replay.weeks.indexOf(w);
+  const fa = wi(d.agreement.example_first), fr = wi(d.replay.first);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="race-t race-d"><title id="race-t">Wrong payments added up week by week</title>
+  <desc id="race-d">Switched on by agreement (one example run): ${int(ca[n - 1])} wrong payments by the end, first switched on in ${wk(d.agreement.example_first)}. Switched on by real results: ${int(cr[n - 1])}, first switched on in ${wk(d.replay.first)}.</desc>`;
+  for (let v = 0; v <= top; v += top / 2) s += `<line class="tick" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${int(v)}</text>`;
+  s += `<text x="${L}" y="${H - 8}">${esc(wk(d.replay.weeks[0]))}</text><text x="${x(n - 1)}" y="${H - 8}" text-anchor="end">${esc(wk(d.replay.weeks[n - 1]))}</text>`;
+  s += `<path class="ln real" pathLength="1" d="${path(cr)}"/><path class="ln agr" pathLength="1" d="${path(ca)}"/>`;
+  if (fa >= 0) s += `<circle class="mk agr" cx="${x(fa)}" cy="${y(ca[fa])}" r="4.5"/><text class="mk-t" x="${x(fa) + 6}" y="${y(ca[fa]) - 8}">on</text>`;
+  if (fr >= 0) s += `<circle class="mk real" cx="${x(fr)}" cy="${y(cr[fr])}" r="4.5"/><text class="mk-t" x="${x(fr) + 6}" y="${y(cr[fr]) - 8}">on</text>`;
+  s += `<text class="end agr" x="${x(n - 1) + 8}" y="${y(ca[n - 1]) + 5}">${int(ca[n - 1])} by agreement</text><text class="end real" x="${x(n - 1) + 8}" y="${y(cr[n - 1]) + 5}">${int(cr[n - 1])} by real results</text>`;
+  return `<figure class="race" id="race"><div class="journey-head"><p class="j-title">Wrong payments, added up week by week</p><button type="button" class="replay" data-replay="race">Play again</button></div>${s}</svg>
+  <figcaption class="small">One example run of the simulation, with reviewers copying 9 times in 10 (across 20 runs the middle result was about ${int(Math.floor(d.agreement.alphas["0.9"].wrong_median / 10) * 10)}). "On" marks the week the AI was first switched on.</figcaption></figure>`;
+}
+
+function wireRace() {
+  const root = document.getElementById("race");
+  if (!root) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const run = () => { root.classList.remove("go"); root.classList.add("ready"); void root.offsetWidth; root.classList.add("go"); };
+  root.classList.add("ready");
+  const obs = new IntersectionObserver((en) => { if (en.some((e) => e.isIntersecting)) { run(); obs.disconnect(); } }, { threshold: 0.4 });
+  obs.observe(root);
+  root.querySelector("[data-replay]").addEventListener("click", run);
 }
 
 /* ---------- B follow-up (exact sentences from the decision record) ---------- */
@@ -431,7 +532,7 @@ function q6(d) {
   <h3>What we tested</h3>
   <p>We ran the same week-by-week replay as in Q5, but this time the AI was switched on when staff agreed with it, not when real results proved it right. The staff were simulated: they copy the AI's suggestion 9 times in 10. The other time they check properly and catch most of its mistakes. We ran this 20 times; the figures are the middle result of the 20 runs.</p>
   <h3>What happened</h3>
-  ${pair("Wrong payments while the AI was switched on", t.wrong, a9.wrong_median, int(t.wrong), `about ${int(down10(a9.wrong_median))}`)}
+  ${race(d) || pair("Wrong payments while the AI was switched on", t.wrong, a9.wrong_median, int(t.wrong), `about ${int(down10(a9.wrong_median))}`)}
   ${pair("Invoices it paid by itself", t.passed, a9.passed_median, int(t.passed), `about ${round100(a9.passed_median)}`)}
   <p>Judged on agreement, the AI was switched on about ${word(Math.round(med(gaps9)))} weeks sooner, paid far more invoices by itself, and made ${word(times)} times as many wrong payments. Each payment was less likely to be wrong (about ${pct(a9.wrong_median / a9.passed_median, 1)} against ${pct(t.wrong / t.passed, 1)}), but only because the rulebook happens to be about 99% right. A much worse AI would have been agreed with nearly as often.</p>
   <p class="callout"><strong>The agreement it was switched on for was mostly copied. It measured the reviewers, not the AI.</strong></p>
@@ -556,6 +657,8 @@ async function boot() {
   const d = DATA;
   main.innerHTML = [q1, q2, q3, q4, q5, q6, q7, method].map((f) => f(d)).join("");
   wireExplorer(d);
+  wireJourney();
+  wireRace();
   const t = d.replay.timeline;
   let cum = [];
   t.reduce((acc, x, i) => (cum[i] = { p: acc.p + x.passed, w: acc.w + x.wrong }), { p: 0, w: 0 });
