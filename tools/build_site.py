@@ -50,6 +50,8 @@ def adrs():
 
 def b2_summary(cost):
     """The follow-up run of B (ADR 0018): its scored result and its own cost."""
+    if not (DATA / "b2_result.json").exists():
+        return None
     res = load_json(DATA / "b2_result.json")
     meta = [row["meta"] for b in range(1, res["blocks"] + 1)
             for row in load_json(DATA / f"b2_live_block_{b:02d}.json")["log"]]
