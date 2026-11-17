@@ -313,3 +313,10 @@ table.score tr.chosen td:first-child { padding-left: 10px; }
 .race.ready.go .ln { stroke-dashoffset: 0; transition: stroke-dashoffset 2.6s cubic-bezier(.33,0,.2,1); }
 .race.ready .end, .race.ready .mk, .race.ready .mk-t { opacity: 0; }
 .race.ready.go .end, .race.ready.go .mk, .race.ready.go .mk-t { opacity: 1; transition: opacity .4s ease 2.4s; }
+
+/* Maker's mark */
+.sign { display: flex; align-items: center; gap: 14px; width: fit-content; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--ink-2); text-decoration: none; font: 700 13px var(--display); letter-spacing: .08em; text-transform: uppercase; min-height: 44px; }
+.sign .logo { width: auto; height: 50px; margin: -6px -8px; display: block; }
+.sign .lg-a { fill: var(--ink); }
+.sign .lg-b { fill: var(--pencil); }
+.sign:hover span { color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
