@@ -211,7 +211,7 @@ function q1(d) {
   const cs = wilson(d.c_sample.passed - d.c_sample.errors, d.c_sample.passed)[0];
   const no = (t) => `<span class="state standby">${t}</span>`;
   const plain = `<h1 id="q1-h">Can an AI decide which invoices are safe to pay without a person checking?</h1>
-  <p class="jump"><a href="#biz">Here for the business decision? Jump to the business case &rarr;</a></p>
+  <p class="jump"><a href="#biz">Here for the business decision? Jump to the business case &rarr;</a><br><a href="rfp.html">Ready to run a pilot? Read the formal pilot request (RFP) &rarr;</a></p>
   <p class="headline">Not at the bar I set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, just short of the proof I asked for.</p>
   ${summaryStrip(d)}
   <h2 class="sub">Why this study</h2>
