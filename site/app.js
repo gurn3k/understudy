@@ -138,6 +138,7 @@ function biz(d) {
   <li><a href="#q3">Q3 The test</a> and <a href="#q4">Q4 The bar</a>: how they were tested, and why 99% with proof.</li>
   <li><a href="#q5">Q5 Earning trust</a> and <a href="#q6">Q6 The agreement trap</a>: the replay and the simulation in full.</li>
   <li><a href="#q7">Q7 Cost</a> and <a href="#q8">Q8 Running it</a>: what each approach costs and what to watch once it is live.</li>
+  <li><a href="rfp.html">A model request for a pilot proposal</a>: scope, requirements, gates, owners, risks, costs and sign-off, for a company that wants to run the pilot I recommend.</li>
   </ul>
   <p class="small footnote" id="usd-note"><a href="#usd-ref">*</a> All money values are in US dollars. Invoice values were recorded in euros and are converted at ${R.toFixed(3)} US dollars per euro, the European Central Bank's average reference rate for 2018. AI costs are at the provider's published US-dollar list prices on the run date.</p>`;
   const detail = `<p>I added this section after every result was known (decision record 0019). It changes no result: no approach met the 99% bar (Q1).</p>
