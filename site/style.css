@@ -376,3 +376,14 @@ table.keys { min-width: 600px; }
 table.num td { text-align: right; }
 .ask { border-top: 2px solid var(--ink); padding-top: 12px; margin: 22px 0 14px; font-size: 18px; }
 .bars-title { font: 700 13px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin: 20px 0 0; }
+.dcards { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 20px 0; }
+.dcard { background: var(--wash); border-top: 4px solid var(--pencil); padding: 16px 18px 6px; }
+.dcard h3 { margin: 4px 0 10px; }
+.dcard p { margin: 0 0 10px; }
+.dcard-id { font: 700 13px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--pencil); }
+.dcard-ask { border-top: 1px solid var(--rule); padding-top: 10px; }
+/* RFP contents: the section being read lights green */
+#toc a[aria-current] .lamp { background: #3fae6d; box-shadow: 0 0 0 2px var(--frame), 0 0 0 3px #3fae6d, 0 0 10px 2px rgba(63, 174, 109, .75); }
+#toc a[aria-current] { color: var(--frame-ink); }
+@media (prefers-reduced-motion: no-preference) { #toc .lamp { transition: background-color .3s, box-shadow .3s; } }
+.dcard .bars .track { background: var(--paper); }

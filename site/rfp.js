@@ -23,7 +23,7 @@ const tbl = (caption, heads, rows, cls = "") =>
   `<div class="tablewrap"><table class="rfp ${cls}"><caption>${caption}</caption><thead><tr>${heads.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i === 0 ? `<th scope="row">${c}</th>` : `<td>${c}</td>`)).join("")}</tr>`).join("")}</tbody></table></div>`;
 const sec = (id, n, title, body) => `<section id="${id}" aria-labelledby="${id}-h"><div class="col"><h2 id="${id}-h"><span class="marg" aria-hidden="true">${n}</span>${title}</h2>${body}</div><div></div></section>`;
 /* Bars drawn to scale (the main report's component). rows: [name, value, label, highlight] */
-const bars = (label, rows) => { const max = Math.max(...rows.map((r) => r[1])) || 1; return `<p class="bars-title">${label}</p><ul class="bars" aria-label="${label}">${rows.map(([n, x, l, hit]) => `<li class="${hit ? "hit" : ""}"><span class="name">${n}</span><span class="track" aria-hidden="true"><span class="fill" style="width:${(x / max) * 100}%"></span></span><span class="val">${l}</span></li>`).join("")}</ul>`; };
+const bars = (label, rows, scale) => { const max = scale || Math.max(...rows.map((r) => r[1])) || 1; return `<p class="bars-title">${label}</p><ul class="bars" aria-label="${label}">${rows.map(([n, x, l, hit]) => `<li class="${hit ? "hit" : ""}"><span class="name">${n}</span><span class="track" aria-hidden="true"><span class="fill" style="width:${(x / max) * 100}%"></span></span><span class="val">${l}</span></li>`).join("")}</ul>`; };
 const list = (xs, tag = "ul") => `<${tag} class="plainlist">${xs.map((x) => `<li>${x}</li>`).join("")}</${tag}>`;
 
 function figures(d) {
@@ -153,7 +153,8 @@ function build(d) {
     ["D2", "Run monthly blind spot-checks of paid invoices.", "It guards against reviewers copying the AI."],
     ["D3", "Track how often people overrule the rulebook, as a warning sign only.", "Agreement is not accuracy."],
     ["D4", "Provide an exit plan and keep the data portable.", "A supplier or model may change."],
-  ])}`));
+  ])}
+  <p class="jump"><a href="#s14">The findings behind D1 to D4 are in section 14 &rarr;</a></p>`));
 
   const ph = [
     ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (minutes per check, cost of a late fix, mistake rate); write the bar and the wrong-payment budget down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget"],
@@ -284,13 +285,36 @@ function build(d) {
   ${list(["Approach, mapped to the requirements.", "Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan."])}
   <h3>Evaluation criteria</h3>
   <p>The weights are my proposal; the issuer sets its own and publishes them to proposers.</p>
-  ${tbl("Proposed weights", ["Criterion", "Weight (points of 100)"], [["Safety and controls (M1 to M8, section 10)", "25"], ["Approach and measurement", "25"], ["Cost", "20"], ["Delivery plan and governance", "15"], ["Team and experience", "10"], ["Exit and portability", "5"]])}
+  ${tbl("Proposed weights", ["Criterion", "Weight (points of 100)"], [["Safety and controls (M1 to M8, D1 to D3, section 10)", "25"], ["Approach and measurement", "25"], ["Cost", "20"], ["Delivery plan and governance", "15"], ["Team and experience", "10"], ["Exit and portability", "5"]])}
   <h3>Terms</h3>
   <p>A proposer shall treat the issuer's data as confidential, shall not start work before a signed approval, and accepts that the issuer may stop at any gate. Changes to this document follow the change log in Appendix D.</p>`));
 
   out.push(sec("s13", "13", "Approvals and sign-off", `
   <p>I recommend that each person below signs once, at Gate 1, and again at Gate 4.</p>
   ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
+
+  const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
+  const topShareWrong = b.top10.wrong_value / b.value.wrong, topSharePaid = b.top10.paid_value / b.value.paid;
+  const dcard = (id, title, found, visual, why, ask) => `<article class="dcard"><p class="dcard-id">${id} · Recommended, not tested</p><h3>${title}</h3><p><strong>What I found:</strong> ${found}</p>${visual}<p><strong>Why it matters:</strong> ${why}</p><p class="dcard-ask"><strong>What I ask proposers:</strong> ${ask}</p></article>`;
+  out.push(sec("s14", "14", "Special findings: the desirable requirements, and why I recommend them", `
+  <p class="headline">The mandatory requirements keep the pilot safe. These four extras come from things I saw in the study, and I would score them.</p>
+  <p class="small">Each is a recommendation drawn from the evidence, not a tested result. None changes the verdict: no approach proved the 99% bar.</p>
+  <div class="dcards">
+  ${dcard("D1", "Send the largest invoices to a person", `the largest tenth of the invoices the rulebook paid (${usd(b.top10.line * f.R)} and up) held ${int(b.top10.wrong)} of its ${int(b.wrong)} mistakes, but ${pct(topShareWrong, 0)} of their value.`,
+    bars("Largest tenth of paid invoices: share of each total", [["Share of invoices paid", b.top10.count / b.paid, pct(b.top10.count / b.paid, 0)], ["Share of mistakes, by count", b.top10.wrong / b.wrong, pct(b.top10.wrong / b.wrong, 0)], ["Share of value paid", topSharePaid, pct(topSharePaid, 0)], ["Share of mistakes' value", topShareWrong, pct(topShareWrong, 0), true]], 1),
+    "a value limit is a common accounts-payable control, and on these invoices that tenth held most of the mistakes' value. The line here was drawn from the same invoices after the results, so it describes what happened; it does not show a limit would help.",
+    "set the limit from the company's own policy or earlier months, before the pilot, and test it there.")}
+  ${dcard("D2", "Check a sample of paid invoices blind, every month", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} wrong payments, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
+    "", "reviewers who can see the AI's answer tend to agree with it. A blind check, where the reviewer does not see the AI's call, measures the AI, not the reviewer.",
+    "describe the sample size, who checks, and how the AI's answer is hidden from them.")}
+  ${dcard("D3", "Watch how often people overrule it, as a warning sign only", "agreement mostly measured the reviewers in the simulation, not the AI.",
+    "", "a rising override rate is worth looking into. A low one is not proof of accuracy, so it must never be used to grant trust (requirement M2).",
+    "show the override rate on the monthly report, next to outcome-based accuracy.")}
+  ${dcard("D4", "Plan the exit, and keep the data portable", `three rulebooks written separately by the same AI landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine on the same invoices.`,
+    "", "a new rulebook or a new AI model can behave differently. The company needs to be able to retest, switch supplier or stop, without losing the record of every call.",
+    "describe the exit steps, the data the company keeps, and how every rulebook version is retested before use.")}
+  </div>
+  <p>Under the evaluation weights in section 12, D1 to D3 count under "Safety and controls" and D4 under "Exit and portability".</p>`));
 
   out.push(sec("ap", "App.", "Appendices", `
   <h3>A. Glossary</h3>
@@ -369,7 +393,7 @@ async function boot() {
   }
   const parts = build(d);
   main.innerHTML = parts.join("");
-  const names = { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost", s12: "Proposers", s13: "Approvals", ap: "Appendices" };
+  const names = { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost", s12: "Proposers", s13: "Approvals", s14: "Findings", ap: "Appendices" };
   $("#toc").innerHTML = Object.entries(names).map(([id, n]) => `<li><a href="#${id}"><i class="lamp"></i><span>${id === "ap" ? "A" : id.slice(1)}</span> ${n}</a></li>`).join("");
   wire(d);
   const links = [...document.querySelectorAll(".cues a, .tabs a[href^='#']")];
@@ -378,6 +402,8 @@ async function boot() {
     links.forEach((a) => (a.getAttribute("href") === "#" + en.target.id ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
   }), { rootMargin: "-30% 0px -60% 0px" });
   document.querySelectorAll("main section").forEach((s) => obs.observe(s));
+  /* The page is drawn after load, so a link to a section needs a scroll once it exists. */
+  if (location.hash) { const el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView(); }
 }
 
 $(".theme").addEventListener("click", () => {

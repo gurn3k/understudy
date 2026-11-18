@@ -162,7 +162,7 @@ def main():
         "eur_usd": 1.1810,
         "value": {"held": sum(val(held)), "paid": sum(pv), "wrong": sum(val(wrong)),
                   "median_paid": statistics.median(pv), "median_wrong": statistics.median(val(wrong))},
-        "top10": {"line": top_line, "wrong": len(top_wrong), "wrong_value": sum(top_wrong),
+        "top10": {"line": top_line, "count": sum(1 for v in pv if v >= top_line), "wrong": len(top_wrong), "wrong_value": sum(top_wrong),
                   "paid_value": sum(v for v in pv if v >= top_line)},
     }
 
