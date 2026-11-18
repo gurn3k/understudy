@@ -6,6 +6,7 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const int = (n) => Math.round(n).toLocaleString("en-US");
 const half = (n) => (Number.isInteger(n) ? int(n) : n.toLocaleString("en-US", { maximumFractionDigits: 1 }));
+const word = (n) => ["None", "One", "Two", "Three", "Four"][n] || String(n);
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const usd = (x) => (x >= 1e6 ? `$${(x / 1e6).toFixed(2)}M` : x >= 1e4 ? `$${int(Math.round(x / 1000))}k` : `$${int(x)}`);
 const fill = (t) => `<span class="blank" title="To be completed by the adopting company">[${t}]</span>`;
@@ -13,12 +14,16 @@ const fill = (t) => `<span class="blank" title="To be completed by the adopting 
 /* Assumptions of mine, not measurements. Shown on the page as such. */
 const PH = { p0: 4, p2: 12, p3: 2 }; // weeks
 const OVERSIGHT_H = 8; // hours a week of oversight during the pilot
+const DEF_MIN = 5, DEF_RATE = 40; // input defaults: my assumptions
+const AGREE = "0.9", SIM_RUNS = 20; // the simulation shown: reviewers copy this share; runs per ADR 0017
 const LATE_FIX = 100; // US$ per late fix: an assumption for the scenario table
 const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
 
 const tbl = (caption, heads, rows, cls = "") =>
   `<div class="tablewrap"><table class="rfp ${cls}"><caption>${caption}</caption><thead><tr>${heads.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i === 0 ? `<th scope="row">${c}</th>` : `<td>${c}</td>`)).join("")}</tr>`).join("")}</tbody></table></div>`;
 const sec = (id, n, title, body) => `<section id="${id}" aria-labelledby="${id}-h"><div class="col"><h2 id="${id}-h"><span class="marg" aria-hidden="true">${n}</span>${title}</h2>${body}</div><div></div></section>`;
+/* Bars drawn to scale (the main report's component). rows: [name, value, label, highlight] */
+const bars = (label, rows) => { const max = Math.max(...rows.map((r) => r[1])) || 1; return `<p class="bars-title">${label}</p><ul class="bars" aria-label="${label}">${rows.map(([n, x, l, hit]) => `<li class="${hit ? "hit" : ""}"><span class="name">${n}</span><span class="track" aria-hidden="true"><span class="fill" style="width:${(x / max) * 100}%"></span></span><span class="val">${l}</span></li>`).join("")}</ul>`; };
 const list = (xs, tag = "ul") => `<${tag} class="plainlist">${xs.map((x) => `<li>${x}</li>`).join("")}</${tag}>`;
 
 function figures(d) {
@@ -27,7 +32,7 @@ function figures(d) {
   const firstWk = d.replay.weeks.indexOf(d.replay.first) + 1;
   const perYear = b.touches_paid * (12 / b.months);
   const v = Object.fromEntries(Object.entries(b.value).map(([k, x]) => [k, x * R]));
-  return { b, R, c, t, b2, firstWk, perYear, v, cOnce: d.cost.c.usd / d.cost.c.calls, ag: d.agreement.alphas["0.9"],
+  return { b, R, c, t, b2, firstWk, perYear, v, cOnce: d.cost.c.usd / d.cost.c.calls, ag: d.agreement.alphas[AGREE],
     totalWeeks: PH.p0 + firstWk + PH.p2 + PH.p3, stopWk: firstWk * 2 };
 }
 
@@ -52,23 +57,33 @@ function build(d) {
   ])}
   </div><div></div></section>`);
 
+  const phases = [["0 Set-up", PH.p0], ["1 Practice mode", firstWk], ["2 Limited autonomy", PH.p2], ["3 Review", PH.p3]];
+  const timeline = `<figure class="tline"><div class="tline-bar" role="img" aria-label="Pilot plan: ${phases.map(([n, w], i) => `${n}, ${i === 1 ? "about " : ""}${w} weeks`).join("; ")}">${phases.map(([n, w], i) => `<span class="seg s${i}" style="flex:${w}"><b>${n}</b><i>${i === 1 ? "~" : ""}${w} wk</i></span>`).join("")}</div><figcaption class="small">${totalWeeks} weeks in all. Each phase ends at a gate (section 7). Phase 1 ends when a kind of invoice proves the bar, which took ${firstWk} weeks in the replay.</figcaption></figure>`;
   out.push(sec("s1", "1", "Executive summary", `
-  <p class="headline">I ask for approval of a controlled pilot, not a roll-out: ${totalWeeks} weeks in four gated phases, starting with ${PH.p0} weeks of set-up.</p>
-  ${list([
-    `<strong>What I tested.</strong> Three approaches on ${int(d.held_out_n)} real test invoices. None proved the 99% bar. The closest, an AI-written rulebook, paid ${int(b.paid)} (${pct(b.paid / d.held_out_n, 1)}) without a check and got ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} of them right. Its worst likely case was ${pct(c.held_out.precision_lower, 2)}.`,
-    `<strong>The prize, on paper.</strong> About ${int(perYear)} manual checks a year, roughly <span data-out="hours"></span> of people's time (<span data-out="fte"></span> full-time people), worth about <span data-out="money"></span> a year at your inputs in section 11. On paper means as if the rulebook were trusted from day one.`,
-    `<strong>The risk.</strong> ${int(b.wrong)} of the ${int(b.paid)} invoices it would have paid needed a fix first: ${pct(b.wrong / b.paid, 2)} of invoices but ${pct(v.wrong / v.paid, 1)} of their value (${usd(v.wrong)} of ${usd(v.paid)}). That is invoice value, not money lost.`,
-    `<strong>The safer way, tested.</strong> In a replay where the rulebook had to earn trust one kind of invoice at a time, the first kind qualified in week ${firstWk}. While trusted it still paid ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}). I plan for errors in the first months.`,
-    `<strong>The cost of the pilot.</strong> About <span data-out="pilot"></span> of oversight time, before your integration cost. That is <span data-out="share"></span> of the on-paper yearly saving, a gross ceiling before late-fix costs.`,
-    `<strong>The return.</strong> The pilot repays itself in its first year after if it earns at least <span data-out="need"></span> of the on-paper volume, at my assumed <span data-out="late"></span> per late fix<span data-out="need-int"></span>. Section 11 shows return, payback and wrong payments for four scenarios, each a scenario, not a forecast.`,
-    `<strong>The decision I ask for.</strong> Approve Phase 0 (set-up and baseline) now. Every later phase waits for a gate in section 7.`,
-  ])}
+  <p class="headline">I ask for approval of a controlled pilot, not a roll-out: ${totalWeeks} weeks in four gated phases.</p>
+  ${timeline}
+  ${tbl("Key figures", ["Question", "Answer", "What it means"], [
+    ["What was tested?", `3 approaches, ${int(d.held_out_n)} real invoices`, "None proved the 99% bar"],
+    ["How close did the best get?", `Rulebook paid ${pct(b.paid / d.held_out_n, 1)}; ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} right; worst likely case ${pct(c.held_out.precision_lower, 2)}`, "Below the bar: not proved"],
+    ["The prize on paper", `${int(perYear)} checks a year; <span data-out="hours"></span>; <span data-out="fte"></span> full-time people; <span data-out="money"></span> a year`, "Only if trusted from day one"],
+    ["The risk", `${int(b.wrong)} of ${int(b.paid)} paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
+    ["Trust earned safely (replay)", `First kind in week ${firstWk}; ${int(t.passed)} paid, ${int(t.wrong)} wrong (${pct(t.wrong / t.passed, 1)})`, "Expect errors in the first months"],
+    ["Pilot cost", `<span data-out="pilot"></span> oversight, plus integration`, `<span data-out="share"></span> of the on-paper yearly saving; a gross ceiling before late-fix costs`],
+    ["Return", `Repays itself in its first year after the pilot if it earns <span data-out="need"></span> of the on-paper volume`, `At <span data-out="late"></span> per late fix<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
+  ], "keys")}
+  <p class="ask"><strong>The decision I ask for:</strong> approve Phase 0 (set-up and baseline) now. Every later phase waits for a gate.</p>
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, safely, whether its own invoices would.</p>`));
 
   out.push(sec("s2", "2", "Purpose and background", `
-  <p>Today people handle nearly every invoice before it is paid: ${pct(b.manual_clear_share, 1)} of the steps that clear an invoice for payment or lift a payment block are done by hand. I wanted to know whether AI could safely take the routine ones off people's desks, and how a company would prove it before trusting it.</p>
-  <p>I ran the test on a real multinational company's purchasing records from 2018 (${int(d.log.raw.cases)} order lines, ${int(d.log.raw.events)} recorded steps, published for research). The result is a clear <em>no</em> at the bar I set, and a clear method for finding out in your own data. A pilot is the way to run that method. It is also the only way to learn two things the records could not tell me: how many minutes a check really takes, and what a late fix really costs.</p>
-  <p>This request asks proposers, whether an internal team or an outside supplier, to say how they would run that pilot to the requirements below.</p>`));
+  <p>People handle nearly every invoice by hand before it is paid. I tested whether AI could safely take the routine ones off their desks, and how a company would prove it first. The answer at my bar was <em>no</em>, but it shows how to find out, and a pilot is how a company does that on its own invoices.</p>
+  ${tbl("The study at a glance", ["Item", "Detail"], [
+    ["Data", "One real multinational company's purchasing records, 2018, published for research"],
+    ["Size", `${int(d.log.raw.cases)} order lines, ${int(d.log.raw.events)} recorded steps`],
+    ["Done by hand today", `${pct(b.manual_clear_share, 1)} of the steps that clear an invoice or lift a payment block`],
+    ["Result", "No approach proved the 99% bar"],
+    ["What only a pilot can tell you", "Real minutes per check, and the real cost of a late fix"],
+  ])}
+  <p>This request asks proposers, an internal team or an outside supplier, how they would run that pilot to the requirements below.</p>`));
 
   out.push(sec("s3", "3", "Scope, objectives and acceptance", `
   <h3>In scope</h3>
@@ -83,7 +98,9 @@ function build(d) {
     "<strong>O4.</strong> Leave a complete audit trail of every call and every outcome.",
   ])}
   <h3>Acceptance</h3>
-  <p>A kind of invoice is accepted for limited autonomy only when the worst likely case of its settled calls that it would have paid without a check is at least 99%. Counted as in the study, a kind needs at least ${int(mc[0].calls)} such calls with no mistakes, ${int(mc[1].calls)} with one, ${int(mc[2].calls)} with two and ${int(mc[3].calls)} with three. The pilot as a whole is accepted when the Gate 4 review (section 7) is signed.</p>`));
+  <p>A kind of invoice may be paid without a check only when the worst likely case of its settled calls (those it would have paid) reaches 99%. In practice that means:</p>
+  ${tbl("Settled calls a kind needs before it is trusted", ["Mistakes among them", "Calls needed, at least"], mc.map((m) => [word(m.errors), int(m.calls)]), "num")}
+  <p>The pilot as a whole is accepted when the Gate 4 review (section 7) is signed.</p>`));
 
   const ev = [
     ["A simple rule", "A fixed checklist from past records", int(d.held_out_n), int(d.a.held_out.coverage[0]), "none paid", "none paid", "Almost nothing"],
@@ -93,18 +110,26 @@ function build(d) {
   out.push(sec("s4", "4", "Evidence base", `
   <p>All figures come from the main report. Each approach could only pay an invoice without a check or hold it for a person, and each was scored against what really happened.</p>
   ${tbl("The three approaches on the test invoices (the bar: worst likely case of at least 99%)", ["Approach", "What it is", "Invoices judged", "Paid without a check", "Of those, wrong", "Worst likely case", "Cost to run"], ev)}
-  <p>None of the three proved the bar. In the week-by-week replay, the rulebook started in practice mode and earned the right to pay one kind of invoice at a time. The first kind qualified in week ${firstWk} of ${d.replay.weeks.length}. While trusted it passed ${int(t.passed)} invoices, ${int(t.wrong)} wrong, and removed ${int(t.touches_removed)} manual touches. The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} mistakes, mostly from one kind of invoice, and the window was too short to show the steady state.</p>
-  <p>In a simulation where reviewers copied the AI's suggestion 9 times in 10, trusting it on agreement paid a median of ${half(ag.passed_median)} invoices with ${half(ag.wrong_median)} wrong, against ${int(t.passed)} and ${int(t.wrong)} when trust was earned on outcomes. That is why requirement M2 forbids promotion on agreement. The simulation assumes how reviewers behave and is not a study of real people; the wrong payments per invoice paid were lower in it (because it paid far more), but there were ten times as many.</p>
+  <h3>Three ways to grant trust, on the same test invoices</h3>
+  ${tbl("How trust was granted, and what it let through", ["Way", "Invoices paid", "Wrong", "Wrong rate", "Note"], [
+    ["Trusted from day one (on paper)", int(b.paid), int(b.wrong), pct(b.wrong / b.paid, 2), "The ceiling; never tested live"],
+    ["Earned on outcomes (replay)", int(t.passed), int(t.wrong), pct(t.wrong / t.passed, 1), `First kind in week ${firstWk} of ${d.replay.weeks.length}; mostly one kind; window too short for the steady state`],
+    ["Trusted on agreement (simulation)", half(ag.passed_median), half(ag.wrong_median), `about ${pct(ag.wrong_median / ag.passed_median, 2)}`, `Reviewers copy ${Math.round(+AGREE * 10)} in 10; medians of ${SIM_RUNS} runs; assumed behaviour, not a study of people`],
+  ])}
+  ${bars("Wrong payments let through", [["Earned on outcomes", t.wrong, int(t.wrong)], ["Trusted on agreement (simulation, assumed behaviour)", ag.wrong_median, half(ag.wrong_median), true]])}
+  <p>Trusting on agreement let through about ten times the wrong payments, though at a lower rate per invoice, because it paid far more. That is why requirement M2 forbids it.</p>
   <h3>Limits of the evidence</h3>
   ${list(["One company's records, from 2018. The method carries over; the numbers are theirs.", "\"Fine\" means no one corrected the invoice before payment. Corrections after payment are not in the records, so the true share could be lower.", "The records hold no invoice text, so the AI never read an invoice document.", "Minutes per check and hourly cost are assumptions, not measurements."])}`));
 
   out.push(sec("s5", "5", "Assumptions, constraints and dependencies", `
   <h3>Assumptions (mine; replace them with your own in Phase 0)</h3>
-  ${list([
-    "Minutes a person spends per check, and the hourly cost of that time (the inputs in section 11).",
-    `Oversight of about ${OVERSIGHT_H} hours a week during the pilot.`,
-    `Phase lengths of ${PH.p0}, ${PH.p2} and ${PH.p3} weeks for Phases 0, 2 and 3. Phase 1 is planned at about ${firstWk} weeks, because that is when the first kind qualified in the replay; outcomes arrive weeks after invoices, so it cannot be hurried. Some supplier-written guides online suggest pilots of 30 to 90 days. I have not checked them, and a pilot that short is unlikely to collect enough settled outcomes for this bar.`,
-    "No seasonality in invoice volume, and a year of 1,800 working hours per full-time person.",
+  ${tbl("Assumptions", ["Assumption", "Default", "Why"], [
+    ["Minutes per check, hourly cost", `${DEF_MIN} minutes, $${DEF_RATE} (inputs in section 11)`, "The records show when work happened, not how long it took"],
+    ["Oversight during the pilot", `${OVERSIGHT_H} hours a week`, "My judgment"],
+    ["Phases 0, 2 and 3", `${PH.p0}, ${PH.p2} and ${PH.p3} weeks`, "My judgment"],
+    ["Phase 1 (practice mode)", `About ${firstWk} weeks`, "When the first kind qualified in the replay; outcomes arrive weeks after invoices"],
+    ["Shorter pilots", "Not used", "Some supplier-written guides online suggest 30 to 90 days. I have not checked them, and that is unlikely to collect enough outcomes for this bar"],
+    ["Volume and working year", "No seasonality; 1,800 hours a person", "A simplification"],
   ])}
   <h3>Constraints</h3>
   ${list(["Nothing is paid on the rulebook's say-so before Gate 2.", "Existing payment, approval and fraud controls stay in force throughout.", "The company's own policies override this document wherever they differ."])}
@@ -196,8 +221,8 @@ function build(d) {
   out.push(sec("s11", "11", "Cost model and expected benefit", `
   <p>These figures use your inputs. The defaults are my assumptions, not measurements. Change them to match the company; everything below updates.</p>
   <div class="biz-inputs" role="group" aria-label="Your inputs">
-  <label>Minutes a person spends per check <select id="in-min"><option value="2">2</option><option value="5" selected>5</option><option value="10">10</option></select></label>
-  <label>Cost of an hour of their time (US$) <input id="in-rate" type="number" min="1" max="500" step="1" value="40" inputmode="numeric"></label>
+  <label>Minutes a person spends per check <select id="in-min">${[2, 5, 10].map((m) => `<option value="${m}"${m === DEF_MIN ? " selected" : ""}>${m}</option>`).join("")}</select></label>
+  <label>Cost of an hour of their time (US$) <input id="in-rate" type="number" min="1" max="500" step="1" value="${DEF_RATE}" inputmode="numeric"></label>
   <label>Oversight hours a week during the pilot <input id="in-oh" type="number" min="0" max="80" step="1" value="${OVERSIGHT_H}" inputmode="numeric"></label>
   <label>Your one-off integration cost (US$) <input id="in-int" type="number" min="0" step="1000" value="" placeholder="not entered" inputmode="numeric"></label>
   </div>
@@ -214,12 +239,24 @@ function build(d) {
     ["Training, change management and audit time", "Yours to estimate", fill("US$ amount")],
     ["Total of the lines above", "", `<span data-out="total"></span>`],
   ])}
-  <p>The saving on paper is the ${int(b.touches_paid)} manual steps the rulebook would have removed in the ${b.months} test months, times ${12 / b.months}, assuming no seasonality: about ${int(perYear)} a year. It is a ceiling that assumes trust from day one. The replay shows the first months are slower, and I do not estimate the steady state.</p>
+  ${tbl("Where the on-paper saving comes from", ["Step", "Figure"], [
+    [`Manual steps on the invoices the rulebook would have paid, ${b.months} test months`, int(b.touches_paid)],
+    ["Scaled to a year (no seasonality)", `× ${12 / b.months} = ${int(perYear)}`],
+    ["What it assumes", "Trust from day one: a ceiling, not a forecast"],
+  ], "num")}
+  ${bars(`Manual steps removed in the same ${b.months} months`, [["On paper (trusted from day one)", b.touches_paid, int(b.touches_paid)], ["Earned in the replay", t.touches_removed, `${int(t.touches_removed)} (${pct(t.touches_removed / b.touches_paid, 1)})`, true]])}
+  <p class="small">In the replay, trust began only in week ${firstWk}, so the window shows the slow start, not the steady state. I do not estimate the steady state.</p>
   <h3>For the executive decision: return on the pilot, by scenario</h3>
-  <p>I cannot know how much of the on-paper saving a company would earn: that is what the pilot finds out. So instead of one forecast, the table shows the return if the pilot ends with kinds of invoice covering a given share of that volume. Each row is a scenario, not a prediction. Mistakes are counted at the higher of two rates: the worst likely case from the test (${pct(1 - c.held_out.precision_lower, 2)} of invoices paid) and the rate while trusted in the replay (${pct(t.wrong / t.passed, 2)}, ${int(t.wrong)} of ${int(t.passed)}). A kind is only trusted once it proves 99%, so this is a cautious stand-in, not what the pilot would aim for, and the same oversight hours continue after the pilot.</p>
+  <p>How much of the on-paper saving a company would earn is what the pilot finds out. So the table shows scenarios, not a forecast.</p>
+  ${tbl("Error rate used for the scenarios", ["Source", "Wrong rate"], [
+    ["Test: worst likely case", pct(1 - c.held_out.precision_lower, 2)],
+    [`Replay: while trusted (${int(t.wrong)} of ${int(t.passed)})`, pct(t.wrong / t.passed, 2)],
+    ["Used: the higher, to be cautious", pct(Math.max(1 - c.held_out.precision_lower, t.wrong / t.passed), 2)],
+  ], "num")}
+  <p class="small">A kind is only trusted once it proves 99%, so this rate is a cautious stand-in, not what the pilot would aim for. The same oversight hours continue after the pilot.</p>
   <div class="biz-inputs" role="group" aria-label="Scenario inputs">
   <label>Cost of one late fix (US$) <input id="in-late" type="number" min="0" max="100000" step="10" value="${LATE_FIX}" inputmode="numeric"></label>
-  <p class="small">My assumption, not a measurement. Set it from your own records. In this table, the time saved no longer covers the late fixes above about <span data-out="be-scen"></span> per late fix, before oversight costs. That differs from the break-even above, which counts one check per paid invoice; this table counts every manual step, about ${(b.touches_paid / b.paid).toFixed(2)} per invoice paid, and uses the higher error rate.</p>
+  <p class="small">My assumption. In this table the time saved stops covering late fixes above about <span data-out="be-scen"></span> each, before oversight. It differs from the break-even above because it counts every manual step (${(b.touches_paid / b.paid).toFixed(2)} per invoice paid) and uses the higher error rate.</p>
   </div>
   <div class="cost biz-tiles">
   <div><span class="small">Earned share needed to repay the pilot in its first year after</span><span class="big" data-out="need"></span><span class="small" data-out="need-note"></span></div>
@@ -228,12 +265,14 @@ function build(d) {
   <p class="warn" data-out="roi-warn" role="status"></p>
   ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Checks removed a year", "Wrong payments a year", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
     SCEN.map((x) => [pct(x, 0), `<span data-out="sc-checks-${x}"></span>`, `<span data-out="sc-wrong-${x}"></span>`, `<span data-out="sc-net-${x}"></span>`, `<span data-out="sc-roi-${x}"></span>`, `<span data-out="sc-pay-${x}"></span>`]), "scen")}
-  <ul class="fine">
-  <li>Net yearly benefit = time saved × hourly cost − wrong payments × cost of a late fix − ongoing oversight (the oversight hours above × 52 weeks).</li>
-  <li>First-year ROI = (net yearly benefit − total pilot cost) ÷ total pilot cost. Payback = total pilot cost ÷ monthly net benefit, counted from the end of the pilot. No discounting, no tax, no seasonality.</li>
-  <li>Total pilot cost is the total of the cost lines above, so integration counts only if you enter it. Training and audit time are not included.</li>
-  <li>${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling. In the replay, trust began only in week ${firstWk}, and it removed ${int(t.touches_removed)} manual touches against ${int(b.touches_paid)} on paper in the same window (${pct(t.touches_removed / b.touches_paid, 1)}). Even the ${pct(SCEN[0], 0)} row is far above anything observed (section 4), and none of these rows changes the verdict: no approach proved the 99% bar.</li>
-  </ul>
+  ${tbl("How each figure is worked out", ["Figure", "Formula"], [
+    ["Net yearly benefit", "Time saved × hourly cost − wrong payments × late-fix cost − oversight (hours a week × 52)"],
+    ["First-year ROI", "(Net yearly benefit − total pilot cost) ÷ total pilot cost"],
+    ["Payback", "Total pilot cost ÷ monthly net benefit, from the end of the pilot"],
+    ["Total pilot cost", "The cost lines above; integration only if entered; training and audit time not included"],
+    ["Not included", "Discounting, tax, seasonality, benefit during the pilot"],
+  ])}
+  <p class="small">${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling, and even the ${pct(SCEN[0], 0)} row is far above what the replay earned (chart above). None of these rows changes the verdict: no approach proved the 99% bar.</p>
   <h3>Benchmarks to collect from your own records</h3>
   <p>I quote no outside figure. Published accounts-payable benchmarks vary widely with definitions and sample, so the pilot should measure your own. Fill in these before Gate 1.</p>
   ${tbl("Baseline measures", ["Measure", "Your figure", "Source and date"], ["Cost to process one invoice", "Share of invoices paid with no manual touch", "Share of invoices needing a correction before payment", "Minutes per manual check", "Minutes to resolve an exception", "Cost of fixing a payment after it was made", "Share of payments corrected after payment", "Invoices per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}`));
@@ -278,7 +317,7 @@ function wire(d) {
   const badRate = Math.max(1 - f.c.held_out.precision_lower, f.t.wrong / f.t.passed), paidYr = b.paid * (12 / b.months);
   const set = (k, s) => document.querySelectorAll(`[data-out="${k}"]`).forEach((el) => (el.textContent = s));
   const draw = () => {
-    const m = Number(min.value), r = Math.min(500, Math.max(1, Number(rate.value) || 40)), h = Math.min(80, Math.max(0, Number(oh.value) || 0));
+    const m = Number(min.value), r = Math.min(500, Math.max(1, Number(rate.value) || DEF_RATE)), h = Math.min(80, Math.max(0, Number(oh.value) || 0));
     const i = Math.max(0, Number(integ.value) || 0), c = (m / 60) * r, hrs = (f.perYear * m) / 60;
     const ohCost = h * f.totalWeeks * r, pilot = ohCost + f.cOnce, total = pilot + i, saving = hrs * r;
     set("hours", `${int(hrs)} hours`);
