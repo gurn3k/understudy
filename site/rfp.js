@@ -8,7 +8,7 @@ const int = (n) => Math.round(n).toLocaleString("en-US");
 const half = (n) => (Number.isInteger(n) ? int(n) : n.toLocaleString("en-US", { maximumFractionDigits: 1 }));
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const usd = (x) => (x >= 1e6 ? `$${(x / 1e6).toFixed(2)}M` : x >= 1e4 ? `$${int(Math.round(x / 1000))}k` : `$${int(x)}`);
-const BLANK = '<span class="blank" aria-label="blank, to be completed">[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]</span>';
+const fill = (t) => `<span class="blank" title="To be completed by the adopting company">[${t}]</span>`;
 
 /* Assumptions of mine, not measurements. Shown on the page as such. */
 const PH = { p0: 4, p2: 12, p3: 2 }; // weeks
@@ -38,15 +38,15 @@ function build(d) {
   out.push(`<section id="s0" aria-labelledby="s0-h"><div class="col">
   <h1 id="s0-h">Request for Proposals: a controlled pilot of AI-assisted invoice clearing</h1>
   <p class="jump"><a href="./">&larr; Back to the main report</a></p>
-  <p class="small">This is a model document. I wrote it from my study, to show how a company with a formal process could ask for a pilot. It is not issued by any organisation, and every blank is for the company that adopts it to complete. I wrote it after every result was known (decision record 0020); it changes no result.</p>
+  <p class="small">This is a model document. I wrote it from my study, to show how a company with a formal process could ask for a pilot. It is not issued by any organisation, and every placeholder in [brackets] is for the company that adopts it to complete. I wrote it after every result was known (decision record 0020); it changes no result.</p>
   ${tbl("Document control", ["Item", "Entry"], [
     ["Title", "Request for Proposals: controlled pilot of AI-assisted invoice clearing"],
-    ["Reference", BLANK],
+    ["Reference", fill("Procurement reference, e.g. RFP-YYYY-NNN")],
     ["Version and date", `1.0, built ${esc(d.built)}`],
     ["Author", "The author of the Understudy study (first-person statements in this document are mine)"],
-    ["Status", "Model document. Dates, names, budgets and approvals are blank"],
-    ["Classification", BLANK],
-    ["Owner of this document", BLANK],
+    ["Status", "Model document. Text in [brackets] is a placeholder for the adopting company to complete"],
+    ["Classification", fill("e.g. Internal, Confidential")],
+    ["Owner of this document", fill("Name, role and department")],
   ])}
   </div><div></div></section>`);
 
@@ -158,7 +158,7 @@ function build(d) {
   out.push(sec("s8", "8", "Governance and responsibilities", `
   <p>R is responsible, A accountable, C consulted, I informed. Names are blank; the roles are mine.</p>
   ${tbl("Responsibilities", ["Activity", "Sponsor", "Pilot Owner", "Finance Controller", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner"], raci, "raci")}
-  ${tbl("Named people", ["Role", "Name", "Date appointed"], ["Executive Sponsor", "Pilot Owner (accounts payable)", "Finance Controller", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner"].map((r) => [r, BLANK, BLANK]))}
+  ${tbl("Named people", ["Role", "Name", "Date appointed"], ["Executive Sponsor", "Pilot Owner (accounts payable)", "Finance Controller", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner"].map((r) => [r, fill("Full name, title"), fill("DD Month YYYY")]))}
   <p>The Rulebook Owner who signs a rulebook version shall not approve its promotions (segregation of duties). The Pilot Owner reports to the sponsor at each gate.</p>`));
 
   const risks = [
@@ -184,7 +184,7 @@ function build(d) {
   ${list([
     "<strong>Segregation of duties.</strong> Who writes a rulebook, who signs it and who approves promotions are different people.",
     "<strong>Change control.</strong> A rulebook version is not used until signed. A change to the bar, a limit or a phase length is a recorded change approved at a gate.",
-    "<strong>Audit trail.</strong> Every call, input and outcome is logged and kept for the retention period the company's policy sets: " + BLANK + ".",
+    "<strong>Audit trail.</strong> Every call, input and outcome is logged and kept for the retention period the company's policy sets: " + fill("e.g. 7 years, per records policy") + ".",
     "<strong>Independent review.</strong> Internal Audit reviews a sample of paid invoices before Gate 3.",
     "<strong>Existing controls.</strong> Payment-approval limits, fraud checks and period-end controls stay in force.",
     "<strong>Regulation.</strong> The company's compliance function decides which rules apply. This document does not state any.",
@@ -208,19 +208,19 @@ function build(d) {
     ["Oversight", `<span data-out="oh-basis"></span>`, `<span data-out="oh-cost"></span>`],
     ["Writing the rulebook", "Measured at API list prices on the run date; nothing per invoice", `$${cOnce.toFixed(2)}`],
     ["Integration and data access", "Yours to enter above", `<span data-out="int-cost"></span>`],
-    ["Training, change management and audit time", "Yours to estimate", BLANK],
+    ["Training, change management and audit time", "Yours to estimate", fill("US$ amount")],
     ["Total of the lines above", "", `<span data-out="total"></span>`],
   ])}
   <p>The saving on paper is the ${int(b.touches_paid)} manual steps the rulebook would have removed in the ${b.months} test months, times ${12 / b.months}, assuming no seasonality: about ${int(perYear)} a year. It is a ceiling that assumes trust from day one. The replay shows the first months are slower, and I do not estimate the steady state.</p>
   <h3>Benchmarks to collect from your own records</h3>
   <p>I quote no outside figure. Published accounts-payable benchmarks vary widely with definitions and sample, so the pilot should measure your own. Fill in these before Gate 1.</p>
-  ${tbl("Baseline measures", ["Measure", "Your figure", "Source and date"], ["Cost to process one invoice", "Share of invoices paid with no manual touch", "Share of invoices needing a correction before payment", "Minutes per manual check", "Minutes to resolve an exception", "Cost of fixing a payment after it was made", "Share of payments corrected after payment", "Invoices per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, BLANK, BLANK]))}`));
+  ${tbl("Baseline measures", ["Measure", "Your figure", "Source and date"], ["Cost to process one invoice", "Share of invoices paid with no manual touch", "Share of invoices needing a correction before payment", "Minutes per manual check", "Minutes to resolve an exception", "Cost of fixing a payment after it was made", "Share of payments corrected after payment", "Invoices per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}`));
 
   out.push(sec("s12", "12", "Instructions to proposers, timetable and evaluation", `
   <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer M1 to M8 and D1 to D4 one by one, and state every assumption it changes.</p>
-  ${tbl("Timetable (proposed offsets from the issue date)", ["Event", "Offset", "Date"], [["Issue date", "T", BLANK], ["Questions close", "T + 2 weeks", BLANK], ["Answers published to all proposers", "T + 3 weeks", BLANK], ["Responses due", "T + 4 weeks", BLANK], ["Shortlist and clarifications", "T + 6 weeks", BLANK], ["Decision and Gate 1 package", "T + 8 weeks", BLANK]])}
+  ${tbl("Timetable (proposed offsets from the issue date)", ["Event", "Offset", "Date"], [["Issue date", "T", fill("DD Month YYYY")], ["Questions close", "T + 2 weeks", fill("DD Month YYYY")], ["Answers published to all proposers", "T + 3 weeks", fill("DD Month YYYY")], ["Responses due", "T + 4 weeks", fill("DD Month YYYY")], ["Shortlist and clarifications", "T + 6 weeks", fill("DD Month YYYY")], ["Decision and Gate 1 package", "T + 8 weeks", fill("DD Month YYYY")]])}
   <h3>What a response contains</h3>
-  ${list(["Approach, mapped to the requirements.", "Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + BLANK + " days.", "An exit plan."])}
+  ${list(["Approach, mapped to the requirements.", "Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan."])}
   <h3>Evaluation criteria</h3>
   <p>The weights are my proposal; the issuer sets its own and publishes them to proposers.</p>
   ${tbl("Proposed weights", ["Criterion", "Weight (points of 100)"], [["Safety and controls (M1 to M8, section 10)", "25"], ["Approach and measurement", "25"], ["Cost", "20"], ["Delivery plan and governance", "15"], ["Team and experience", "10"], ["Exit and portability", "5"]])}
@@ -229,7 +229,7 @@ function build(d) {
 
   out.push(sec("s13", "13", "Approvals and sign-off", `
   <p>I recommend that each person below signs once, at Gate 1, and again at Gate 4.</p>
-  ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller", "Internal Audit", "Risk and Compliance"].map((r) => [r, BLANK, "Approve / Reject", BLANK, BLANK]))}`));
+  ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
 
   out.push(sec("ap", "App.", "Appendices", `
   <h3>A. Glossary</h3>
@@ -247,7 +247,7 @@ function build(d) {
   <h3>C. Benchmarks to collect</h3>
   <p>See the table at the end of section 11.</p>
   <h3>D. Change log</h3>
-  ${tbl("Changes", ["Version", "Date", "Change", "Approved by"], [["1.0", esc(d.built), "First issue as a model document", BLANK]])}`));
+  ${tbl("Changes", ["Version", "Date", "Change", "Approved by"], [["1.0", esc(d.built), "First issue as a model document", fill("Name, role")]])}`));
   return out;
 }
 
