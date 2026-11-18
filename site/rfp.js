@@ -13,6 +13,8 @@ const fill = (t) => `<span class="blank" title="To be completed by the adopting 
 /* Assumptions of mine, not measurements. Shown on the page as such. */
 const PH = { p0: 4, p2: 12, p3: 2 }; // weeks
 const OVERSIGHT_H = 8; // hours a week of oversight during the pilot
+const LATE_FIX = 100; // US$ per late fix: an assumption for the scenario table
+const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
 
 const tbl = (caption, heads, rows, cls = "") =>
   `<div class="tablewrap"><table class="rfp ${cls}"><caption>${caption}</caption><thead><tr>${heads.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i === 0 ? `<th scope="row">${c}</th>` : `<td>${c}</td>`)).join("")}</tr>`).join("")}</tbody></table></div>`;
@@ -58,6 +60,7 @@ function build(d) {
     `<strong>The risk.</strong> ${int(b.wrong)} of the ${int(b.paid)} invoices it would have paid needed a fix first: ${pct(b.wrong / b.paid, 2)} of invoices but ${pct(v.wrong / v.paid, 1)} of their value (${usd(v.wrong)} of ${usd(v.paid)}). That is invoice value, not money lost.`,
     `<strong>The safer way, tested.</strong> In a replay where the rulebook had to earn trust one kind of invoice at a time, the first kind qualified in week ${firstWk}. While trusted it still paid ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}). I plan for errors in the first months.`,
     `<strong>The cost of the pilot.</strong> About <span data-out="pilot"></span> of oversight time, before your integration cost. That is <span data-out="share"></span> of the on-paper yearly saving, a gross ceiling before late-fix costs.`,
+    `<strong>The return.</strong> The pilot repays itself in its first year after if it earns at least <span data-out="need"></span> of the on-paper volume, at my assumed <span data-out="late"></span> per late fix<span data-out="need-int"></span>. Section 11 shows return, payback and wrong payments for four scenarios, each a scenario, not a forecast.`,
     `<strong>The decision I ask for.</strong> Approve Phase 0 (set-up and baseline) now. Every later phase waits for a gate in section 7.`,
   ])}
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, safely, whether its own invoices would.</p>`));
@@ -212,6 +215,25 @@ function build(d) {
     ["Total of the lines above", "", `<span data-out="total"></span>`],
   ])}
   <p>The saving on paper is the ${int(b.touches_paid)} manual steps the rulebook would have removed in the ${b.months} test months, times ${12 / b.months}, assuming no seasonality: about ${int(perYear)} a year. It is a ceiling that assumes trust from day one. The replay shows the first months are slower, and I do not estimate the steady state.</p>
+  <h3>For the executive decision: return on the pilot, by scenario</h3>
+  <p>I cannot know how much of the on-paper saving a company would earn: that is what the pilot finds out. So instead of one forecast, the table shows the return if the pilot ends with kinds of invoice covering a given share of that volume. Each row is a scenario, not a prediction. Mistakes are counted at the higher of two rates: the worst likely case from the test (${pct(1 - c.held_out.precision_lower, 2)} of invoices paid) and the rate while trusted in the replay (${pct(t.wrong / t.passed, 2)}, ${int(t.wrong)} of ${int(t.passed)}). A kind is only trusted once it proves 99%, so this is a cautious stand-in, not what the pilot would aim for, and the same oversight hours continue after the pilot.</p>
+  <div class="biz-inputs" role="group" aria-label="Scenario inputs">
+  <label>Cost of one late fix (US$) <input id="in-late" type="number" min="0" max="100000" step="10" value="${LATE_FIX}" inputmode="numeric"></label>
+  <p class="small">My assumption, not a measurement. Set it from your own records. In this table, the time saved no longer covers the late fixes above about <span data-out="be-scen"></span> per late fix, before oversight costs. That differs from the break-even above, which counts one check per paid invoice; this table counts every manual step, about ${(b.touches_paid / b.paid).toFixed(2)} per invoice paid, and uses the higher error rate.</p>
+  </div>
+  <div class="cost biz-tiles">
+  <div><span class="small">Earned share needed to repay the pilot in its first year after</span><span class="big" data-out="need"></span><span class="small" data-out="need-note"></span></div>
+  <div><span class="small">Wrong payments a year, at the full on-paper volume</span><span class="big" data-out="wrong-yr"></span><span class="small">At the higher of the two error rates above. Each is paid before a needed fix; it is not money lost.</span></div>
+  </div>
+  <p class="warn" data-out="roi-warn" role="status"></p>
+  ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Checks removed a year", "Wrong payments a year", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
+    SCEN.map((x) => [pct(x, 0), `<span data-out="sc-checks-${x}"></span>`, `<span data-out="sc-wrong-${x}"></span>`, `<span data-out="sc-net-${x}"></span>`, `<span data-out="sc-roi-${x}"></span>`, `<span data-out="sc-pay-${x}"></span>`]), "scen")}
+  <ul class="fine">
+  <li>Net yearly benefit = time saved × hourly cost − wrong payments × cost of a late fix − ongoing oversight (the oversight hours above × 52 weeks).</li>
+  <li>First-year ROI = (net yearly benefit − total pilot cost) ÷ total pilot cost. Payback = total pilot cost ÷ monthly net benefit, counted from the end of the pilot. No discounting, no tax, no seasonality.</li>
+  <li>Total pilot cost is the total of the cost lines above, so integration counts only if you enter it. Training and audit time are not included.</li>
+  <li>${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling. In the replay, trust began only in week ${firstWk}, and it removed ${int(t.touches_removed)} manual touches against ${int(b.touches_paid)} on paper in the same window (${pct(t.touches_removed / b.touches_paid, 1)}). Even the ${pct(SCEN[0], 0)} row is far above anything observed (section 4), and none of these rows changes the verdict: no approach proved the 99% bar.</li>
+  </ul>
   <h3>Benchmarks to collect from your own records</h3>
   <p>I quote no outside figure. Published accounts-payable benchmarks vary widely with definitions and sample, so the pilot should measure your own. Fill in these before Gate 1.</p>
   ${tbl("Baseline measures", ["Measure", "Your figure", "Source and date"], ["Cost to process one invoice", "Share of invoices paid with no manual touch", "Share of invoices needing a correction before payment", "Minutes per manual check", "Minutes to resolve an exception", "Cost of fixing a payment after it was made", "Share of payments corrected after payment", "Invoices per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}`));
@@ -252,7 +274,8 @@ function build(d) {
 }
 
 function wire(d) {
-  const f = figures(d), b = f.b, min = $("#in-min"), rate = $("#in-rate"), oh = $("#in-oh"), integ = $("#in-int");
+  const f = figures(d), b = f.b, min = $("#in-min"), rate = $("#in-rate"), oh = $("#in-oh"), integ = $("#in-int"), late = $("#in-late");
+  const badRate = Math.max(1 - f.c.held_out.precision_lower, f.t.wrong / f.t.passed), paidYr = b.paid * (12 / b.months);
   const set = (k, s) => document.querySelectorAll(`[data-out="${k}"]`).forEach((el) => (el.textContent = s));
   const draw = () => {
     const m = Number(min.value), r = Math.min(500, Math.max(1, Number(rate.value) || 40)), h = Math.min(80, Math.max(0, Number(oh.value) || 0));
@@ -271,8 +294,26 @@ function wire(d) {
     set("total", usd(total));
     set("breakeven", `about $${int(c * b.checks_per_mistake)}`);
     set("breakeven-low", `about $${int(c * b.checks_per_mistake_lower)}`);
+    const M = Math.max(0, Number(late.value) || 0), run = h * 52 * r, wrongFull = paidYr * badRate;
+    const margin = saving - wrongFull * M; // net yearly benefit per unit of share, before oversight
+    const need = margin > 0 ? (total + run) / margin : Infinity;
+    set("wrong-yr", int(wrongFull));
+    set("late", `$${int(M)}`);
+    set("need-int", i ? "" : ", before integration cost");
+    set("be-scen", wrongFull ? `$${int(saving / wrongFull)}` : "n/a");
+    set("need", need <= 1 ? pct(need, 1) : "not reachable");
+    set("need-note", need <= 1 ? `of the on-paper volume, with a late fix at $${int(M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(M)}, even the full on-paper volume does not repay the pilot in a year.`);
+    set("roi-warn", i ? "" : "Integration cost not entered: the pilot cost below is oversight only, so return and payback are hidden until you enter your integration cost above.");
+    SCEN.forEach((x) => {
+      const net = x * margin - run, roi = total ? (net - total) / total : NaN;
+      set(`sc-checks-${x}`, int(x * f.perYear));
+      set(`sc-wrong-${x}`, int(x * wrongFull));
+      set(`sc-net-${x}`, (net < 0 ? "−" : "") + usd(Math.abs(net)));
+      set(`sc-roi-${x}`, !i ? "enter integration cost" : Number.isFinite(roi) ? `${roi < 0 ? "−" : ""}${int(Math.abs(roi) * 100)}%` : "n/a");
+      set(`sc-pay-${x}`, !i ? "enter integration cost" : net > 0 ? `${(total / (net / 12)).toFixed(1)} months` : "does not pay back");
+    });
   };
-  [min, rate, oh, integ].forEach((el) => el.addEventListener(el === min ? "change" : "input", draw));
+  [min, rate, oh, integ, late].forEach((el) => el.addEventListener(el === min ? "change" : "input", draw));
   draw();
 }
 

@@ -29,3 +29,6 @@ Rules for the figures:
 
 ## Where
 `site/rfp.html` and `site/rfp.js`, with a few styles added to `site/style.css`. Q9 gets one link to it.
+
+## Addition (2026-11-18, at the owner's request)
+Added later at the owner's request: section 11 shows first-year return, payback and wrong payments for scenarios at 10, 25, 50 and 100% of the on-paper volume, plus the earned share needed to repay the pilot, at an assumed late-fix cost the reader can change ($100 default); these are scenarios, not a forecast of what would be earned. The independent reviewer ruled ACCEPT WITH CHANGES (one break-even basis named, the higher of the test and replay error rates, ROI and payback hidden until integration cost is entered, the live late-fix value in the summary, and the replay's observed touches beside the scenarios), all applied.
