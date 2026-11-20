@@ -43,7 +43,7 @@ const Calc = (() => {
     ["net", "Net a year, everything earned"],
     ["down", "Net a year, at the replay's earned share"],
     ["be", "Break-even cost of one late fix"],
-    ["need", "Share reviewed today it needs"],
+    ["need", "Share reviewed today it needs to pay its way"],
     ["pilot", "Pilot cost, blind checks included"],
     ["roi", "First-year return and payback"],
   ];
@@ -87,7 +87,10 @@ const Calc = (() => {
         roi: v.hasInt && total ? (net - total) / total : null, pay: v.hasInt && net > 0 ? total / (net / 12) : null };
     };
     const need = (lpm) => M / (lpm * c);
-    return { c, M, sUse, hrs, saving, wrongFull, bad, blindH, blindWin, blindPilot, blindYr, p0, ohRest, oversight, total, ohYr, run, margin,
+    // The decision figure: the share reviewed today at which the yearly net, with everything earned, reaches zero after
+    // late fixes (cautious end), oversight and blind checks. need() above is the per-line test, before running costs.
+    const needNet = (wrongFull * M + ohYr + blindYr) / (B.linesYr * c);
+    return { c, M, sUse, hrs, saving, wrongFull, bad, blindH, blindWin, blindPilot, blindYr, p0, ohRest, oversight, total, ohYr, run, margin, needNet,
       ask: margin > 0 ? (total + run) / margin : Infinity, row, need, be: (lpm) => lpm * sUse * c };
   }
 
@@ -95,28 +98,30 @@ const Calc = (() => {
 
   function fill(p, B, v, x) {
     const set = (k, t) => document.querySelectorAll(`[data-out="${p}-${k}"]`).forEach((e) => (e.textContent = t));
+    const dflt = (parts) => (parts.length ? ` · default ${parts.join(", ")}` : "");
+    const costD = v.costDefault ? ["time and rate"] : [], fixD = v.fixDefault ? ["late fix"] : [], runD = v.runDefault ? ["oversight and blind checks"] : [];
     const shareState = v.sh === null ? "Upper limit" : "Your share";
     const full = x.row(1), down = x.row(B.g.earned_share);
     set("r-gross", v.sh === null ? `up to ${usd(x.saving)}` : usd(x.saving));
-    set("s-gross", shareState);
+    set("s-gross", shareState + dflt(costD));
     set("n-gross", v.sh === null ? "if a person reviewed every line today; enter your share" : `${int(x.hrs)} hours of review at ${pct(v.sh, 1)}`);
     set("r-net", signed(full.net));
-    set("s-net", v.sh === null ? "Upper limit" : "Ceiling");
+    set("s-net", (v.sh === null ? "Upper limit" : "Ceiling") + dflt([...costD, ...fixD, ...runD]));
     set("n-net", `100% earned, after late fixes, oversight and blind checks; before the pilot's one-off cost`);
     set("r-down", signed(down.net));
-    set("s-down", "Observed");
+    set("s-down", "Observed earned share" + (v.sh === null ? " · upper-limit share" : "") + dflt([...costD, ...fixD, ...runD]));
     set("n-down", `${pct(B.g.earned_share, 1)} earned, as in the replay (window too short)`);
     set("r-be", `$${int(x.be(B.L.gated_cautious))} · $${int(x.be(B.L.paper))}`);
-    set("s-be", shareState);
+    set("s-be", shareState + dflt(costD));
     set("n-be", `cautious end · on paper; a late fix costs you about $${int(x.M)}`);
-    set("r-need", needTxt(x.need(B.L.gated_cautious)));
-    set("s-need", v.fixDefault ? "Default late fix" : "Your late fix");
-    set("n-need", `cautious end; ${needTxt(x.need(B.L.paper))} on paper. The records can't show today's share`);
+    set("r-need", x.needNet > 1 ? "Doesn't pay at these inputs" : needTxt(x.needNet));
+    set("s-need", dflt([...costD, ...fixD, ...runD]).replace(/^ · d/, "D") || "Your inputs");
+    set("n-need", `${x.needNet > 1 ? "Even with every line reviewed today and everything earned, late fixes, oversight and blind checks cost more than the time saved." : "With everything earned, after late fixes (cautious end), oversight and blind checks; before the pilot's one-off cost."} Late fixes alone, before running costs: ${needTxt(x.need(B.L.gated_cautious))} (cautious end), ${needTxt(x.need(B.L.paper))} on paper.`);
     set("r-pilot", usd(x.total));
-    set("s-pilot", v.hasInt ? "Integration entered" : "No integration");
+    set("s-pilot", (v.hasInt ? "Integration entered" : "No integration") + dflt([...(v.costDefault ? ["time and rate"] : []), ...runD]));
     set("n-pilot", `${v.runDefault ? "default" : "your"} oversight and blind checks (${v.k} kind${v.k === 1 ? "" : "s"}, monthly)${v.hasInt ? "" : "; add integration for ROI"}; other required lines are still blank`);
     set("r-roi", !v.hasInt ? "Enter integration" : full.roi === null ? "n/a" : `${full.roi < 0 ? "−" : ""}${int(Math.abs(full.roi) * 100)}% · ${full.pay ? `${full.pay.toFixed(1)} months` : "no payback"}`);
-    set("s-roi", !v.hasInt ? "Not entered" : v.sh === null ? "Upper limit" : "Ceiling");
+    set("s-roi", !v.hasInt ? "Not entered" : (v.sh === null ? "Upper limit" : "Ceiling") + dflt([...costD, ...fixD, ...runD]));
     set("n-roi", `at 100% earned; it needs ${x.ask <= 1 ? pct(x.ask, 1) : "more than 100%"} of the on-paper volume to repay in its first year after the pilot`);
   }
 

@@ -120,12 +120,12 @@ function biz(d) {
   <p>A line the rulebook pays saves a review only if a person would have reviewed it. Each mistake adds a late fix. So it pays off while a late fix costs less than: lines paid per mistake × share reviewed × the cost of one review (<strong data-out="c"></strong> at your inputs).</p>
   <p>A late fix costs the work of fixing a line after payment, plus whatever part of its value is never recovered. At your inputs that is <strong data-out="M"></strong>. The average line it paid wrongly was worth ${usd(mb.meanWrong)}, or ${usd(mb.meanBelow)} if the largest tenth of lines always went to a person.</p>
   <p>How many lines it pays per mistake depends on how it is trusted, so I show both ways, on the same unit:</p>
-  <div class="tablewrap"><table class="score"><caption>Lines paid per mistake, and the break-even at your inputs</caption><thead><tr><th scope="col">How it is trusted</th><th scope="col">Lines per mistake</th><th scope="col">Break-even late fix</th><th scope="col">Share reviewed it needs</th></tr></thead><tbody>
+  <div class="tablewrap"><table class="score"><caption>Lines paid per mistake, and the break-even at your inputs</caption><thead><tr><th scope="col">How it is trusted</th><th scope="col">Lines per mistake</th><th scope="col">Break-even late fix</th><th scope="col">Share reviewed it needs, late fixes only</th></tr></thead><tbody>
   <tr><th scope="row">On paper: trusted from day one (the test)</th><td>${int(L.paper)} (worst likely case ${int(L.paper_cautious)})</td><td data-out="be-paper"></td><td data-out="need-paper"></td></tr>
   <tr><th scope="row">Gated: trust earned on outcomes (the replay)</th><td>${int(L.gated)}, likely ${int(L.gated_cautious)} to ${int(L.gated_generous)}</td><td data-out="be-gated"></td><td data-out="need-gated"></td></tr>
   <tr class="chosen"><th scope="row">The cautious end, used to decide</th><td>${int(L.gated_cautious)}</td><td data-out="be-low"></td><td data-out="need-low"></td></tr>
   </tbody></table></div>
-  <p class="small">The gated figure rests on ${int(g.wrong)} mistakes in ${int(g.passed)} lines, ${word(g.top_order_wrong)} of them on one purchase order, so its range is wide, and even that range assumes the lines are independent. "Share reviewed it needs" is the smallest share of lines a person must review today for the time saved to cover your late fixes. Break-even uses your share, or every line (100%) if you have not entered one.</p>
+  <p class="small">The gated figure rests on ${int(g.wrong)} mistakes in ${int(g.passed)} lines, ${word(g.top_order_wrong)} of them on one purchase order, so its range is wide, and even that range assumes the lines are independent. "Late fixes only" is the smallest share of lines a person must review today for the time saved to cover your late fixes, before oversight and blind checks; the readout above gives the share it needs after those running costs. Break-even uses your share, or every line (100%) if you have not entered one.</p>
   <p class="ask" data-out="verdict"></p>
   <p data-out="anchor"></p>
   <h3>4. What the first months really look like</h3>
@@ -205,13 +205,12 @@ function wireBiz(d) {
     set("need-gated", `${need(L.gated_generous)} to ${need(L.gated_cautious)}`);
     set("be-low", `$${int(x.be(L.gated_cautious))}`);
     set("need-low", need(L.gated_cautious));
-    const nLow = x.need(L.gated_cautious);
-    let verdict = nLow > 1
-      ? `At a late fix of about $${int(x.M)}, the rulebook does not pay off on time saved even if a person reviews every line today (cautious end).`
-      : nLow <= 0
-      ? `At a late fix of $0, the rulebook pays off at any share reviewed: the time saved has no late fixes to cover.`
-      : `At a late fix of about $${int(x.M)}, the rulebook is worth piloting only if a person today reviews at least ${pct(nLow, 1)} of these lines (cautious end; ${need(L.paper)} on paper). How many they review today is not in the records: the ${pct(mb.anchorShares[0][0], 1)} with a person's own step is a footprint, not a measure of how many are reviewed.`;
-    if (sh !== null) verdict += sh >= nLow ? ` At your ${pct(sh, 1)}, it clears the cautious end.` : ` At your ${pct(sh, 1)}, it does not clear the cautious end.`;
+    // The decision rests on the net after running costs (oversight and blind checks); the per-line share is secondary.
+    const nNet = x.needNet, perLine = `On late fixes alone, before running costs, it would need ${need(L.gated_cautious)} (cautious end; ${need(L.paper)} on paper).`;
+    let verdict = nNet > 1
+      ? `At these inputs the rulebook does not pay its way, even if a person reviews every line today and it earns the right to pay all of them: after late fixes (cautious end), oversight and blind checks the yearly net is ${signed(x.row(1).net)}. ${perLine}`
+      : `At these inputs the rulebook pays its way only if a person today reviews at least ${pct(nNet, 1)} of these lines, with everything earned, after late fixes (cautious end), oversight and blind checks. ${perLine} How many they review today is not in the records: the ${pct(mb.anchorShares[0][0], 1)} with a person's own step is a footprint, not a measure of how many are reviewed.`;
+    if (sh !== null) verdict += nNet <= 1 && sh >= nNet ? ` At your ${pct(sh, 1)}, it clears that.` : ` At your ${pct(sh, 1)}, it does not.`;
     set("verdict", verdict);
     const cover = (lpm, V) => { const q = (lpm * x.c) / V; return q >= 1 ? "all of it (100% or more)" : `about ${pct(q, 0)}`; };
     set("anchor", `For scale: even if a person reviewed every line today, the time saved would cover losing ${cover(L.paper, mb.meanWrong)} of an average wrongly paid line's value on paper, or ${cover(L.gated_cautious, mb.meanWrong)} at the cautious end, before any work to fix it. If the largest tenth of lines always went to a person: ${cover(L.paper, mb.meanBelow)} on paper, and ${cover(L.gated_cautious, mb.meanBelow)} at the cautious end.`);

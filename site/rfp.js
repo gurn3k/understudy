@@ -71,9 +71,9 @@ function build(d) {
     ["The saving", `Not known yet. It rests on the share of order lines a person reviews today, which the records can't show. ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step`, "A footprint, not proof of review. Phase 0 measures it"],
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
     ["Trust earned on outcomes (replay)", `${int(t.passed)} paid, ${int(t.wrong)} needed correction (${pct(t.wrong / t.passed, 1)}), ${d.evidence.replay.kinds === 1 ? "all in one kind" : `in ${int(d.evidence.replay.kinds)} kinds`}, ${int(d.evidence.replay.top_order)} on one order; first kind in week ${firstWk} of the replay (ISO week ${firstIso})`, "Not proven either; expect errors in the first months"],
-    ["When it pays off", `Only if a person today reviews at least <span data-out="need-low"></span> of these lines`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate (section 11)`],
+    ["When it pays off", `<span data-out="pays-off"></span>`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate, after oversight and blind checks (section 11)`],
     ["Pilot cost", `<span data-out="total"></span>: internal oversight, monthly blind checks on <span data-out="kinds-lab"></span> and the rulebook (my assumptions), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
-    ["Return", `Repays itself in its first year after the pilot if it earns <span data-out="need"></span> of the on-paper volume`, `At your inputs, including monthly blind checks on <span data-out="kinds-lab"></span> (my assumption)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
+    ["Return", `<span data-out="return-line"></span>`, `At your inputs, including monthly blind checks on <span data-out="kinds-lab"></span> (my assumption)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
   ], "keys")}
   <p class="ask"><strong>The decision I ask for:</strong> approve Phase 0 (set-up and baseline) now. Every later phase waits for a gate.</p>
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, under controls, whether its own invoices would.</p>`));
@@ -259,7 +259,7 @@ function build(d) {
     [`Order lines the rulebook would have paid, ${b.months} test months`, `${int(b.paid)} (about ${int(b.groups_paid)} invoice groups)`],
     ["Scaled to a year (no seasonality)", `× ${12 / b.months} = ${int(linesYr)}`],
     ["× share a person reviews today", `<span data-out="share-used"></span>`],
-    ["× minutes per review ÷ 60 × hourly cost", `<span data-out="money2"></span> gross a year`],
+    ["× minutes per review ÷ 60 × hourly cost", `<span data-out="money2"></span>`],
     ["What it assumes", "Trust from day one: a ceiling, not a forecast"],
   ], "num")}
   ${bars(`Order lines paid without a person in the same ${b.months} months`, [["On paper (trusted from day one)", b.paid, int(b.paid)], ["Earned in the replay", g.passed, `${int(g.passed)} (${pct(g.earned_share, 1)})`, true]])}
@@ -374,6 +374,8 @@ function wire(d) {
     set("wrong-yr", int(x.wrongFull));
     set("need-int", (v.hasInt ? "" : ", before integration cost") + (v.sh === null ? ", with every line counted as reviewed today (an upper limit)" : ""));
     set("need", x.ask <= 1 ? pct(x.ask, 1) : "not reachable");
+    set("return-line", x.ask <= 1 ? `Repays itself in its first year after the pilot if it earns ${pct(x.ask, 1)} of the on-paper volume` : "Does not repay itself in its first year after the pilot at these inputs, even at the full on-paper volume");
+    set("pays-off", x.needNet > 1 ? `Not at these inputs: even with every line reviewed today, late fixes, oversight and blind checks cost more than the time saved (late fixes alone would need ${Calc.needTxt(x.need(B.L.gated_cautious))} reviewed)` : `Only if a person today reviews at least ${pct(x.needNet, 1)} of these lines (late fixes alone: ${Calc.needTxt(x.need(B.L.gated_cautious))})`);
     const upper = v.sh === null ? " Share reviewed not entered, so every line counts as reviewed today: an upper limit." : "";
     const blindTxt = ` It counts blind checks on ${kTxt} each month (${usd(x.blindYr)} a year), my assumption.`;
     set("need-note", (x.ask <= 1 ? `of the on-paper volume, with a late fix at $${int(x.M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(x.M)}, even the full on-paper volume does not repay the pilot in a year.`) + blindTxt + upper);
