@@ -373,7 +373,8 @@ table.scen { min-width: 600px; }
 .tline .s0 { background: #5b6678; } .tline .s1 { background: #3150a0; } .tline .s2 { background: #1f7a45; } .tline .s3 { background: #5b6678; }
 @media (max-width: 560px) { .tline-bar { flex-direction: column; min-height: 0; } .tline .seg { flex: none !important; flex-direction: row; justify-content: space-between; } }
 table.keys { min-width: 600px; }
-table.num td { text-align: right; white-space: nowrap; }
+table.num td { text-align: right; }
+table.money td { white-space: nowrap; }
 /* Money tables (ADR 0021): a row's plain-words note sits under its label, not in bold. */
 table th .small { display: block; font-weight: 400; letter-spacing: 0; }
 .ask { border-top: 2px solid var(--ink); padding-top: 12px; margin: 22px 0 14px; font-size: 18px; }

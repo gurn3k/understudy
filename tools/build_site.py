@@ -163,10 +163,6 @@ def main():
     blind_n = money.blind_sample(q=0.02, power=0.8)
     business = {
         "unit": "order line",
-        # LEGACY until the pilot request is re-based (next commit).
-        "manual_clear_share": 1 - cands["ranked"][0]["batch_share"],
-        "touches_paid": sum(tm[r["id"]]["manual_touches"] for r in paid),
-        "checks_per_mistake": paper, "checks_per_mistake_lower": paper_cautious,
         "paid": len(paid), "wrong": len(wrong), "problems_all": sum(1 for r in held if not r["straight_through"]),
         "months": 3,
         # The log has no invoice-document field: (purchase order, first-receipt minute) groups stand in for documents.
