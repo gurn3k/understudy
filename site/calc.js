@@ -37,7 +37,7 @@ const Calc = (() => {
     ["int", "Your one-off integration cost (US$)", `type="number" min="0" step="1000" value="" placeholder="not entered" inputmode="numeric"`],
   ].map(([k, lab, attrs]) => k === "min"
     ? `<label>${lab} <select id="${p}-min">${[2, 5, 10].map((m) => `<option value="${m}"${m === DEF.min ? " selected" : ""}>${m}</option>`).join("")}</select></label>`
-    : `<label>${lab} <input id="${p}-${k}" ${attrs}></label>`).join("");
+    : `<label>${lab} <input id="${p}-${k}" ${attrs}><span class="clamp small" data-clamp="${p}-${k}"></span></label>`).join("");
 
   const ROWS = [
     ["gross", "Gross saving a year"],
@@ -59,19 +59,33 @@ const Calc = (() => {
 </div>`;
   }
 
+  /* Field limits, shared by read() and the notes that say when an entry was held at a limit. */
+  const LIMITS = { share: [0, 100], rate: [1, 500], fix: [0, 100000], lost: [0, 100], oh: [0, 80], kinds: [0, 50], int: [0, Infinity] };
+  function clampNote(el, k, used) {
+    const raw = el.value.trim(), n = Number(raw), [lo, hi] = LIMITS[k];
+    if (raw === "" || !Number.isFinite(n)) return "";
+    if (n < lo) return `Held at ${lo}, the lowest allowed.`;
+    if (n > hi) return `Held at ${hi.toLocaleString("en-US")}, the highest allowed.`;
+    if (k === "kinds" && n !== used) return `Rounded to ${used}.`;
+    return "";
+  }
+
   function read(p) {
     const el = (k) => document.getElementById(`${p}-${k}`);
     const raw = (k) => el(k).value.trim();
-    const s = readNum(el("share"), 0, 100, null);
-    const v = { s, sh: s === null ? null : s / 100, m: Number(el("min").value), r: readNum(el("rate"), 1, 500, DEF.rate),
-      fix: readNum(el("fix"), 0, 100000, DEF.fix), lost: readNum(el("lost"), 0, 100, DEF.lost) / 100,
-      h: readNum(el("oh"), 0, 80, DEF.oh), k: Math.round(readNum(el("kinds"), 0, 50, DEF.kinds)),
+    const s = readNum(el("share"), ...LIMITS.share, null);
+    const v = { s, sh: s === null ? null : s / 100, m: Number(el("min").value), r: readNum(el("rate"), ...LIMITS.rate, DEF.rate),
+      fix: readNum(el("fix"), ...LIMITS.fix, DEF.fix), lost: readNum(el("lost"), ...LIMITS.lost, DEF.lost) / 100,
+      h: readNum(el("oh"), ...LIMITS.oh, DEF.oh), k: Math.round(readNum(el("kinds"), ...LIMITS.kinds, DEF.kinds)),
       hasInt: raw("int") !== "" && Number.isFinite(Number(raw("int"))) };
     v.i = v.hasInt ? Math.max(0, Number(raw("int"))) : 0;
     const changed = (k, d) => raw(k) !== "" && Number(raw(k)) !== d;
     v.costDefault = !changed("min", DEF.min) && !changed("rate", DEF.rate);
     v.fixDefault = !changed("fix", DEF.fix) && !changed("lost", DEF.lost);
     v.runDefault = !changed("oh", DEF.oh) && !changed("kinds", DEF.kinds);
+    // Say when an entry was held at a field's limit, so no input is changed silently.
+    const used = { share: v.s, rate: v.r, fix: v.fix, lost: v.lost * 100, oh: v.h, kinds: v.k, int: v.i };
+    v.notes = Object.fromEntries(Object.keys(LIMITS).map((k) => [k, clampNote(el(k), k, used[k])]));
     return v;
   }
 
@@ -134,7 +148,11 @@ const Calc = (() => {
   function wire(p, d, after) {
     const B = basis(d), ids = ["share", "min", "rate", "fix", "lost", "oh", "kinds", "int"];
     if (!ids.every((k) => document.getElementById(`${p}-${k}`))) return;
-    const draw = () => { const v = read(p), x = compute(B, v); fill(p, B, v, x); if (after) after(B, v, x); };
+    const draw = () => {
+      const v = read(p), x = compute(B, v);
+      Object.entries(v.notes).forEach(([k, t]) => document.querySelectorAll(`[data-clamp="${p}-${k}"]`).forEach((e) => (e.textContent = t)));
+      fill(p, B, v, x); if (after) after(B, v, x);
+    };
     ids.forEach((k) => document.getElementById(`${p}-${k}`).addEventListener(k === "min" ? "change" : "input", draw));
     draw();
   }
