@@ -18,6 +18,8 @@ const DEF_MIN = 5, DEF_RATE = 40; // input defaults: my assumptions
 const AGREE = "0.9", SIM_RUNS = 20; // the simulation shown: reviewers copy this share; runs per ADR 0017
 const DEF_FIX = 100, DEF_LOST = 0; // a late fix: US$ of work, and % of the line's value never recovered. My assumptions.
 const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
+/* Rows of the return table: none earned, the replay's observed share (a truncated window), then the scenarios. */
+const scenRows = (g) => [[0, "none earned yet"], [g.earned_share, "observed in the replay; window too short"], ...SCEN.map((x) => [x, x === 1 ? "the on-paper ceiling" : ""])];
 
 const tbl = (caption, heads, rows, cls = "") =>
   `<div class="tablewrap"><table class="rfp ${cls}"><caption>${caption}</caption><thead><tr>${heads.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i === 0 ? `<th scope="row">${c}</th>` : `<td>${c}</td>`)).join("")}</tr>`).join("")}</tbody></table></div>`;
@@ -284,18 +286,18 @@ function build(d) {
   <div><span class="small">Wrong payments a year, at the full on-paper volume</span><span class="big" data-out="wrong-yr"></span><span class="small">Order lines, at the cautious rate above. Each is paid before a needed fix; it is not money lost.</span></div>
   </div>
   <p class="warn" data-out="roi-warn" role="status"></p>
-  ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Lines paid alone a year", "Wrong payments a year", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
-    SCEN.map((x) => [pct(x, 0), `<span data-out="sc-checks-${x}"></span>`, `<span data-out="sc-wrong-${x}"></span>`, `<span data-out="sc-net-${x}"></span>`, `<span data-out="sc-roi-${x}"></span>`, `<span data-out="sc-pay-${x}"></span>`]), "scen")}
+  ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Lines paid alone a year", "Wrong payments a year", "Gross saving", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
+    scenRows(g).map(([x, why], k) => [`${pct(x, x && x < 0.1 ? 1 : 0)}${why ? `<span class="small">${why}</span>` : ""}`, `<span data-out="sc-checks-${k}"></span>`, `<span data-out="sc-wrong-${k}"></span>`, `<span data-out="sc-gross-${k}"></span>`, `<span data-out="sc-net-${k}"></span>`, `<span data-out="sc-roi-${k}"></span>`, `<span data-out="sc-pay-${k}"></span>`]), "scen")}
   ${tbl("How each figure is worked out", ["Figure", "Formula"], [
     ["Gross saving", "Lines paid alone × share reviewed today × minutes per review ÷ 60 × hourly cost"],
     ["Late-fix cost", "Lines paid alone × the cautious error rate × (work per fix + share never recovered × average value of a wrongly paid line)"],
-    ["Net yearly benefit", "Gross saving − late-fix cost − oversight (hours a week × 52)"],
+    ["Net yearly benefit", "Gross saving − late-fix cost − oversight (hours a week × 52). At 0% earned it is the oversight cost alone"],
     ["First-year ROI", "(Net yearly benefit − total pilot cost) ÷ total pilot cost"],
     ["Payback", "Total pilot cost ÷ monthly net benefit, from the end of the pilot"],
     ["Total pilot cost", "The cost lines above with a figure; integration only if entered"],
     ["Not included", "The required lines still blank, blind checks, discounting, tax, seasonality, benefit during the pilot"],
   ])}
-  <p class="small">${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling, and even the ${pct(SCEN[0], 0)} row is far above what the replay earned (chart above). None of these rows changes the verdict: no approach proved the 99% bar.</p>
+  <p class="small">The ${pct(g.earned_share, 1)} row is what the replay earned on the same test lines; its window was too short to show the steady state, so it is a floor seen once, not an estimate. ${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling. None of these rows changes the verdict: no approach proved the 99% bar.</p>
   <h3>Benchmarks to collect from your own records</h3>
   <p>I quote no outside figure. Published accounts-payable benchmarks vary widely with definitions and sample, so the pilot should measure your own, per order line. Fill in these before Gate 1.</p>
   ${tbl("Baseline measures", ["Measure", "Your figure", "Source and date"], ["Order lines per invoice document", "Cost to process one order line", "Share of order lines a person actually reviews before payment (not just clears)", "Minutes per review", "Share of order lines needing a correction before payment", "Minutes to resolve an exception", "Work to fix a line after it was paid", "Share of a wrongly paid line's value never recovered", "Share of lines corrected after payment", "Order lines per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}`));
@@ -403,13 +405,14 @@ function wire(d) {
     const upper = s === null ? " Share reviewed not entered, so every line counts as reviewed today: an upper limit." : "";
     set("need-note", (ask <= 1 ? `of the on-paper volume, with a late fix at $${int(M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(M)}, even the full on-paper volume does not repay the pilot in a year.`) + upper);
     set("roi-warn", i ? "" : "Integration cost not entered: the pilot cost below is internal oversight only, so return and payback are hidden until you enter your integration cost above.");
-    SCEN.forEach((x) => {
+    scenRows(f.g).forEach(([x], k) => {
       const net = x * margin - run, roi = total ? (net - total) / total : NaN;
-      set(`sc-checks-${x}`, int(x * f.linesYr));
-      set(`sc-wrong-${x}`, int(x * wrongFull));
-      set(`sc-net-${x}`, (net < 0 ? "−" : "") + usd(Math.abs(net)));
-      set(`sc-roi-${x}`, !i ? "enter integration cost" : Number.isFinite(roi) ? `${roi < 0 ? "−" : ""}${int(Math.abs(roi) * 100)}%` : "n/a");
-      set(`sc-pay-${x}`, !i ? "enter integration cost" : net > 0 ? `${(total / (net / 12)).toFixed(1)} months` : "does not pay back");
+      set(`sc-checks-${k}`, int(x * f.linesYr));
+      set(`sc-wrong-${k}`, int(x * wrongFull));
+      set(`sc-gross-${k}`, usd(x * saving));
+      set(`sc-net-${k}`, (net < 0 ? "−" : "") + usd(Math.abs(net)));
+      set(`sc-roi-${k}`, !i ? "enter integration cost" : Number.isFinite(roi) ? `${roi < 0 ? "−" : ""}${int(Math.abs(roi) * 100)}%` : "n/a");
+      set(`sc-pay-${k}`, !i ? "enter integration cost" : net > 0 ? `${(total / (net / 12)).toFixed(1)} months` : "does not pay back");
     });
   };
   min.addEventListener("change", draw);

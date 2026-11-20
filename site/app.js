@@ -143,6 +143,10 @@ function biz(d) {
   <p class="small">In the decision record's words ("the written policy" is the rulebook):</p>
   <p>${esc(eventSentence(d))}</p>
   <p>While trusted it paid ${int(t.passed)} lines on its own, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar). On the same test lines, that is ${pct(g.earned_share, 1)} of the ${int(b.paid)} it would have paid on paper. Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion. The test window was too short to show the steady state, so ${pct(g.earned_share, 1)} understates it, and I do not estimate it here.</p>
+  <div class="tablewrap"><table class="score num money"><caption>Gross and net a year, at your inputs, by share of lines the rulebook earns the right to pay</caption><thead><tr><th scope="col">Share earned</th><th scope="col">Lines paid on its own</th><th scope="col">Gross saving</th><th scope="col">Late fixes</th><th scope="col">Net</th></tr></thead><tbody>
+  ${[["0%", "none earned yet", 0], [pct(g.earned_share, 1), "observed in the replay; window too short", g.earned_share], ["100%", "on paper, trusted from day one", 1]].map(([lab, why, x], i) => `<tr><th scope="row">${lab} <span class="small">(${why})</span></th><td>${int(x * mb.linesYr)}</td><td data-out="gn-g-${i}"></td><td data-out="gn-f-${i}"></td><td data-out="gn-n-${i}"></td></tr>`).join("")}
+  </tbody></table></div>
+  <p class="small" data-out="gn-note"></p>
   <h3>5. Why agreement is not proof</h3>
   <p>A tempting shortcut is to trust the AI once the people checking its work usually agree with it. I simulated that. When reviewers copied the AI's suggestion 9 times in 10, trusting it on agreement paid a median of ${half(ag.passed_median)} invoices, ${half(ag.wrong_median)} of them wrong, against ${int(t.passed)} and ${int(t.wrong)} when trust had to be earned on real outcomes: ten times the wrong payments, though at a lower rate per invoice paid, because it paid far more. The agreement mostly measured the reviewers, not the AI. This is a simulation with assumed reviewer behaviour, not a study of real people (Q6).</p>
   <h3>6. A value limit to try in the pilot (proposed, not tested)</h3>
@@ -225,6 +229,13 @@ function wireBiz(d) {
     set("verdict", verdict);
     const cover = (lpm, V) => pct((lpm * x.c) / V, 0);
     set("anchor", `For scale: even if a person reviewed every line today, the time saved would cover losing only about ${cover(L.paper, mb.meanWrong)} of an average wrongly paid line's value on paper, or ${cover(L.gated_cautious, mb.meanWrong)} at the cautious end, before any work to fix it. If the largest tenth of lines always went to a person, about ${cover(L.paper, mb.meanBelow)} and ${cover(L.gated_cautious, mb.meanBelow)}.`);
+    [0, mb.g.earned_share, 1].forEach((e, i) => {
+      const gross = x.saving(sUse) * e, fixes = ((mb.linesYr * e) / L.gated_cautious) * x.M;
+      set(`gn-g-${i}`, usd(gross));
+      set(`gn-f-${i}`, signed(-fixes));
+      set(`gn-n-${i}`, signed(gross - fixes));
+    });
+    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the cautious end, one in ${int(L.gated_cautious)} lines, at about $${int(x.M)} each. Net is before the pilot's own costs (see the pilot request). The rows are scenarios, not forecasts.`);
   };
   min.addEventListener("change", draw);
   [share, rate, fix, lost].forEach((x) => x.addEventListener("input", draw));
