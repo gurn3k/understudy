@@ -25,7 +25,7 @@ No contender earned trust at the 99% bar. The fixed rule passes nothing. The pol
 - **Checks that fail.** Every check was shown to fail on purpose before it was trusted. Fixtures with hand-worked answers are in `tests/fixtures/`.
 - **Separate recount.** A second program, written separately with no shared code, recounts the raw log, and its totals match.
 - **Claude's output is gated in code.** Invalid or missing answers count as "leave to a person". Policies are validated before they run.
-- **Fixed wording.** `tools/check_claims.mjs` confirms that every sentence fixed in the decision records appears verbatim on the page.
+- **Fixed wording.** `tools/check_claims.mjs` confirms that every sentence fixed in the decision records appears verbatim on the page, that wording the records rule out appears on neither page nor in this README, and that the key figures appear in the business case and the pilot request. It runs in CI with the unit tests and a term scan (`tools/term_scan.py`), against `site/` served locally: `python -m http.server 8765 --bind 127.0.0.1 --directory site`, then `node tools/check_claims.mjs`.
 
 ## Layout
 

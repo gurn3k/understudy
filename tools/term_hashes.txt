@@ -1,0 +1,13 @@
+# Terms that must not appear in committed files, as HMAC-SHA256 of the lowercase term keyed with UNDERSTUDY_TERM_KEY
+# (see tools/term_scan.py; the key is never committed).
+# hmac mode length
+0caa1c70db06ea11f97155384f564e99b22e8b3f477c76218da094f4005b4c78 sub 8
+dd59b9ba95d75f0bb0684a7d28444ecf5841285aa4967fe1f8ebcfdda819346e sub 6
+f620d4ee2c79b0ef5c95975afa3cac970bbbbdbcee77c2bd358613980b37361b token 2
+488ae3e67807f1aaf698120356f0e6cd3eadc90a8fa4ab246bface7d44d1c4b3 sub 7
+a5dd0980edfd1ba8ed0a89a0922cedd8268af03662cffea2177883642199875e sub 8
+75fee9aa9e734e75eda57a0487090a8a80b0cd560e6364564c3be811b0ae542e sub 7
+1e2a8a9f93bcc7196da9f0f5edadc9a6789f9507f641f75aac1f0cb1923ff628 words 2
+7068ac55ddf76cf34fe32a30d182af018611e4bee92695fc7a2bc83ce3e876ff words 2
+30addb3dcec6db28f90e4af1e7c4815cf1a13846f155456fde693d5329dc981d words 3
+74b6f4732d4c846cbf9ce9e930f730bd1a1f966140ef8c07e06395be9b47ee86 words 2

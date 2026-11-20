@@ -77,7 +77,9 @@ const FORBIDDEN = [
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
-const proc = spawn(CHROME, ["--headless=new", "--disable-gpu", `--remote-debugging-port=${port}`, `--user-data-dir=${join(tmpdir(), "us-claims")}`, "about:blank"], { stdio: "ignore" });
+// CHROME_ARGS: extra flags, e.g. "--no-sandbox" on a CI runner that blocks Chrome's sandbox.
+const EXTRA = (process.env.CHROME_ARGS || "").split(/\s+/).filter(Boolean);
+const proc = spawn(CHROME, [...EXTRA, "--headless=new", "--disable-gpu", `--remote-debugging-port=${port}`, `--user-data-dir=${join(tmpdir(), "us-claims")}`, "about:blank"], { stdio: "ignore" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let wsUrl;
 for (let i = 0; i < 50 && !wsUrl; i++) {

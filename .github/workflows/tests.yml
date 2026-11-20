@@ -13,5 +13,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # check_claims.mjs uses Node's built-in fetch and WebSocket (Node 22 or later); no packages are installed.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - name: Unit tests
         run: python -m unittest -v
+      - name: Term scan
+        run: python tools/term_scan.py
+      - name: Claims check (serves site/ and reads both pages in headless Chrome)
+        env:
+          CHROME: google-chrome
+          # The runner's Chrome can't use its sandbox on Ubuntu 24.04; the page served is this repo's own site/.
+          CHROME_ARGS: --no-sandbox
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 --directory site > "$RUNNER_TEMP/server.log" 2>&1 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8765/ && break; sleep 1; done
+          google-chrome --version
+          node tools/check_claims.mjs http://127.0.0.1:8765/
