@@ -78,6 +78,7 @@ const FORBIDDEN = [
   [/30 to 90 days|supplier-written guides/i, "an outside claim with no checked source: the study's own replay sets the shortest pilot", "review round, Should 24"],
   [/Out of scope; existing controls stay/i, "the existing duplicate and fraud checks must run on lines paid on their own (M14)", "review round, Should 18"],
   [/overrule|rising override rate|show the override rate|The AI suggests, and a person still decides/i, "the AI's calls are hidden in practice mode, so there is nothing to overrule; the override rate is dropped", "ADR 0027"],
+  [/Rulebook Owner|sign off each rulebook version|rulebook's say-so/i, "the requirements are outcomes on the decision component, any approach; the rulebook is the reference design (Appendix E)", "review round, Should 9"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -182,7 +183,7 @@ REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.gate_lo
   ["whitelist is mandatory", "Requirement M11"], ["mandatory means pass/fail", "Failing any M requirement disqualifies the proposal"],
   ["data protection, mandatory", "Data protection (all mandatory, under M13)"], ["retention and training use", "DP1 Retention and training use"], ["residency", "DP2 Residency"],
   ["sub-processors", "DP3 Sub-processors"], ["breach notice", "DP4 Breach notice"], ["attestations", "DP5 Attestations"], ["data-processing agreement", "DP6 Data-processing agreement"],
-  ["RACI: switch-off row renamed", "Confirm or override an automatic switch-off"], ["RACI: writing row", "Write or regenerate a rulebook version"],
+  ["RACI: switch-off row renamed", "Confirm or override an automatic switch-off"], ["RACI: writing row", "Write or change a version of the decision component"],
   ["RACI: AP team lead", "Accounts-payable team lead"], ["RACI: control owner", "Finance Controller or Internal Control"],
   ["Gate 4 success box", "Success at Gate 4"], ["budget in count and value", "two parts, count and value"],
   ["default count budget breached in the replay", `the replay had ${n0(D.replay.totals.wrong)} (${pc(D.replay.totals.wrong / D.replay.totals.passed, 1)}), so it would have been exceeded`]);
@@ -251,9 +252,10 @@ REQUIRED.rfp.push(["R8 rated Medium", "Fraud or duplicate paymentsMediumHigh"], 
 // Goods receipt and variance (Should 17): no goods receipt yet means hold; price and quantity differences are a data input.
 REQUIRED.rfp.push(["no goods receipt means hold", "No goods receipt yet means hold"], ["variance as a data input", "price and quantity differences between invoice, order and goods receipt"]);
 // Practice calls hidden, override rate dropped (Should 8, ADR 0027).
-REQUIRED.rfp.push(["practice calls hidden", "The rulebook's calls are hidden from the people who handle invoices"], ["override rate dropped", "D3, the override rate, is dropped"]);
+REQUIRED.rfp.push(["practice calls hidden", "The decision component's calls are hidden from the people who handle invoices"], ["override rate dropped", "D3, the override rate, is dropped"]);
 // Procurement readiness (Should 9): who reads which sections.
 REQUIRED.rfp.push(["how to use: internal case", "The internal case: sections 1 and 13."], ["how to use: the request", "The request: sections 2 to 12, section 14 and the appendices."], ["ask: issue the request", "approve issuing this request"]);
+REQUIRED.rfp.push(["outcome requirements", "The requirements are outcomes, not a design."], ["decision component defined", "whatever makes the pay-or-hold call on a line"], ["reference design annex", "E. Reference design: the study's rulebook"], ["owner role renamed", "Component Owner"]);
 // The README names the business case and the pilot request (Should 20).
 REQUIRED.readme = [["README: business case", "a business case (Q9)"], ["README: pilot request", "`site/rfp.html`"]];
 // Q1's dot chart prints exact counts per lane (Should 7): the dots round the AI's mistakes away.

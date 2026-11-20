@@ -70,6 +70,7 @@ function build(d) {
   ${list([
     "<strong>The internal case: sections 1 and 13.</strong> Section 1 asks the sponsor to approve issuing this request, with Phase 0 funded on award; section 13 records the sign-off. They are not sent to proposers.",
     "<strong>The request: sections 2 to 12, section 14 and the appendices.</strong> These go to every proposer, the same text to each, with the placeholders completed.",
+    "<strong>Requirements are outcomes.</strong> Section 6 asks for results on the decision component, whatever makes the pay-or-hold call on a line; any approach may meet them. The study's rulebook is the reference design in Appendix E. Sections 1, 2 and 4 name the approaches the study tested, including the model; that is evidence, not a requirement.",
     "<strong>Before issue.</strong> The issuer completes every placeholder in [brackets], and confirms or replaces every figure marked as my assumption, my default or my proposal: phase lengths, control defaults, evaluation weights and dates.",
   ])}</div>
   ${tbl("Document control", ["Item", "Entry"], [
@@ -174,18 +175,19 @@ function build(d) {
     ["Volume", "No seasonality", "A simplification"],
   ])}
   <h3>Constraints</h3>
-  ${list(["Nothing is paid on the rulebook's say-so before Gate 2.", "Existing payment, approval and fraud controls stay in force throughout.", "The company's own policies override this document wherever they differ."])}
+  ${list(["Nothing is paid on the decision component's say-so before Gate 2.", "Existing payment, approval and fraud controls stay in force throughout.", "The company's own policies override this document wherever they differ."])}
   <h3>Dependencies</h3>
-  ${list(["Access to outcome data, including corrections made after payment.", "A named Rulebook Owner and a Pilot Owner before Phase 0 ends.", "A place to log every call, its inputs and its outcome.", "Each line's price and quantity differences between invoice, order and goods receipt, as an input the rulebook and the scoring can use. The study's rulebook did not use them.", "The data-protection requirements (M13) met and checked before any real invoice data is used."])}`));
+  ${list(["Access to outcome data, including corrections made after payment.", "A named Component Owner and a Pilot Owner before Phase 0 ends.", "A place to log every call, its inputs and its outcome.", "Each line's price and quantity differences between invoice, order and goods receipt, as an input the decision component and the scoring can use. The study's rulebook did not use them.", "The data-protection requirements (M13) met and checked before any real invoice data is used."])}`));
 
   out.push(sec("s6", "6", "Requirements", `
   <p>A proposer shall state, for each requirement, how the pilot will meet it and how the test will be run. <strong>Failing any M requirement disqualifies the proposal</strong>; the M requirements are pass/fail and carry no points (section 12).</p>
+  <p><strong>The requirements are outcomes, not a design.</strong> They apply to <em>the decision component</em>: whatever makes the pay-or-hold call on a line, whether a rulebook written once and applied by software, a model called on each invoice, a trained classifier or a rules engine. Any approach that meets them may be proposed. The rulebook the study tested is the issuer's reference design, described in Appendix E; it is not a requirement.</p>
   ${tbl("Mandatory requirements", ["Ref", "The pilot shall", "Test"], [
-    ["M1", "Start in practice mode on every kind of invoice, with people handling every invoice. The rulebook's calls are hidden from the people who handle invoices: no screen, report or queue order they see shows or hints at a call.", "No invoice is paid on the rulebook's say-so before Gate 2, and a check of the processors' screens and reports in Phase 0 finds no call."],
+    ["M1", "Start in practice mode on every kind of invoice, with people handling every invoice. The decision component's calls are hidden from the people who handle invoices: no screen, report or queue order they see shows or hints at a call.", "No invoice is paid on the decision component's say-so before Gate 2, and a check of the processors' screens and reports in Phase 0 finds no call."],
     ["M2", `Promote a kind of invoice only on its real outcomes, never on how often reviewers agree, by a rule that keeps the chance of ever promoting a kind whose true rate is below 99%, across all its weekly looks for the planned length of Phase 1, at or below 5%: a named sequential method (a confidence sequence or alpha spending), or this default of mine: its worst likely case, allowing for orders, at or above ${pct(MARGIN, 1)} at ${word(CONSEC).toLowerCase()} weekly looks in a row.`, "Shown by simulation at a true 99.0%, at the kind's volume and design effect, or on the issuer's earlier months: at most 5% of kinds promoted. Each promotion record cites outcome counts and every look taken."],
     ["M3", `Switch a kind off automatically when the upper end of the two-sided 95% Wilson interval of its last ${int(ctl.window)} settled calls paid on its own, taken in arrival order, falls below 99%. After promotion, also switch it off when the lower end of the two-sided 95% Wilson interval of its error rate, on every settled call it has paid on its own since promotion, rises above the upper end of the error interval it was promoted on. Both outcome streams (M9) count; a line flagged by both counts once.`, "A seeded failure switches the kind off; so does a seeded slow rise above the promotion interval."],
     ["M4", "Log every call, its inputs and its outcome, and keep the log for the retention period in section 10.", "An auditor can trace any paid invoice back to its call."],
-    ["M5", "Have a named person read and sign off each rulebook version before use, under change control. Trust belongs to the version that earned it: a new version keeps a kind's promotion and practice-mode record only if every rule that can apply to that kind is unchanged, shown by both versions making the same call on every line of that kind logged so far. Any other kind goes back to practice mode with no evidence.", "Every version in use has a signed record. A seeded rewrite that changes one kind's rules sends that kind, and only that kind, back to practice mode."],
+    ["M5", "Have a named person review and sign off each version of the decision component (its rules, prompts, model and settings) before use, under change control. Trust belongs to the version that earned it: a new version keeps a kind's promotion and practice-mode record only if every part that can apply to that kind is unchanged, shown by both versions making the same call on every line of that kind logged so far. Any other kind goes back to practice mode with no evidence.", "Every version in use has a signed record. A seeded change that alters one kind's calls sends that kind, and only that kind, back to practice mode."],
     ["M6", "Count corrections made after payment as mistakes.", "The outcome feed includes post-payment corrections."],
     ["M7", `Confirm in writing, before Gate 1, the 99% bar, the cost of a late fix, the correction budget (section 7), any value limit and when a call counts as settled. The budget is binding: going over it switches every kind off at once until the sponsor decides.`, "A signed Gate 1 record exists; a seeded breach of the budget switches every kind off."],
     ["M8", "Provide a kill switch that the Pilot Owner and the Finance Controller can use without the supplier.", "Tested in Phase 0."],
@@ -198,12 +200,12 @@ function build(d) {
     ["M15", "Hold for a person any line with no goods receipt recorded when its invoice arrives, whatever its kind's record. No goods receipt yet means hold. This is a hard rule written outside the rulebook, not a tested control: the study's rulebook had no such rule.", "A seeded line with no goods receipt, in a kind that is paid on its own, is held."],
   ], "fit cards")}
   ${tbl("Data protection (all mandatory, under M13)", ["Ref", "The proposer shall", "Evidence"], [
-    ["DP1 Retention and training use", `Keep invoice, supplier and call data only as long as the pilot and the retention period in section 10 need it, delete it on request, and never use it to train or improve any model without the company's written consent.`, "Contract terms, and the model provider's written data-use terms for the plan used"],
+    ["DP1 Retention and training use", `Keep invoice, supplier and call data only as long as the pilot and the retention period in section 10 need it, delete it on request, and never use it to train or improve any model without the company's written consent.`, "Contract terms, and the written data-use terms of any model provider used, for the plan used"],
     ["DP2 Residency", `Store and process the data only in ${fill("permitted countries or regions")}, including backups and any model calls.`, "A data-flow map naming each location"],
-    ["DP3 Sub-processors", `List every sub-processor, including the model provider, give ${fill("e.g. 30")} days' notice of any change, and let the company object.`, "The current list, and the change-notice clause"],
+    ["DP3 Sub-processors", `List every sub-processor, including any model provider, give ${fill("e.g. 30")} days' notice of any change, and let the company object.`, "The current list, and the change-notice clause"],
     ["DP4 Breach notice", `Tell the company of any breach affecting its data within ${fill("e.g. 72")} hours of finding it, with what is known and what is being done.`, "The contract clause and an incident contact"],
     ["DP5 Attestations", `Hold a current independent security attestation covering the service, such as ${fill("e.g. an ISO/IEC 27001 certificate or a SOC 2 Type II report")}.`, "The report or certificate, with its date and scope"],
-    ["DP6 Data-processing agreement", "Sign the company's data-processing agreement before any real data is shared, and send only the fields the rulebook needs.", "The signed agreement and the field list"],
+    ["DP6 Data-processing agreement", "Sign the company's data-processing agreement before any real data is shared, and send only the fields the decision component needs.", "The signed agreement and the field list"],
   ], "fit")}
   <h3>How the switch-off test works (M3), in numbers</h3>
   <p>The test uses the two-sided 95% Wilson interval. A call is <em>settled</em> once its line has been cleared for payment and ${SETTLE_DAYS} days have passed (my default; the issuer sets it at Gate 1), with any correction in that time counted against it. In the study, of the ${int(sl.lines)} paid lines corrected after clearing, ${pct(sl.within[String(SETTLE_DAYS)], 0)} were corrected within ${SETTLE_DAYS} days, ${pct(sl.within["60"], 0)} within 60 and ${pct(sl.within["90"], 0)} within 90 (median ${int(sl.median_days)} days). So a correction found after a call is settled still counts: the call is re-scored, and the switch-off and the budget are recomputed. Only the last ${int(ctl.window)} settled calls the kind paid on its own count, in the order they arrived.</p>
@@ -220,7 +222,7 @@ function build(d) {
 
   const ph = [
     ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; consult the accounts-payable staff and their representatives (a works council where there is one) on how roles and workload change, and plan redeployment of freed hours; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget, and Phase 0's measured share reviewed, minutes per review and late-fix cost give a positive net after running costs (section 11); otherwise stop"],
-    ["1 Practice mode", `At least ${firstWk}, at most ${stopWk} under the stop rule (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}, under its own single-crossing rule, and was switched off again later; ${m2Line}); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice without seeing those calls (M1); every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
+    ["1 Practice mode", `At least ${firstWk}, at most ${stopWk} under the stop rule (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}, under its own single-crossing rule, and was switched off again later; ${m2Line}); it ends when G2 holds, and depends on your volume per kind`, "The decision component makes calls on every kind; people handle every invoice without seeing those calls (M1); every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
     ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind checks run window by window (one month to one quarter) on each kind paid on its own (M9).", "G3: results review; the correction budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
   ];
@@ -248,12 +250,12 @@ function build(d) {
   <p class="small">Anything less is a stop or an extension, decided at Gate 4; it is not a roll-out.</p></div>`));
 
   /* Columns: Sponsor, Pilot Owner, Finance Controller or Internal Control, Internal Audit, Risk and Compliance, IT and Data,
-     Rulebook Owner, accounts-payable team lead. One A per row. Whoever writes a rulebook does not sign it; whoever signs it
+     Component Owner, accounts-payable team lead. One A per row. Whoever writes a version does not sign it; whoever signs it
      does not approve its promotions; promotions, switch-offs and the monthly review are accountable outside the pilot team. */
   const raci = [
     ["Approve the bar, the pilot budget and the correction budget", "A", "R", "C", "C", "C", "I", "I", "C"],
-    ["Write or regenerate a rulebook version", "I", "I", "I", "I", "I", "A/R", "C", "C"],
-    ["Sign off a rulebook version", "I", "C", "I", "C", "C", "C", "A/R", "C"],
+    ["Write or change a version of the decision component", "I", "I", "I", "I", "I", "A/R", "C", "C"],
+    ["Sign off a version of the decision component", "I", "C", "I", "C", "C", "C", "A/R", "C"],
     ["Approve a promotion of a kind", "I", "R", "A", "C", "I", "I", "I", "C"],
     ["Confirm or override an automatic switch-off", "I", "R", "A", "I", "C", "C", "I", "C"],
     ["Run the blind checks (M9)", "I", "C", "A", "C", "I", "C", "I", "R"],
@@ -263,15 +265,15 @@ function build(d) {
   ];
   out.push(sec("s8", "8", "Governance and responsibilities", `
   <p>R is responsible, A accountable, C consulted, I informed. Names are blank; the roles are mine.</p>
-  ${tbl("Responsibilities", ["Activity", "Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner", "Accounts-payable team lead"], raci, "raci")}
-  ${tbl("Named people", ["Role", "Name", "Date appointed"], ["Executive Sponsor", "Pilot Owner (accounts payable)", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner", "Accounts-payable team lead"].map((r) => [r, fill("Full name, title"), fill("DD Month YYYY")]))}
-  <p><strong>Segregation of duties.</strong> Whoever writes or regenerates a rulebook version (IT and Data, or the proposer under its direction) shall not sign it. The Rulebook Owner who signs it shall not approve its promotions. Promotions, decisions to confirm or override an automatic switch-off, and the monthly review are accountable to the Finance Controller, or to Internal Control where the company has one, not to the Pilot Owner who runs the pilot. The blind checks, the independent outcome source that can switch the pilot off, are accountable to the Finance Controller or Internal Control and run by the accounts-payable team lead, not by the Pilot Owner. The audit trail is accountable to Internal Audit and kept write-once; IT and Data operate it but, since they also write the rulebook, cannot change it. The accounts-payable team lead is consulted throughout. The Pilot Owner reports to the sponsor at each gate.</p>`));
+  ${tbl("Responsibilities", ["Activity", "Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance", "IT and Data", "Component Owner", "Accounts-payable team lead"], raci, "raci")}
+  ${tbl("Named people", ["Role", "Name", "Date appointed"], ["Executive Sponsor", "Pilot Owner (accounts payable)", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance", "IT and Data", "Component Owner", "Accounts-payable team lead"].map((r) => [r, fill("Full name, title"), fill("DD Month YYYY")]))}
+  <p><strong>Segregation of duties.</strong> Whoever writes or changes a version of the decision component (IT and Data, or the proposer under its direction) shall not sign it. The Component Owner who signs it shall not approve its promotions. Promotions, decisions to confirm or override an automatic switch-off, and the monthly review are accountable to the Finance Controller, or to Internal Control where the company has one, not to the Pilot Owner who runs the pilot. The blind checks, the independent outcome source that can switch the pilot off, are accountable to the Finance Controller or Internal Control and run by the accounts-payable team lead, not by the Pilot Owner. The audit trail is accountable to Internal Audit and kept write-once; IT and Data operate it but, since they also write the decision component, cannot change it. The accounts-payable team lead is consulted throughout. The Pilot Owner reports to the sponsor at each gate.</p>`));
 
   const risks = [
     ["R1", "A line that needs a correction is paid", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7, M9, M12", "Pilot Owner"],
     ["R2", "A late fix costs more than the break-even", "Medium", "High", `Cautious break-even: ${int(L.gated_cautious)} lines per mistake × share reviewed × cost of a review (section 11)`, "Measure it in Phase 0; stop rule", "Finance Controller"],
     ["R3", "Mistakes concentrate in one kind of invoice", "Medium", "Medium", `The replay's ${int(t.wrong)} mistakes were ${er.kinds === 1 ? "all in one kind" : `in ${int(er.kinds)} kinds`}, ${int(er.top_order)} of them on one order`, "Promote kind by kind; M3; M12", "Pilot Owner"],
-    ["R4", "The rulebook goes stale", "High", "Medium", "Suppliers, prices and buying habits change", "M5: a rewrite that changes a kind's rules restarts its practice mode, so rewrites follow a schedule the evidence can keep up with; retest before each", "Rulebook Owner"],
+    ["R4", "The decision component goes stale", "High", "Medium", "Suppliers, prices and buying habits change", "M5: a rewrite that changes a kind's rules restarts its practice mode, so changes follow a schedule the evidence can keep up with; retest before each", "Component Owner"],
     ["R5", "Mistakes found after payment go unnoticed", "Medium", "High", "Not in the study's records", "M6", "Finance Controller"],
     ["R6", "Reviewers copy the AI's suggestion", "Medium", "High", "The agreement simulation", "M1 (calls hidden in practice mode), M2, M9", "Internal Audit"],
     ["R7", "A few large invoices carry most of the value at risk", "Medium", "High", `${pct(v.wrong / v.paid, 1)} of paid value from ${pct(b.wrong / b.paid, 2)} of invoices`, "D1", "Risk and Compliance"],
@@ -289,8 +291,8 @@ function build(d) {
 
   out.push(sec("s10", "10", "Controls and compliance", `
   ${list([
-    "<strong>Segregation of duties.</strong> Who writes a rulebook, who signs it and who approves promotions are different people. The blind checks are accountable outside the pilot team (Finance Controller or Internal Control), and the audit trail is write-once and accountable to Internal Audit (section 8).",
-    "<strong>Change control.</strong> A rulebook version is not used until signed. A change to the bar, a limit or a phase length is a recorded change approved at a gate.",
+    "<strong>Segregation of duties.</strong> Who writes a version of the decision component, who signs it and who approves promotions are different people. The blind checks are accountable outside the pilot team (Finance Controller or Internal Control), and the audit trail is write-once and accountable to Internal Audit (section 8).",
+    "<strong>Change control.</strong> A version of the decision component is not used until signed. A change to the bar, a limit or a phase length is a recorded change approved at a gate.",
     "<strong>Audit trail.</strong> Every call, input and outcome is logged and kept for the retention period the company's policy sets: " + fill("e.g. 7 years, per records policy") + ".",
     "<strong>Independent review.</strong> Internal Audit reviews a sample of paid invoices before Gate 3.",
     "<strong>Data protection.</strong> Nothing leaves the company until every item under M13 is met; Risk and Compliance checks them before Phase 0 uses real data and at each gate.",
@@ -308,10 +310,10 @@ function build(d) {
     [`Oversight, phases 1 to 3<span class="small">My assumption</span>`, `<span data-out="oh-basis"></span>`, `<span data-out="oh-cost"></span>`],
     [`Blind checks<span class="small">${req("M9, sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. The switch-off test on ${int(bl.n)} lines catches a true ${pct(bl.q, 0)} error rate ${pct(bl.power, 0)} of the time. Power does not rise smoothly with the window: ${int(bl.first_n)} lines already reach 80%, but ${int(1000)} fall back to ${pct(bl.power_1000, 0)}, so I size in steps of 50 to the first that holds. On paper, ${word(ctl.kinds_month_full).toLowerCase()} of the ${int(ctl.kinds_paid)} kinds the rulebook pays reach ${int(bl.n)} lines a month; the replay's first kind pays about ${int(ctl.first_kind_month)} (all of a month's lines reach ${pct(ctl.power_first_kind_month, 0)} power), and ${int(ctl.kind_months.filter((x) => x <= 200).length)} pay 200 or fewer, so for them every line paid alone is checked, which leaves no saving. The cost here is monthly, the cautious end, and never counts more checks than lines paid alone. ${int(ctl.small_n)} lines would catch it only ${pct(ctl.power_400, 0)} of the time. Drawn as whole purchase orders, lines on one order are not independent, so this power holds only if the window is enlarged by the kind's own design effect, measured in practice mode; the cost here uses ${int(bl.n)}.`, `<span data-out="blind-cost"></span> a kind a window; <span data-out="blind-pilot"></span> in the pilot`],
     [`Weekly reconciliation of calls against outcomes<span class="small">${req("Yours to estimate")}</span>`, "Hours a week × the weeks of the pilot", fill("US$ amount")],
-    [`Writing the rulebook<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line", `$${cOnce.toFixed(2)}`],
+    [`Writing the rulebook (the reference design, Appendix E)<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line. A proposal prices its own design in the lines below", `$${cOnce.toFixed(2)}`],
     [`Integration and data access<span class="small">${req("Yours to enter above")}</span>`, "One-off", `<span data-out="int-cost"></span>`],
     [`Supplier fees<span class="small">${req("Proposer to price")}</span>`, "Fixed and variable", fill("US$ amount")],
-    [`Model or API use<span class="small">${req("Proposer to price")}</span>`, "Per call or per rulebook version, with the model named", fill("US$ amount")],
+    [`Model or API use<span class="small">${req("Proposer to price")}</span>`, "Per call or per version, with any model named", fill("US$ amount")],
     [`Hosting and logging<span class="small">${req("Proposer to price")}</span>`, "For the pilot and the retention period", fill("US$ amount")],
     [`Outcome scoring<span class="small">${req("Proposer to price")}</span>`, "Matching each call to its outcome as it arrives", fill("US$ amount")],
     [`Audit<span class="small">${req("Yours to estimate")}</span>`, "Internal Audit's review before Gate 3 (section 10)", fill("US$ amount")],
@@ -389,19 +391,20 @@ function build(d) {
     "describe the sample size, who checks, and how the AI's answer is hidden from them.", "Mandatory since this issue (it was D2), not tested")}
   ${dcard("D4", "Plan the exit, and keep the data portable", `three rulebooks the same AI drafted from the same inputs landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine on the same invoices: consistent, but not independent checks.`,
     "", "a new rulebook or a new AI model can behave differently. The company needs to be able to retest, switch supplier or stop, without losing the record of every call.",
-    "describe the exit steps, the data the company keeps, and how every rulebook version is retested before use.")}
+    "describe the exit steps, the data the company keeps, and how every version of the decision component is retested before use.")}
   </div>
   <p>Under the evaluation weights in section 12, D1 counts under "How the controls are run" and D4 under "Exit and portability". M9, like every M requirement, is pass/fail and carries no points.</p>`));
 
   out.push(sec("ap", "App.", "Appendices", `
   <h3>A. Glossary</h3>
   ${tbl("Terms", ["Term", "Meaning"], [
-    ["Practice mode (shadow mode)", "The rulebook makes its calls, hidden from the people who still handle every invoice; each call is scored on its outcome."],
+    ["Decision component", "Whatever makes the pay-or-hold call on a line in the pilot: a rulebook written once and applied by software (the reference design, Appendix E), a model called on each invoice, a trained classifier or a rules engine. The requirements in section 6 apply to it whatever its design."],
+    ["Practice mode (shadow mode)", "The decision component makes its calls, hidden from the people who still handle every invoice; each call is scored on its outcome."],
     ["Kind of invoice", `In the study, the spend area (which department bought) × the item category (the order's matching setting: the invoice is matched to each recorded delivery, or it may be entered before the goods arrive). The category is a setting, not the order things happened in: on orders that allow the invoice first, ${pct(d.evidence.kind_setting.before_gr_gr_first / d.evidence.kind_setting.before_gr_lines, 1)} of the test lines had the goods received first anyway. A proposal may group invoices differently, and shall say why its grouping fits (section 12).`],
     ["Allowing for orders", "An interval that treats each purchase order, not each line, as the independent unit, because lines on one order succeed or fail together. It is wider, so more calls are needed."],
     ["Worst likely case", "The lowest the true share of paid invoices that turn out fine is likely to be, given how many were checked (95% sure). Also called the lower bound."],
     ["The 99% bar", "Of the invoices paid without a check, at least 99 in 100 must turn out fine, judged by the worst likely case."],
-    ["Settled call", `A call whose outcome is known: its line was cleared for payment ${SETTLE_DAYS} days ago or more (my default; set at Gate 1), and any correction in that time counts against it. A correction found later still counts: the call is re-scored. For acceptance, only calls the rulebook would have paid without a check count; for the switch-off rule, only calls it paid on its own, in arrival order.`],
+    ["Settled call", `A call whose outcome is known: its line was cleared for payment ${SETTLE_DAYS} days ago or more (my default; set at Gate 1), and any correction in that time counts against it. A correction found later still counts: the call is re-scored. For acceptance, only calls the decision component would have paid without a check count; for the switch-off rule, only calls it paid on its own, in arrival order.`],
     ["Two-sided 95% Wilson interval", "The range the true share right is likely to sit in, 95% sure, given the calls counted. Its lower end is the worst likely case; its upper end is the best likely case."],
     ["Order line", "The unit of every count and amount here. The study's records have no invoice-document field, so one \"invoice\" in the study is one order line."],
     ["Late fix", "Correcting a line after it was paid instead of before. Its cost is the work to fix it plus any share of its value never recovered."],
@@ -413,7 +416,16 @@ function build(d) {
   <h3>C. Benchmarks to collect</h3>
   <p>See the table at the end of section 11.</p>
   <h3>D. Change log</h3>
-  ${tbl("Changes", ["Version", "Date", "Change", "Approved by"], [["1.0", esc(d.built), "First issue as a model document", fill("Name, role")]])}`));
+  ${tbl("Changes", ["Version", "Date", "Change", "Approved by"], [["1.0", esc(d.built), "First issue as a model document", fill("Name, role")]])}
+  <h3>E. Reference design: the study's rulebook</h3>
+  <p>This is the design the study tested, given for reference. A proposer may offer it, adapt it or offer another approach; the requirements in section 6 apply the same way to each.</p>
+  ${tbl("The reference design", ["Item", "What the study did"], [
+    ["What it is", "An AI model writes a rulebook once from past records: rules for when a line may be paid without a check. Ordinary software then applies the rules to each line. No model is called per invoice."],
+    ["What it decides", "Pay without a check, or hold for a person. It never rejects or changes an invoice."],
+    ["Versions", "A new rulebook is a new version, signed before use (M5); a kind keeps its record only if its rules are unchanged."],
+    ["Cost in the study", `About $${cOnce.toFixed(2)} to write one rulebook, at the model's API list prices on the run date; nothing per line.`],
+    ["Result in the study", `It paid ${pct(b.paid / d.held_out_n, 1)} of the test lines with a worst likely case of ${pct(c.held_out.precision_lower, 2)}: below the 99% bar, not proved (section 4).`],
+  ])}`));
   return out;
 }
 
