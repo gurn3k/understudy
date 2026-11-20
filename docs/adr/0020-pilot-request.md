@@ -3,6 +3,8 @@
 ## Status
 Drafted 2026-11-18. Ruled ACCEPT WITH CHANGES by an independent reviewer after the page was built locally, with six required changes, all applied: the RACI follows the segregation rule and keeps Internal Audit independent; the bar is counted on the calls the rulebook would pay, as in ADR 0013; the stop rule and phase lengths are labelled as my judgment; two outside-guide claims are hedged or cut; the cost tile is relabelled as a gross ceiling; and the reviewer's optional notes were taken. Nothing ships without the owner's go-ahead. Every result was already known: the verdict (ADR 0016), the replay (ADR 0017), the B follow-up (ADR 0018) and the business case (ADR 0019). Nothing here changes a verdict, a bar or a fixed sentence.
 
+**Superseded in part by ADR 0021 (2026-11-20).** The on-paper saving, the pilot cost as a share of it, the second break-even and the $100 late fix are replaced; see the parts marked [superseded] below and ADR 0021's list. The text below is kept as written.
+
 ## Why
 The owner asked for the business case to be revisited as a formal request for proposals in a corporation with a lot of process: structure and a one-screen summary, a firmer set of numbers, a leader's framing, a concrete pilot plan, and the missing pieces (pilot cost, benchmarks, wider risks). The page already answers "what could it save?" (Q9). A leader deciding on a pilot also needs the controls, owners, gates, costs and approvals a company would ask for before saying yes.
 
@@ -22,7 +24,7 @@ Rules for the figures:
 ## Not claimed
 - That any approach met the 99% bar, or that a pilot would succeed.
 - Any real cost of integration, oversight, a late fix, or a company's own volumes. These are the reader's inputs or blank fields.
-- A steady-state saving. The page shows the saving on paper and the pilot cost, and the pilot's cost as a share of the on-paper yearly saving (a gross ceiling, before late-fix costs); it does not estimate what would be earned.
+- A steady-state saving. The page shows the saving on paper and the pilot cost, and the pilot's cost as a share of the on-paper yearly saving (a gross ceiling, before late-fix costs); it does not estimate what would be earned. [superseded: ADR 0021 drops the share-of-saving tile and rebuilds the saving from the share of lines reviewed]
 - That the risk ratings are measured. They are my judgment.
 - That a value limit would help (ADR 0019 item 6 stands: described, not tested).
 - That the page is a legal, audit or procurement-policy document. A company's own process governs.
@@ -31,7 +33,7 @@ Rules for the figures:
 `site/rfp.html` and `site/rfp.js`, with a few styles added to `site/style.css`. Q9 gets one link to it.
 
 ## Addition (2026-11-18, at the owner's request)
-Added later at the owner's request: section 11 shows first-year return, payback and wrong payments for scenarios at 10, 25, 50 and 100% of the on-paper volume, plus the earned share needed to repay the pilot, at an assumed late-fix cost the reader can change ($100 default); these are scenarios, not a forecast of what would be earned. The independent reviewer ruled ACCEPT WITH CHANGES (one break-even basis named, the higher of the test and replay error rates, ROI and payback hidden until integration cost is entered, the live late-fix value in the summary, and the replay's observed touches beside the scenarios), all applied.
+Added later at the owner's request: section 11 shows first-year return, payback and wrong payments for scenarios at 10, 25, 50 and 100% of the on-paper volume, plus the earned share needed to repay the pilot, at an assumed late-fix cost the reader can change ($100 default) [superseded: ADR 0021 splits it into work plus share never recovered, and adds 0% and observed rows]; these are scenarios, not a forecast of what would be earned. The independent reviewer ruled ACCEPT WITH CHANGES (one break-even basis named, the higher of the test and replay error rates [superseded: ADR 0021, the cautious end of the replay's range], ROI and payback hidden until integration cost is entered, the live late-fix value in the summary, and the replay's observed touches beside the scenarios), all applied.
 
 ## Readability pass (2026-11-18, at the owner's request)
 Dense paragraphs replaced with tables, a phase timeline and two to-scale bar charts; no figure or caveat added or removed. The independent reviewer ruled ACCEPT WITH CHANGES (seven fidelity fixes: gross-ceiling and scenarios caveats restored to the summary, "below the bar: not proved", the simulation bar labelled as assumed behaviour, simulation parameters and input defaults read from one place, Phase 1 shown as about 13 weeks), all applied.

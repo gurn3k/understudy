@@ -3,6 +3,8 @@
 ## Status
 Accepted 2026-11-17 by an independent reviewer, with changes, all applied here. Every result was already known when this was written: the verdict (ADR 0016), the replay (ADR 0017) and the B follow-up (ADR 0018). Nothing here changes a verdict, a bar or a fixed sentence. Everything it adds is labelled on the page as added after the results, for a business reader.
 
+**Superseded in part by ADR 0021 (2026-11-20).** The parts marked [superseded] below counted bulk clearing postings as human checks. ADR 0021 re-bases the money on order lines a person reviews, with one break-even. The text below is kept as written.
+
 ## Why
 The page answers "did any approach earn trust at the 99% bar?" A business leader also asks what it would save, what a mistake costs, and what to do next. These additions answer those questions from the same records. They don't move the bar. The owner placed the business case first on the page; the technical sections follow unchanged.
 
@@ -10,10 +12,10 @@ The page answers "did any approach earn trust at the 99% bar?" A business leader
 Each figure is computed by `tools/build_site.py` into `site/data.json` (key `business`). None is typed by hand. The chosen rulebook is policy 2 on all 54,874 held-out invoices.
 
 1. **What a mistake can cost before the rulebook stops paying off.**
-   - Today people handle nearly every invoice before it is paid (93.6% of clearing events are manual). Each of the 249 wrong passes was corrected before payment (ADR 0009). The rulebook would pay it first and fix it after. *M* includes any amount that can't be recovered after payment.
+   - [superseded: ADR 0021] Today people handle nearly every invoice before it is paid (93.6% of clearing events are manual). Each of the 249 wrong passes was corrected before payment (ADR 0009). The rulebook would pay it first and fix it after. *M* includes any amount that can't be recovered after payment.
    - Let *c* be the cost of one manual check (minutes × hourly cost ÷ 60), and *M* the extra cost of fixing an invoice after payment instead of before.
-   - The rulebook saves 26,715 × *c* in checks and adds 249 × *M* in late fixes. It pays off while *M* ≤ about 107 checks' worth (26,715 ÷ 249). At the worst likely case (lower bound 98.95%), that is about 95. Hourly cost is in EUR, to match invoice values (default €40, an assumption). The reader sets minutes (2, 5 or 10, the PRD's range) and hourly cost.
-2. **Touches and hours taken off desks.**
+   - [superseded: ADR 0021, one break-even on lines × share reviewed] The rulebook saves 26,715 × *c* in checks and adds 249 × *M* in late fixes. It pays off while *M* ≤ about 107 checks' worth (26,715 ÷ 249). At the worst likely case (lower bound 98.95%), that is about 95. Hourly cost is in EUR, to match invoice values (default €40, an assumption). The reader sets minutes (2, 5 or 10, the PRD's range) and hourly cost.
+2. **Touches and hours taken off desks.** [superseded in full: ADR 0021]
    - Touches taken off desks on paper = the manual touches on the 26,715 invoices the rulebook paid, counted the way ADR 0013 counts them (heldout_timing), over the three held-out months. A yearly figure is that × 4, labelled "assumes no seasonality".
    - Hours = touches × minutes ÷ 60, at 2, 5 and 10 minutes. Full-time equivalents at 1,800 hours a year. Money = hours × the reader's hourly cost.
    - The page renames 227,548 to "manual clearing and block-removal events in the log".
@@ -27,7 +29,7 @@ Each figure is computed by `tools/build_site.py` into `site/data.json` (key `bus
 4. **The earned first year.**
    - ADR 0017's corrected sentences, exactly as fixed.
    - With ADR 0017's limit: the window was too short for the outcome lag.
-   - Set beside the on-paper figure for the same held-out invoices (26,715 paid), never the yearly figure. 844 understates steady-state volume, and the page doesn't estimate the steady state.
+   - Set beside the on-paper figure for the same held-out invoices (26,715 paid), never the yearly figure. [ADR 0021: shown as a share, 844 of 26,715 lines.] 844 understates steady-state volume, and the page doesn't estimate the steady state.
 5. **A recommendation.**
    - Drawn only from the replay (ADR 0013, 0017). Run the rulebook in practice mode (shadow) on every kind of invoice. Let a kind pay on its own only when its outcomes prove 99%, and switch it off on the replay's rule. In the replay this setup still paid 15 wrong of 844 (1.8%) before withdrawal, so plan for errors in the first months. Fix the bar and your cost of a late fix (item 1) before the pilot starts. Expect the first kind to qualify after months, not weeks.
    - Labelled as a recommendation, not a result.
