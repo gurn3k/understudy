@@ -67,6 +67,7 @@ const FORBIDDEN = [
   [/wrong payments?/i, "say lines paid that needed a correction: the label is a correction, not a wrong payment", "ADR 0022"],
   [/corrections after payment aren't seen/i, "post-clearing corrections are in the records and move the result: give the figure", "ADR 0022"],
   [/\bFTEs?\b|staff resist/i, "count the saving as review hours freed (capacity, not jobs); staff are consulted, not a resistance risk", "review round, Should 4"],
+  [/made about \d+ times as often|most repeated of the decisions|manual clearing and block-removal events in these records/i, "unlike units: logged steps are not decisions or invoices; count in order lines", "review round, Should 5"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
