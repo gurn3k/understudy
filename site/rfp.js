@@ -220,20 +220,25 @@ function build(d) {
     "A control in section 10 cannot be met.",
   ])}`));
 
+  /* Columns: Sponsor, Pilot Owner, Finance Controller or Internal Control, Internal Audit, Risk and Compliance, IT and Data,
+     Rulebook Owner, accounts-payable team lead. One A per row. Whoever writes a rulebook does not sign it; whoever signs it
+     does not approve its promotions; promotions, switch-offs and the monthly review are accountable outside the pilot team. */
   const raci = [
-    ["Approve the bar, the pilot budget and the correction budget", "A", "R", "C", "C", "C", "I", "I"],
-    ["Sign off a rulebook version", "I", "A", "C", "C", "C", "C", "R"],
-    ["Approve a promotion of a kind", "I", "A/R", "R", "C", "I", "I", "C"],
-    ["Trigger a switch-off", "I", "A/R", "R", "I", "I", "C", "C"],
-    ["Review outcomes each month", "I", "A", "R", "C", "I", "R", "C"],
-    ["Hold the audit trail", "I", "C", "C", "C", "C", "A/R", "C"],
-    ["Make the Gate 4 decision", "A/R", "R", "C", "C", "C", "C", "C"],
+    ["Approve the bar, the pilot budget and the correction budget", "A", "R", "C", "C", "C", "I", "I", "C"],
+    ["Write or regenerate a rulebook version", "I", "I", "I", "I", "I", "A/R", "C", "C"],
+    ["Sign off a rulebook version", "I", "C", "I", "C", "C", "C", "A/R", "C"],
+    ["Approve a promotion of a kind", "I", "R", "A", "C", "I", "I", "I", "C"],
+    ["Confirm or override an automatic switch-off", "I", "R", "A", "I", "C", "C", "I", "C"],
+    ["Run the blind checks (M9)", "I", "A", "I", "C", "I", "C", "I", "R"],
+    ["Review outcomes each month", "I", "R", "A", "C", "I", "R", "I", "C"],
+    ["Hold the audit trail", "I", "C", "C", "C", "C", "A/R", "C", "I"],
+    ["Make the Gate 4 decision", "A/R", "R", "C", "C", "C", "C", "C", "C"],
   ];
   out.push(sec("s8", "8", "Governance and responsibilities", `
   <p>R is responsible, A accountable, C consulted, I informed. Names are blank; the roles are mine.</p>
-  ${tbl("Responsibilities", ["Activity", "Sponsor", "Pilot Owner", "Finance Controller", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner"], raci, "raci")}
-  ${tbl("Named people", ["Role", "Name", "Date appointed"], ["Executive Sponsor", "Pilot Owner (accounts payable)", "Finance Controller", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner"].map((r) => [r, fill("Full name, title"), fill("DD Month YYYY")]))}
-  <p>The Rulebook Owner who signs a rulebook version shall not approve its promotions (segregation of duties). The Pilot Owner reports to the sponsor at each gate.</p>`));
+  ${tbl("Responsibilities", ["Activity", "Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner", "Accounts-payable team lead"], raci, "raci")}
+  ${tbl("Named people", ["Role", "Name", "Date appointed"], ["Executive Sponsor", "Pilot Owner (accounts payable)", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance", "IT and Data", "Rulebook Owner", "Accounts-payable team lead"].map((r) => [r, fill("Full name, title"), fill("DD Month YYYY")]))}
+  <p><strong>Segregation of duties.</strong> Whoever writes or regenerates a rulebook version (IT and Data, or the proposer under its direction) shall not sign it. The Rulebook Owner who signs it shall not approve its promotions. Promotions, decisions to confirm or override an automatic switch-off, and the monthly review are accountable to the Finance Controller, or to Internal Control where the company has one, not to the Pilot Owner who runs the pilot. The accounts-payable team lead, whose people do the work and the blind checks, is consulted throughout. The Pilot Owner reports to the sponsor at each gate.</p>`));
 
   const risks = [
     ["R1", "A line that needs a correction is paid", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7, M9, M12", "Pilot Owner"],
@@ -338,7 +343,7 @@ function build(d) {
 
   out.push(sec("s13", "13", "Approvals and sign-off", `
   <p>I recommend that each person below signs once, at Gate 1, and again at Gate 4.</p>
-  ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
+  ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
 
   const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
   const topShareWrong = b.top10.wrong_value / b.value.wrong, topSharePaid = b.top10.paid_value / b.value.paid;
