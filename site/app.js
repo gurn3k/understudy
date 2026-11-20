@@ -157,7 +157,7 @@ function biz(d) {
   <li><strong>Let a kind of invoice be paid without a check only once its outcomes prove the bar by a rule that holds when checked every week</strong> (the replay's single crossing did not; <a href="rfp.html#s6">pilot request M2</a>), and switch it off automatically when recent results slip.</li>
   <li><strong>Check a sample of what it pays on its own, blind</strong> (M9): a reviewer who can't see the AI's call measures the AI, not the reviewer.</li>
   <li><strong>Cap how many lines of one order it pays on its own</strong> (M12; a lesson from the replay, where ${int(d.evidence.replay.top_order)} of the ${int(t.wrong)} mistakes were on one order, not a tested control).</li>
-  <li><strong>Judge it on outcomes, never on how often people agree with it</strong> (section 5). Track how often people overrule it as a warning sign only.</li>
+  <li><strong>Judge it on outcomes, never on how often people agree with it</strong> (section 5). While it practises, hide its calls from the people who handle invoices, so their decisions stay their own.</li>
   <li><strong>Plan for mistakes in the first months.</strong> In the replay, ${int(t.wrong)} of ${int(t.passed)} (${pct(t.wrong / t.passed, 1)}) were wrong before trust was withdrawn. Expect the first kind of invoice to qualify after months, not weeks.</li>
   <li><strong>Consider a value limit</strong>, set from your own policy before the pilot (section 6, a proposal, not a result).</li>
   </ol>
@@ -725,7 +725,7 @@ function q5(d) {
   const dem = proms[0] && ev.find((e) => e.event === "demoted" && e.type === proms[0].type && e.week > proms[0].week);
   const plain = `<p>So far the question was all or nothing: trust the AI with every invoice, or with none. In practice a company could switch it on gradually, one kind of invoice at a time, and only after it has proved itself on that kind. If it slips, it gets switched off again. I replayed June 2018 to January 2019 week by week, as if the rulebook had been used this way.</p>
   <ol class="plainlist">
-  <li><strong>Practice.</strong> The AI suggests, and a person still decides. I keep score of whether its suggestions would have been right.</li>
+  <li><strong>Practice.</strong> The AI makes its call, hidden from the person, who still decides. I keep score of whether its calls would have been right.</li>
   <li><strong>On.</strong> Once its practice calls on one kind of invoice prove 99%, it pays that kind by itself.</li>
   <li><strong>Off again.</strong> If its recent calls on that kind clearly drop below 99%, it goes back to practice.</li>
   </ol>
@@ -784,7 +784,7 @@ function q6(d) {
   <ul>
   <li>Judge the AI on real outcomes, such as whether the payment later needed fixing, not on whether people agreed with it.</li>
   <li>Spot-check blind: now and then, have a person decide without seeing the AI's suggestion, and compare.</li>
-  <li>Track how often people overrule the AI. If they almost never do, treat that as a warning sign, not a success.</li>
+  <li>While the AI practises, hide its calls from the people who handle invoices. If they can see a call, how often they agree with it measures them, not the AI.</li>
   </ul>
   <p class="small">This is a simulation. How often real reviewers copy is an assumption here, not a measurement. The steps under "What to do instead" follow from this but were not tested here.</p>`;
   const detail = `<p>The simulation runs the same replay with agreement as the switch instead of outcomes. A simulated reviewer copies the suggestion some share of the time. Otherwise the reviewer catches a wrong "pay" 4 times in 5, and wrongly flags a right one 1 time in 50. The chart shows one example run with reviewers copying 9 times in 10.</p>
@@ -915,7 +915,7 @@ function q8(d) {
   <li><strong>Keep the guardrail on.</strong> Track how many recently paid invoices turned out fine, and switch the AI off automatically when that slips (Q5). Grant trust only by a rule that holds when checked every week, which the replay's single crossing did not (pilot request M2), check a sample blind (M9), and cap the lines paid alone on one order (M12).</li>
   <li><strong>Count the saving in review time actually freed,</strong> on lines a person really reviewed before, not just the share of invoices paid.</li>
   <li><strong>Time to spot a problem,</strong> and how often the AI has to be switched off.</li>
-  <li><strong>How often people overrule it:</strong> a warning sign worth looking into, never a measure of accuracy. Q6 shows why agreement misleads.</li>
+  <li><strong>Whether its calls stay hidden:</strong> in practice mode the people who handle invoices must not see them, or they may copy them. Q6 shows why agreement misleads.</li>
   </ul>
   <h3>One limit on every measure</h3>
   <p>"Fine" means no one corrected the invoice before it was paid. Corrections made after clearing are in the records but not in the label; counting them, the rulebook's worst likely case falls to ${pct(d.evidence.sensitivity.post_clear_lower, 2)}. A live system should count corrections made after payment as mistakes from the start.</p>`;

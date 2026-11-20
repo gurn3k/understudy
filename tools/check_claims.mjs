@@ -77,6 +77,7 @@ const FORBIDDEN = [
   [/pre-registered approaches, [\d,]+ real invoices/i, "the three approaches were not all judged on the same invoices: give each its own set", "review round, Should 23"],
   [/30 to 90 days|supplier-written guides/i, "an outside claim with no checked source: the study's own replay sets the shortest pilot", "review round, Should 24"],
   [/Out of scope; existing controls stay/i, "the existing duplicate and fraud checks must run on lines paid on their own (M14)", "review round, Should 18"],
+  [/overrule|rising override rate|show the override rate|The AI suggests, and a person still decides/i, "the AI's calls are hidden in practice mode, so there is nothing to overrule; the override rate is dropped", "ADR 0027"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
@@ -248,6 +249,8 @@ REQUIRED.rfp.push(["why not a shorter pilot", `the first kind qualified only in 
 REQUIRED.rfp.push(["R8 rated Medium", "Fraud or duplicate paymentsMediumHigh"], ["duplicate check on autonomous payments", "Run the company's existing duplicate-payment and fraud checks on every line paid on its own"]);
 // Goods receipt and variance (Should 17): no goods receipt yet means hold; price and quantity differences are a data input.
 REQUIRED.rfp.push(["no goods receipt means hold", "No goods receipt yet means hold"], ["variance as a data input", "price and quantity differences between invoice, order and goods receipt"]);
+// Practice calls hidden, override rate dropped (Should 8, ADR 0027).
+REQUIRED.rfp.push(["practice calls hidden", "The rulebook's calls are hidden from the people who handle invoices"], ["override rate dropped", "D3, the override rate, is dropped"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"] }[where];
