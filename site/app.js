@@ -66,12 +66,6 @@ function moneyBasis(d) {
     meanWrong: b.anchors.mean_wrong * R, meanBelow: b.anchors.mean_wrong_below_top10 * R,
     anchorShares: [[b.footprint.isolated_paid / b.paid, "lines with a person's own step: a footprint, used here only as an example share"], [b.footprint.rpb_manual_paid / b.paid, "lines with a block released under a person's login: also a footprint, an example share"]] };
 }
-/* m: minutes per review; r: hourly cost; fix: work per late fix; lost: share of value never recovered (0-1). */
-function moneyAt(mb, m, r, fix, lost) {
-  const c = (m / 60) * r, M = fix + lost * mb.meanWrong;
-  return { c, M, be: (lpm, share) => lpm * share * c, need: (lpm) => M / (lpm * c),
-    saving: (share) => mb.linesYr * share * c, hours: (share) => (mb.linesYr * share * m) / 60 };
-}
 function biz(d) {
   const mb = moneyBasis(d), { b, R, L, fp, g } = mb, yr = 12 / b.months;
   const v = Object.fromEntries(Object.entries(b.value).map(([k, x]) => [k, x * R]));
@@ -106,15 +100,8 @@ function biz(d) {
   ${tile("Cost to run the rulebook", `>$${cOnce.toFixed(2)}`, "once, to write it. Nothing per line: ordinary software applies it.")}
   ${tile("Lines paid that needed fixing", `>${int(b.wrong)} of ${int(b.problems_all)}`, `problem lines (${pct(b.wrong / b.problems_all, 0)}) would have been paid before the fix, worth ${usd(v.wrong)} in order-line value (not money lost)`)}
   </div>
-  <h3>Your inputs</h3>
-  <div class="biz-inputs" role="group" aria-label="Your inputs">
-  <label>Share of these lines a person reviews today (%) <input id="biz-share" type="number" min="0" max="100" step="0.1" value="" placeholder="not measured" inputmode="decimal"></label>
-  <label>Minutes per review <select id="biz-min"><option value="2">2</option><option value="5" selected>5</option><option value="10">10</option></select></label>
-  <label>Cost of an hour of their time (US$) <input id="biz-rate" type="number" min="1" max="500" step="1" value="40" inputmode="numeric"></label>
-  <label>Work to fix one line after payment (US$) <input id="biz-fix" type="number" min="0" max="100000" step="10" value="100" inputmode="numeric"></label>
-  <label>Share of a wrongly paid line's value never recovered (%) <input id="biz-lost" type="number" min="0" max="100" step="0.5" value="0" inputmode="decimal"></label>
-  <p class="small">None of these is in the records. A pilot measures them first; until then the defaults are my assumptions. Change them to match your business; the figures below update.</p>
-  </div>
+  <h3>Your inputs, and what they add up to</h3>
+  ${Calc.html("biz", "None of these is in the records. A pilot measures them first; until then the defaults are my assumptions, and each result says whether it rests on yours, a default or an upper limit. The sections below show the working.")}
   <h3>1. What it would save</h3>
   <p>The saving is the review time a person would no longer spend on the lines the rulebook pays. I can't measure it from the records: they show whose login posted each step and when, not whether anyone looked at the line. So the saving rests on two figures a company has to measure first: the share of these lines a person actually reviews today, and the minutes per review.</p>
   <p>What the records do show, on the ${int(b.paid)} lines it would have paid: ${pct(iso, 1)} had a step under a person's login, besides the clearing, that was not part of a bulk posting, and ${pct(rpb, 1)} had a payment block released under a person's login, most of those in bulk too. That is a footprint, not proof of review. A person can review a line without leaving a step, and a step can be a posting with no review behind it.</p>
@@ -195,36 +182,25 @@ function biz(d) {
     `No figure in this section changes the verdict, which stands as in Q1`,
   ]);
 }
-/* Reads a number input: blank or unreadable gives the default; out of range is held to the field's limits. */
-function readNum(el, lo, hi, dflt) {
-  const v = el.value.trim(), n = Number(v);
-  if (v === "" || !Number.isFinite(n)) return dflt;
-  return Math.min(hi, Math.max(lo, n));
-}
 function wireBiz(d) {
-  const mb = moneyBasis(d), L = mb.L, el = (id) => $("#" + id);
-  const share = el("biz-share"), min = el("biz-min"), rate = el("biz-rate"), fix = el("biz-fix"), lost = el("biz-lost");
-  if (!share || !min || !rate || !fix || !lost) return;
+  const mb = moneyBasis(d), L = mb.L;
   const set = (k, s) => document.querySelectorAll(`[data-out="${k}"]`).forEach((x) => (x.textContent = s));
-  const draw = () => {
-    const s = readNum(share, 0, 100, null);
-    const sh = s === null ? null : s / 100, sUse = sh === null ? 1 : sh;
-    const m = Number(min.value), r = readNum(rate, 1, 500, 40);
-    const x = moneyAt(mb, m, r, readNum(fix, 0, 100000, 100), readNum(lost, 0, 100, 0) / 100);
+  Calc.wire("biz", d, (B, v, x) => {
+    const sh = v.sh, m = v.m;
     [...mb.anchorShares.map(([a]) => a), sh, 1].forEach((q, i) => {
       set(`rv-${i}`, q === null ? "enter it above" : int(mb.linesYr * q));
-      set(`hr-${i}`, q === null ? "–" : int(x.hours(q)));
-      set(`sv-${i}`, q === null ? "–" : usd(x.saving(q)));
+      set(`hr-${i}`, q === null ? "–" : int((mb.linesYr * q * m) / 60));
+      set(`sv-${i}`, q === null ? "–" : usd(mb.linesYr * q * x.c));
     });
     set("share-lab", sh === null ? "" : `(${pct(sh, 1)})`);
     set("c", `$${x.c.toFixed(2)}`);
     set("M", `about $${int(x.M)} a line`);
-    const need = (lpm) => { const n = x.need(lpm); return n > 1 ? "more than every line" : n <= 0 ? "any share" : pct(n, 1); };
-    set("be-paper", `$${int(x.be(L.paper, sUse))}`);
+    const need = (lpm) => Calc.needTxt(x.need(lpm));
+    set("be-paper", `$${int(x.be(L.paper))}`);
     set("need-paper", need(L.paper));
-    set("be-gated", `$${int(x.be(L.gated_cautious, sUse))} to $${int(x.be(L.gated_generous, sUse))}`);
+    set("be-gated", `$${int(x.be(L.gated_cautious))} to $${int(x.be(L.gated_generous))}`);
     set("need-gated", `${need(L.gated_generous)} to ${need(L.gated_cautious)}`);
-    set("be-low", `$${int(x.be(L.gated_cautious, sUse))}`);
+    set("be-low", `$${int(x.be(L.gated_cautious))}`);
     set("need-low", need(L.gated_cautious));
     const nLow = x.need(L.gated_cautious);
     let verdict = nLow > 1
@@ -237,16 +213,13 @@ function wireBiz(d) {
     const cover = (lpm, V) => { const q = (lpm * x.c) / V; return q >= 1 ? "all of it (100% or more)" : `about ${pct(q, 0)}`; };
     set("anchor", `For scale: even if a person reviewed every line today, the time saved would cover losing ${cover(L.paper, mb.meanWrong)} of an average wrongly paid line's value on paper, or ${cover(L.gated_cautious, mb.meanWrong)} at the cautious end, before any work to fix it. If the largest tenth of lines always went to a person: ${cover(L.paper, mb.meanBelow)} on paper, and ${cover(L.gated_cautious, mb.meanBelow)} at the cautious end.`);
     [0, mb.g.earned_share, 1].forEach((e, i) => {
-      const gross = x.saving(sUse) * e, fixes = ((mb.linesYr * e) / L.gated_cautious) * x.M;
-      set(`gn-g-${i}`, usd(gross));
-      set(`gn-f-${i}`, signed(-fixes));
-      set(`gn-n-${i}`, signed(gross - fixes));
+      const r = x.row(e);
+      set(`gn-g-${i}`, usd(r.gross));
+      set(`gn-f-${i}`, signed(-r.fixes));
+      set(`gn-n-${i}`, signed(r.netBefore));
     });
-    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. Net is before the pilot's own costs (see the pilot request). The rows are scenarios, not forecasts.`);
-  };
-  min.addEventListener("change", draw);
-  [share, rate, fix, lost].forEach((x) => x.addEventListener("input", draw));
-  draw();
+    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. Net here is before the pilot's own costs; the readout above and the pilot request count them. The rows are scenarios, not forecasts.`);
+  });
 }
 
 /* ---------- Q1: the answer ---------- */

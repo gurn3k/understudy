@@ -35,3 +35,7 @@ Every figure is computed by `tools/money.py` and `tools/build_site.py` into `sit
 
 ## Where
 Q9 on the main page (sections 1 to 4, the inputs, the tiles and the detail fold), short notes in Q1, Q2 and Q5 on what "by hand" counts, and the pilot request's sections 1, 2, 3, 5, 7, 9, 11 and appendices A and B.
+
+## Addendum: one readout beside the inputs
+
+Both calculators (the business case and section 11 of the pilot request) now share one script, `site/calc.js`, with one set of inputs and one set of formulas. Beside the inputs it shows every key result together: gross and net saving, net at the earned share the replay saw, the break-even (cautious end and on paper), the share reviewed needed, the pilot cost with blind checks, and first-year return and payback. Each result says in words whether it rests on the reader's figure, a default, an upper limit or the observed share. The detail tables stay below for the working. Sharing the script keeps the two pages from drifting apart.
