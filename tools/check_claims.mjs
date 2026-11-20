@@ -161,7 +161,9 @@ REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)}
   ["two outcome streams", "two outcome streams"], ["sampled by order", "drawn as whole purchase orders"],
   ["calls needed allowing for orders, no mistakes", `about ${n0(K.clustered_calls[0].clustered)}`], ["intervals allow for orders", "cluster-robust at order level"],
   ["supplier-level design effect", `about ${n0(E.rulebook_by_vendor.deff)} across ${n0(E.rulebook_by_vendor.vendors)} suppliers`],
-  ["whitelist is mandatory", "Requirement M11"], ["mandatory means pass/fail", "Failing any M requirement disqualifies the proposal"]);
+  ["whitelist is mandatory", "Requirement M11"], ["mandatory means pass/fail", "Failing any M requirement disqualifies the proposal"],
+  ["data protection, mandatory", "Data protection (all mandatory, under M13)"], ["retention and training use", "DP1 Retention and training use"], ["residency", "DP2 Residency"],
+  ["sub-processors", "DP3 Sub-processors"], ["breach notice", "DP4 Breach notice"], ["attestations", "DP5 Attestations"], ["data-processing agreement", "DP6 Data-processing agreement"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);

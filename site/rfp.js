@@ -160,7 +160,7 @@ function build(d) {
   <h3>Constraints</h3>
   ${list(["Nothing is paid on the rulebook's say-so before Gate 2.", "Existing payment, approval and fraud controls stay in force throughout.", "The company's own policies override this document wherever they differ."])}
   <h3>Dependencies</h3>
-  ${list(["Access to outcome data, including corrections made after payment.", "A named Rulebook Owner and a Pilot Owner before Phase 0 ends.", "A place to log every call, its inputs and its outcome.", "A review of data privacy and supplier-data terms before any real invoice data is used."])}`));
+  ${list(["Access to outcome data, including corrections made after payment.", "A named Rulebook Owner and a Pilot Owner before Phase 0 ends.", "A place to log every call, its inputs and its outcome.", "The data-protection requirements (M13) met and checked before any real invoice data is used."])}`));
 
   out.push(sec("s6", "6", "Requirements", `
   <p>A proposer shall state, for each requirement, how the pilot will meet it and how the test will be run. <strong>Failing any M requirement disqualifies the proposal</strong>; the M requirements are pass/fail and carry no points (section 12).</p>
@@ -177,7 +177,16 @@ function build(d) {
     ["M10", `Give every interval allowing for purchase orders (cluster-robust at order level), state the method, and show a worked example. With no mistakes, ${int(mc[0].calls)} independent calls prove 99%; at the study's design effect of ${cl.deff.toFixed(2)} that is about ${int(ctl.clustered_calls[0].clustered)} lines, so about ${int(Math.round(ctl.clustered_calls[0].clustered / 100) * 100)}. For a policy built on a list of suppliers, also give the bound with suppliers as the units, or state that it relies on the suppliers listed.`, "Every promotion record shows the order-level bound, the method, and the supplier-level bound where it applies."],
     ["M11", "Pay more lines than a supplier whitelist built by the same selection rule on the issuer's own earlier months, at a worst likely case of at least 99% allowing for orders, on the same test months.", "Both are scored on the same held-out months before Gate 2; a proposal that does not beat the whitelist is disqualified."],
     ["M12", `Pay at most ${word(ORDER_CAP).toLowerCase()} lines of one purchase order on their own before a person sees one of them (my default; the issuer sets the number at Gate 1). This is a lesson from the replay, where ${int(er.top_order)} of the ${int(er.wrong)} mistakes were on one order, not a tested control.`, "A seeded order with more lines than the cap stops at the cap."],
+    ["M13", "Meet every data-protection requirement in the table below before any invoice, supplier or call data leaves the company, and keep to them for as long as any of it is held.", "Each item has the evidence named in the table, checked by Risk and Compliance before Phase 0 uses real data."],
   ])}
+  ${tbl("Data protection (all mandatory, under M13)", ["Ref", "The proposer shall", "Evidence"], [
+    ["DP1 Retention and training use", `Keep invoice, supplier and call data only as long as the pilot and the retention period in section 10 need it, delete it on request, and never use it to train or improve any model without the company's written consent.`, "Contract terms, and the model provider's written data-use terms for the plan used"],
+    ["DP2 Residency", `Store and process the data only in ${fill("permitted countries or regions")}, including backups and any model calls.`, "A data-flow map naming each location"],
+    ["DP3 Sub-processors", `List every sub-processor, including the model provider, give ${fill("e.g. 30")} days' notice of any change, and let the company object.`, "The current list, and the change-notice clause"],
+    ["DP4 Breach notice", `Tell the company of any breach affecting its data within ${fill("e.g. 72")} hours of finding it, with what is known and what is being done.`, "The contract clause and an incident contact"],
+    ["DP5 Attestations", `Hold a current independent security attestation covering the service, such as ${fill("e.g. an ISO/IEC 27001 certificate or a SOC 2 Type II report")}.`, "The report or certificate, with its date and scope"],
+    ["DP6 Data-processing agreement", "Sign the company's data-processing agreement before any real data is shared, and send only the fields the rulebook needs.", "The signed agreement and the field list"],
+  ], "fit")}
   <h3>How the switch-off test works (M3), in numbers</h3>
   <p>The test uses the two-sided 95% Wilson interval. A call is <em>settled</em> once its line has been cleared for payment and ${SETTLE_DAYS} days have passed (my default; the issuer sets it at Gate 1), with any correction in that time counted against it. Only the last ${int(ctl.window)} settled calls the kind paid on its own count, in the order they arrived.</p>
   ${tbl("The switch-off at the edge", ["Wrong in the last " + int(ctl.window), "Right", "Interval", "Result"], [
@@ -235,7 +244,7 @@ function build(d) {
     ["R6", "Reviewers copy the AI's suggestion", "Medium", "High", "The agreement simulation", "M2, M9, D3", "Internal Audit"],
     ["R7", "A few large invoices carry most of the value at risk", "Medium", "High", `${pct(v.wrong / v.paid, 1)} of paid value from ${pct(b.wrong / b.paid, 2)} of invoices`, "D1", "Risk and Compliance"],
     ["R8", "Fraud or duplicate payments", "Low", "High", "Not tested", "Out of scope; existing controls stay", "Risk and Compliance"],
-    ["R9", "Privacy or supplier-data terms are breached", "Low", "High", "The study used no invoice text", "Review before any real data is used", "Risk and Compliance"],
+    ["R9", "Privacy or supplier-data terms are breached", "Medium", "High", "A live pilot sends supplier and invoice data to an outside service and, for some designs, an outside model; the study sent none", "M13 and the data-protection table (section 6)", "Risk and Compliance"],
     ["R10", "Staff resist or roles are unclear", "Medium", "Medium", "Not tested", "Explain the change in Phase 0", "Executive Sponsor"],
     ["R11", "The AI model or a supplier changes", "Medium", "Medium", "Models can change behaviour", "Retest on every change; D4", "IT and Data"],
     ["R12", "Seasonal volume hides a weakness", "Medium", "Medium", `The test covered ${b.months} months`, "Track by month through Phase 2", "Pilot Owner"],
@@ -251,6 +260,7 @@ function build(d) {
     "<strong>Change control.</strong> A rulebook version is not used until signed. A change to the bar, a limit or a phase length is a recorded change approved at a gate.",
     "<strong>Audit trail.</strong> Every call, input and outcome is logged and kept for the retention period the company's policy sets: " + fill("e.g. 7 years, per records policy") + ".",
     "<strong>Independent review.</strong> Internal Audit reviews a sample of paid invoices before Gate 3.",
+    "<strong>Data protection.</strong> Nothing leaves the company until every item under M13 is met; Risk and Compliance checks them before Phase 0 uses real data and at each gate.",
     "<strong>Existing controls.</strong> Payment-approval limits, fraud checks and period-end controls stay in force.",
     "<strong>Regulation.</strong> The company's compliance function decides which rules apply. This document does not state any.",
   ])}`));
