@@ -259,6 +259,7 @@ REQUIRED.rfp.push(["outcome requirements", "The requirements are outcomes, not a
 REQUIRED.rfp.push(["commercial: payment by work done", "Payment follows the work done to each gate, not the gate's result"], ["commercial: liability", "Liability for lines paid on the system's call"], ["commercial: data return", "every copy is then deleted, including backups"]);
 REQUIRED.rfp.push(["submission block", "Where to submit"], ["questions in writing", "Answers go to every proposer at once"], ["signature authority", "Signed by a person with authority to commit the proposer"]);
 REQUIRED.rfp.push(["price formula", "Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price"], ["points from the scale", "weight × score ÷ 5"], ["no obligation to award", "The issuer is not bound to award a contract"]);
+REQUIRED.rfp.push(["voice is optional", "Voice, optional."], ["sign-off modal", "Each person below shall sign once"]);
 // The README names the business case and the pilot request (Should 20).
 REQUIRED.readme = [["README: business case", "a business case (Q9)"], ["README: pilot request", "`site/rfp.html`"]];
 // Q1's dot chart prints exact counts per lane (Should 7): the dots round the AI's mistakes away.

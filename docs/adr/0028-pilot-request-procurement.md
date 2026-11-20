@@ -14,4 +14,4 @@ The request mixed an internal approval note with a solicitation. A proposer coul
 5. **Commercial terms and submission** are placeholders the issuer completes before issue. No date, address, contact or legal entity is filled in.
 
 ## Not decided here
-The issuer's contract, its liability and insurance positions, and whether to issue the request in the first person. The page keeps my first person.
+The issuer's contract, its liability and insurance positions, and whether to issue the request in the first person. The page keeps my first person; the box says how an issuer may change it.

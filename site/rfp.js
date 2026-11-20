@@ -71,6 +71,7 @@ function build(d) {
     "<strong>The internal case: sections 1 and 13.</strong> Section 1 asks the sponsor to approve issuing this request, with Phase 0 funded on award; section 13 records the sign-off. They are not sent to proposers.",
     "<strong>The request: sections 2 to 12, section 14 and the appendices.</strong> These go to every proposer, the same text to each, with the placeholders completed.",
     "<strong>Requirements are outcomes.</strong> Section 6 asks for results on the decision component, whatever makes the pay-or-hold call on a line; any approach may meet them. The study's rulebook is the reference design in Appendix E. Sections 1, 2 and 4 name the approaches the study tested, including the model; that is evidence, not a requirement.",
+    "<strong>Voice, optional.</strong> I wrote this in the first person, as the study's author. An issuer that sends it formally may replace \"I\" and \"my\" with \"the Issuer\", and \"my assumption\", \"my default\" or \"my proposal\" with \"Issuer to set\". What a proposer must do already reads \"shall\".",
     "<strong>Before issue.</strong> The issuer completes every placeholder in [brackets], and confirms or replaces every figure marked as my assumption, my default or my proposal: phase lengths, control defaults, evaluation weights and dates.",
   ])}</div>
   ${tbl("Document control", ["Item", "Entry"], [
@@ -417,7 +418,7 @@ function build(d) {
   <p class="small">Changes to this document follow the change log in Appendix D.</p>`));
 
   out.push(sec("s13", "13", "Approvals and sign-off", `
-  <p>I recommend that each person below signs once, at Gate 1, and again at Gate 4.</p>
+  <p>Each person below shall sign once, at Gate 1, and again at Gate 4.</p>
   ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
 
   const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
