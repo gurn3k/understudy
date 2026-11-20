@@ -147,7 +147,9 @@ function biz(d) {
   <ol class="plainlist">
   <li><strong>Measure before you decide.</strong> Find out what share of these lines a person really reviews today, how long a review takes, and what a late fix costs (the work, plus the share never recovered). Then fix your bar and these figures, and write them down (section 3), before any pilot starts.</li>
   <li><strong>Run the rulebook in practice mode on every kind of invoice.</strong> It makes its calls, people still check everything, and every call is scored against what really happened.</li>
-  <li><strong>Let a kind of invoice be paid without a check only once its record proves the bar,</strong> and switch it off automatically when recent results slip, as the replay did.</li>
+  <li><strong>Let a kind of invoice be paid without a check only once its outcomes prove the bar by a rule that holds when checked every week</strong> (the replay's single crossing did not; <a href="rfp.html#s6">pilot request M2</a>), and switch it off automatically when recent results slip.</li>
+  <li><strong>Check a sample of what it pays on its own, blind</strong> (M9): a reviewer who can't see the AI's call measures the AI, not the reviewer.</li>
+  <li><strong>Cap how many lines of one order it pays on its own</strong> (M12; a lesson from the replay, where ${int(d.evidence.replay.top_order)} of the ${int(t.wrong)} mistakes were on one order, not a tested control).</li>
   <li><strong>Judge it on outcomes, never on how often people agree with it</strong> (section 5). Track how often people overrule it as a warning sign only.</li>
   <li><strong>Plan for mistakes in the first months.</strong> In the replay, ${int(t.wrong)} of ${int(t.passed)} (${pct(t.wrong / t.passed, 1)}) were wrong before trust was withdrawn. Expect the first kind of invoice to qualify after months, not weeks.</li>
   <li><strong>Consider a value limit</strong>, set from your own policy before the pilot (section 6, a proposal, not a result).</li>
@@ -900,7 +902,7 @@ function q8(d) {
   </div>
   <h4 class="kpis-all">For any of them</h4>
   <ul>
-  <li><strong>Keep the guardrail on.</strong> Track how many recently paid invoices turned out fine, and switch the AI off automatically when that slips, as the replay does (Q5).</li>
+  <li><strong>Keep the guardrail on.</strong> Track how many recently paid invoices turned out fine, and switch the AI off automatically when that slips (Q5). Grant trust only by a rule that holds when checked every week, which the replay's single crossing did not (pilot request M2), check a sample blind (M9), and cap the lines paid alone on one order (M12).</li>
   <li><strong>Count the saving in review time actually freed,</strong> on lines a person really reviewed before, not just the share of invoices paid.</li>
   <li><strong>Time to spot a problem,</strong> and how often the AI has to be switched off.</li>
   <li><strong>How often people overrule it:</strong> a warning sign worth looking into, never a measure of accuracy. Q6 shows why agreement misleads.</li>
