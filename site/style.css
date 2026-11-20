@@ -374,6 +374,7 @@ table.scen { min-width: 600px; }
 .tline .seg i { font: 400 12px/1.2 var(--body); font-style: normal; opacity: .9; }
 .tline .pre { background: repeating-linear-gradient(135deg, #5b6678 0 6px, #485162 6px 12px); } .tline .s0 { background: #5b6678; } .tline .s1 { background: #3150a0; } .tline .s2 { background: #1f7a45; } .tline .s3 { background: #5b6678; }
 @media (max-width: 560px) { .tline-bar { flex-direction: column; min-height: 0; } .tline .seg { flex: none !important; flex-direction: row; justify-content: space-between; } }
+@media (min-width: 561px) { .tline .seg { min-width: 4.8em; } .tline .seg b { overflow-wrap: normal; } }
 table.keys { min-width: 600px; }
 table.num td { text-align: right; }
 table.money td { white-space: nowrap; }
