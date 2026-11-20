@@ -163,7 +163,7 @@ function build(d) {
   ${list(["Access to outcome data, including corrections made after payment.", "A named Rulebook Owner and a Pilot Owner before Phase 0 ends.", "A place to log every call, its inputs and its outcome.", "A review of data privacy and supplier-data terms before any real invoice data is used."])}`));
 
   out.push(sec("s6", "6", "Requirements", `
-  <p>A proposer shall state, for each requirement, how the pilot will meet it and how the test will be run.</p>
+  <p>A proposer shall state, for each requirement, how the pilot will meet it and how the test will be run. <strong>Failing any M requirement disqualifies the proposal</strong>; the M requirements are pass/fail and carry no points (section 12).</p>
   ${tbl("Mandatory requirements", ["Ref", "The pilot shall", "Test"], [
     ["M1", "Start in practice mode on every kind of invoice, with people handling every invoice.", "No invoice is paid on the rulebook's say-so before Gate 2."],
     ["M2", `Promote a kind of invoice only on its real outcomes, never on how often reviewers agree, by a rule that stays valid when it is checked every week: a named sequential method (a confidence sequence or alpha spending), or this default of mine: its worst likely case, allowing for orders, at or above ${pct(MARGIN, 1)} at ${word(CONSEC).toLowerCase()} weekly looks in a row.`, "Each promotion record cites outcome counts and every look taken. Run on the issuer's earlier months, the rule shows how often it would have promoted a kind that later failed."],
@@ -316,13 +316,13 @@ function build(d) {
   ${tbl("Baseline measures", ["Measure", "Your figure", "Source and date"], ["Order lines per invoice document", "Cost to process one order line", "Share of order lines a person actually reviews before payment (not just clears)", "Minutes per review", "Share of order lines needing a correction before payment", "Minutes to resolve an exception", "Work to fix a line after it was paid", "Share of a wrongly paid line's value never recovered", "Share of lines corrected after payment", "Order lines per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}`));
 
   out.push(sec("s12", "12", "Instructions to proposers, timetable and evaluation", `
-  <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer M1 to M8 and D1 to D4 one by one, and state every assumption it changes.</p>
+  <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer every M and D requirement in section 6 one by one, and state every assumption it changes.</p>
   ${tbl("Timetable (proposed offsets from the issue date)", ["Event", "Offset", "Date"], [["Issue date", "T", fill("DD Month YYYY")], ["Questions close", "T + 2 weeks", fill("DD Month YYYY")], ["Answers published to all proposers", "T + 3 weeks", fill("DD Month YYYY")], ["Responses due", "T + 4 weeks", fill("DD Month YYYY")], ["Shortlist and clarifications", "T + 6 weeks", fill("DD Month YYYY")], ["Decision and Gate 1 package", "T + 8 weeks", fill("DD Month YYYY")]])}
   <h3>What a response contains</h3>
   ${list(["Approach, mapped to the requirements.", "Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan."])}
   <h3>Evaluation criteria</h3>
-  <p>The weights are my proposal; the issuer sets its own and publishes them to proposers.</p>
-  ${tbl("Proposed weights", ["Criterion", "Weight (points of 100)"], [["Safety and controls (M1 to M8, D1 to D3, section 10)", "25"], ["Approach and measurement", "25"], ["Cost", "20"], ["Delivery plan and governance", "15"], ["Team and experience", "10"], ["Exit and portability", "5"]])}
+  <p><strong>Failing any M requirement disqualifies the proposal.</strong> The M requirements carry no points: they are checked first, pass or fail, and only proposals that meet every one are scored, on the criteria below. The weights are my proposal; the issuer sets its own and publishes them to proposers.</p>
+  ${tbl("Proposed weights, for proposals that meet every M requirement", ["Criterion", "Weight (points of 100)"], [["How the controls are run (D1, D3, section 10)", "25"], ["Approach and measurement", "25"], ["Cost", "20"], ["Delivery plan and governance", "15"], ["Team and experience", "10"], ["Exit and portability", "5"]])}
   <h3>Terms</h3>
   <p>A proposer shall treat the issuer's data as confidential, shall not start work before a signed approval, and accepts that the issuer may stop at any gate. Changes to this document follow the change log in Appendix D.</p>`));
 
@@ -351,7 +351,7 @@ function build(d) {
     "", "a new rulebook or a new AI model can behave differently. The company needs to be able to retest, switch supplier or stop, without losing the record of every call.",
     "describe the exit steps, the data the company keeps, and how every rulebook version is retested before use.")}
   </div>
-  <p>Under the evaluation weights in section 12, D1 to D3 count under "Safety and controls" and D4 under "Exit and portability".</p>`));
+  <p>Under the evaluation weights in section 12, D1 and D3 count under "How the controls are run" and D4 under "Exit and portability". M9, like every M requirement, is pass/fail and carries no points.</p>`));
 
   out.push(sec("ap", "App.", "Appendices", `
   <h3>A. Glossary</h3>

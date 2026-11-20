@@ -55,6 +55,7 @@ const FORBIDDEN = [
   [/could not measure by how much/i, "the floor is measured: give it", "ADR 0022"],
   [/too few to tell/i, "it was about as accurate as the rulebook on what it paid, paying far fewer", "ADR 0022"],
   [/say, 95%/i, "an unexplained example threshold", "ADR 0022"],
+  [/Safety and controls \(M1|answer M1 to M8/i, "M requirements are pass/fail, not scored", "ADR 0025"],
   [/wrong[- ]payment budget/i, "say the correction budget", "ADR 0025"],
   [/blind checks[^.]{0,60}\(my assumption|window is still to be fixed/i, "the blind-check window is a requirement (M9), not an assumption", "ADR 0025"],
   [/the safer way|trust earned safely/i, "the replay is not shown to be safer", "ADR 0017, Don't claim"],
@@ -160,7 +161,7 @@ REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)}
   ["two outcome streams", "two outcome streams"], ["sampled by order", "drawn as whole purchase orders"],
   ["calls needed allowing for orders, no mistakes", `about ${n0(K.clustered_calls[0].clustered)}`], ["intervals allow for orders", "cluster-robust at order level"],
   ["supplier-level design effect", `about ${n0(E.rulebook_by_vendor.deff)} across ${n0(E.rulebook_by_vendor.vendors)} suppliers`],
-  ["whitelist is mandatory", "Requirement M11"]);
+  ["whitelist is mandatory", "Requirement M11"], ["mandatory means pass/fail", "Failing any M requirement disqualifies the proposal"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);
