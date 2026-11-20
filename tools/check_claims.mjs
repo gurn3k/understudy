@@ -68,6 +68,7 @@ const FORBIDDEN = [
   [/corrections after payment aren't seen/i, "post-clearing corrections are in the records and move the result: give the figure", "ADR 0022"],
   [/\bFTEs?\b|staff resist/i, "count the saving as review hours freed (capacity, not jobs); staff are consulted, not a resistance risk", "review round, Should 4"],
   [/made about \d+ times as often|most repeated of the decisions|manual clearing and block-removal events in these records/i, "unlike units: logged steps are not decisions or invoices; count in order lines", "review round, Should 5"],
+  [/, (before|after) delivery\b|arrived before or after the goods|came before or after the delivery/i, "the kind is the order's matching setting, not when the invoice came", "review round, Should 6"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -206,6 +207,10 @@ REQUIRED.q9.push(["largest tenth: share of mistakes by count", `held ${pc(T10.wr
   ["value rate of lines needing a correction", pc(B.value.wrong / B.value.paid, 1)]);
 REQUIRED.rfp.push(["largest tenth: share of mistakes by count", `held ${pc(T10.wrong / B.wrong, 0)} of its mistakes`],
   ["largest tenth: share of value paid", `${pc(T10.paid_value / B.value.paid, 0)} of all the value paid`]);
+// The kind label (Should 6): a matching setting, with the share of invoice-first lines whose goods came first.
+const KS = E.kind_setting;
+REQUIRED.rfp.push(["kind is a setting", `${pc(KS.before_gr_gr_first / KS.before_gr_lines, 1)} of the test lines had the goods received first`],
+  ["proposers justify the grouping", "How it groups invoices into kinds, and why"]);
 // People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.
 REQUIRED.q9.push(["saving as capacity", "capacity, not jobs"]);
 REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payable staff"], ["consultation in Phase 0", "a works council where there is one"],

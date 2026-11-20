@@ -227,6 +227,10 @@ def main():
         "sweep": sweep["cells"] if sweep else None,
         # The rulebook's paid lines with whole suppliers as the units (ADR 0025).
         "rulebook_by_vendor": evidence.vendor_clustering(paid, wrong_ids),
+        # The "invoice before GR" category is an order setting, not the order of events: how many of its test lines
+        # had a goods receipt before the first invoice receipt anyway.
+        "kind_setting": {"before_gr_lines": sum(1 for r in held if r["category"] == "3-way match, invoice before GR"),
+                         "before_gr_gr_first": sum(1 for r in held if r["category"] == "3-way match, invoice before GR" and r["gr_before_invoice"])},
     }
 
     # The pilot request's controls (ADR 0025): the switch-off test in numbers, blind-check power, and how the

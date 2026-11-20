@@ -53,7 +53,7 @@ const WORDS_USED = [
   ["The 99% bar", "Of the invoices an AI pays without a check, at least 99 in 100 must turn out fine."],
   ["Worst likely case", "A short test can be lucky. Given how many invoices were checked, this is the lowest the true share of paid invoices that turn out fine is likely to be (I am 95% sure it is at least this). I judge every AI by this number, not by its average. Statisticians call it the \"lower bound\"; the highest likely value is the \"upper bound\"."],
   ["Learning months and test months", "January to May 2018 were used to learn from. June to August 2018 were held out for the test: no approach saw how those invoices turned out. Some information from those months still reached the setup (a look-ahead, listed in the Method section)."],
-  ["Kind of invoice", "Which department made the purchase, and whether the invoice arrived before or after the goods did."],
+  ["Kind of invoice", "Which department made the purchase, and how its order is set up for matching: \"delivery first\" orders match each invoice to a recorded delivery; \"invoice-first allowed\" orders let an invoice be entered before the goods arrive, and hold it until they do. It is a setting on the order, not the order things happened in (Q5)."],
 ];
 const wordsBox = () => `<details class="words" open><summary>Words used on this page</summary><dl>${WORDS_USED.map(([t, x]) => `<div><dt>${esc(t)}</dt><dd>${esc(x)}</dd></div>`).join("")}</dl></details>`;
 const worst = (x, d = 2) => `${pct(x, d)}`;
@@ -693,7 +693,9 @@ function plainEvents(d) {
 }
 
 /* ---------- Q5 and Q6: cue sheets ---------- */
-const kindLabel = (t) => { const [m, dept] = t.split(" / "); return `${dept}, ${/after GR/.test(m) ? "after delivery" : "before delivery"}`; };
+/* The kind's matching setting (the order's item category), in plain words. "Invoice before GR" is a setting that
+   allows an invoice first; it does not mean the invoice came first (evidence.kind_setting). */
+const kindLabel = (t) => { const [m, dept] = t.split(" / "); return `${dept}, ${/after GR/.test(m) ? "delivery first" : /before GR/.test(m) ? "invoice-first allowed" : m}`; };
 function cueSheet(id, d, states, opts) {
   const weeks = d.replay.weeks, types = d.replay.cue_types;
   let g = `<div class="grid" style="--weeks:${weeks.length}" role="table" aria-label="${esc(opts.label)}"><div role="row" style="display:contents"><span role="columnheader" class="rowlab small">Kind of invoice</span>`;
@@ -720,7 +722,7 @@ function q5(d) {
   <li><strong>On.</strong> Once its practice calls on one kind of invoice prove 99%, it pays that kind by itself.</li>
   <li><strong>Off again.</strong> If its recent calls on that kind clearly drop below 99%, it goes back to practice.</li>
   </ol>
-  <p><strong>How to read the chart:</strong> each row is a kind of invoice: the buying department, then whether the invoice came before or after the delivery. Each column is a week. Drag the slider to move through time and watch kinds switch on and off.</p>
+  <p><strong>How to read the chart:</strong> each row is a kind of invoice: the buying department, then how its order is set up for matching, "delivery first" or "invoice-first allowed". That is a setting on the order, not the order things happened in: on invoice-first orders, ${pct(d.evidence.kind_setting.before_gr_gr_first / d.evidence.kind_setting.before_gr_lines, 1)} of the test lines (${int(d.evidence.kind_setting.before_gr_gr_first)} of ${int(d.evidence.kind_setting.before_gr_lines)}) had the goods received before the first invoice anyway. Each column is a week. Drag the slider to move through time and watch kinds switch on and off.</p>
   ${cueSheet("sheet-outcome", d, d.replay.states, { label: "Kinds of invoice switched on, by week" })}
   <h3>What happened</h3>
   <p>${esc(plainEvents(d))}</p>
@@ -965,7 +967,7 @@ function openDrawer(set, all = false) {
   $("#drawer-title").textContent = `${title} (${int(rows.length)})`;
   $("#drawer-note").textContent = `${note} Values are in US dollars, converted from euros (see the footnote in Q9).`;
   $("#drawer-body").innerHTML = `<table><thead><tr><th>Invoice line</th><th>Kind of invoice</th>${hasWeek ? "<th>Week</th>" : ""}<th>Value (US$)</th><th>Outcome</th></tr></thead><tbody>${shown.map((r) =>
-    `<tr><td>${esc(r.id)}</td><td style="text-align:left">${esc(r.type)}</td>${hasWeek ? `<td>${esc(r.week.split("-W")[1])}</td>` : ""}<td>${r.value == null ? "" : int(r.value * DATA.business.eur_usd)}</td><td><span class="state ${r.straight_through ? "go" : "standby"}">${r.straight_through ? "PAID CLEAN" : "CORRECTED"}</span></td></tr>`).join("")}</tbody></table>
+    `<tr><td>${esc(r.id)}</td><td style="text-align:left" title="${esc(r.type)}">${esc(kindLabel(r.type))}</td>${hasWeek ? `<td>${esc(r.week.split("-W")[1])}</td>` : ""}<td>${r.value == null ? "" : int(r.value * DATA.business.eur_usd)}</td><td><span class="state ${r.straight_through ? "go" : "standby"}">${r.straight_through ? "PAID CLEAN" : "CORRECTED"}</span></td></tr>`).join("")}</tbody></table>
     ${shown.length < rows.length ? `<button type="button" class="open more" data-all="${set}">Show all ${int(rows.length)}</button>` : ""}`;
   if (dr.hidden) lastFocus = document.activeElement;
   dr.hidden = false;
