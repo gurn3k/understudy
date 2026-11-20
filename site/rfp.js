@@ -364,12 +364,24 @@ function build(d) {
   <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer every M and D requirement in section 6 one by one, and state every assumption it changes.</p>
   ${tbl("Timetable (proposed offsets from the issue date)", ["Event", "Offset", "Date"], TT.map(([e, w]) => [e, w ? `T + ${w} weeks` : "T", fill("DD Month YYYY")]))}
   <h3>What a response contains</h3>
-  ${list(["Approach, mapped to the requirements.", "How it groups invoices into kinds, and why: each kind needs enough volume to prove the bar (section 3), and lines alike enough to be trusted together.","Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan."])}
+  ${list(["Approach, mapped to the requirements.", "How it groups invoices into kinds, and why: each kind needs enough volume to prove the bar (section 3), and lines alike enough to be trusted together.","Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan.", "Answers to the commercial terms below, row by row."])}
   <h3>Evaluation criteria</h3>
   <p><strong>Failing any M requirement disqualifies the proposal.</strong> The M requirements carry no points: they are checked first, pass or fail, and only proposals that meet every one are scored, on the criteria below. The weights are my proposal; the issuer sets its own and publishes them to proposers.</p>
   ${tbl("Proposed weights, for proposals that meet every M requirement", ["Criterion", "Weight (points of 100)"], [["How the controls are run (D1, section 10)", "25"], ["Approach and measurement", "25"], ["Cost", "20"], ["Delivery plan and governance", "15"], ["Team and experience", "10"], ["Exit and portability", "5"]])}
-  <h3>Terms</h3>
-  <p>A proposer shall treat the issuer's data as confidential, shall not start work before a signed approval, and accepts that the issuer may stop at any gate. Changes to this document follow the change log in Appendix D.</p>`));
+  <h3>Commercial terms</h3>
+  <p>The issuer completes the left column before issue; a response answers the right column for each row and states any departure. This is a model for a pilot, not a contract: the contract itself is the issuer's own.</p>
+  ${tbl("Commercial terms", ["Term", "The issuer sets", "The proposer states"], [
+    ["Pricing model", `${fill("Pricing basis set at issue, e.g. fixed price per phase")}`, "Its pricing model and every rate, priced on the cost lines of section 11, and whether any fee rises with the number of lines paid on their own"],
+    ["Payment milestones", `Payment follows the work done to each gate, not the gate's result: stopping at a gate is a valid outcome. ${fill("Share of the price paid at each gate, set at issue")}`, "What it delivers at each gate, against those milestones"],
+    ["Intellectual property", `The issuer owns its data, the call log and outcomes, and the rules, prompts and settings built for it. ${fill("Any other terms, set at issue")}`, "What it brings that it already owns, and the licence it grants to use it during the pilot and the exit"],
+    ["Liability for lines paid on the system's call", fill("The issuer's position and any cap, set at issue"), "The liability it accepts for lines paid on the decision component's call that needed a correction, and its cap"],
+    ["Insurance", fill("Cover required and amounts, set at issue, e.g. professional indemnity and cyber"), "Its current cover, with insurer, amount and expiry"],
+    ["Termination", `The issuer may stop at any gate, and at once if the correction budget is breached (M7) or a data-protection requirement fails (M13), with ${fill("notice period set at issue")}. Fees cover work done to that point only.`, "Any fee or notice it asks for on termination"],
+    ["Data return and deletion", `On stop or at the end, the data and the call log are returned in ${fill("open format set at issue")} within ${fill("e.g. 30")} days; every copy is then deleted, including backups and sub-processors' copies, and deletion is confirmed in writing.`, "How it returns the data, deletes it and confirms the deletion (with its exit plan, D4)"],
+    ["Confidentiality and start of work", "The issuer's data is confidential. No work starts before a signed contract.", "Acceptance, or any departure"],
+    ["Contract", fill("The issuer's standard terms, named at issue"), "Any departure from them"],
+  ])}
+  <p class="small">Changes to this document follow the change log in Appendix D.</p>`));
 
   out.push(sec("s13", "13", "Approvals and sign-off", `
   <p>I recommend that each person below signs once, at Gate 1, and again at Gate 4.</p>
