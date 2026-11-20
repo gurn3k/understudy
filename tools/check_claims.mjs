@@ -71,6 +71,7 @@ const FORBIDDEN = [
   [/, (before|after) delivery\b|arrived before or after the goods|came before or after the delivery/i, "the kind is the order's matching setting, not when the invoice came", "review round, Should 6"],
   [/Code: MIT\.|independent program|recounted the records independently/i, "the code is private, and the recount is a second program written separately", "review round, Should 13"],
   [/written separately all landed|written separately landed|independently written|rulebooks agree/i, "the three rulebooks are drafts by the same model from the same inputs: consistent, not independent", "review round, Should 15"],
+  [/Decision and Gate 1 package|\d+ weeks expected/i, "the plan is a range (at least, at most under the stop rule) and procurement ends in the award decision", "review round, Should 26"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -217,6 +218,10 @@ REQUIRED.rfp.push(["kind is a setting", `${pc(KS.before_gr_gr_first / KS.before_
 const firstWkC = D.replay.weeks.indexOf(D.replay.first) + 1;
 REQUIRED.q9.push(["in brief: recommendation", "What I recommend:"], ["in brief: cost now", `${"$" + n0(8 * 4 * 40)} of oversight time`],
   ["in brief: stop rule", `no kind proves the bar by week ${firstWkC * 2} of practice mode`]);
+// The timeline (Should 26): at least the replay's first promotion, at most the stop rule, after procurement.
+const PHc = { p0: 4, p2: 12, p3: 2 }, minWk = PHc.p0 + firstWkC + PHc.p2 + PHc.p3, maxWk = PHc.p0 + 2 * firstWkC + PHc.p2 + PHc.p3;
+REQUIRED.rfp.push(["plan length range", `at least ${minWk} weeks and at most ${maxWk}`], ["procurement pre-phase", "weeks of procurement"],
+  ["award decision", "Award decision"]);
 // The three rulebooks (Should 15): consistent, not independent.
 REQUIRED.rfp.push(["three drafts are not independent", "consistent, but not independent checks"]);
 // People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.

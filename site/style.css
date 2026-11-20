@@ -372,7 +372,7 @@ table.scen { min-width: 600px; }
 .tline .seg { min-width: 5.2em; display: flex; flex-direction: column; justify-content: center; padding: 6px 8px; min-width: 0; color: #fff; overflow: hidden; }
 .tline .seg b { font: 700 13px/1.15 var(--display); letter-spacing: .03em; overflow-wrap: anywhere; }
 .tline .seg i { font: 400 12px/1.2 var(--body); font-style: normal; opacity: .9; }
-.tline .s0 { background: #5b6678; } .tline .s1 { background: #3150a0; } .tline .s2 { background: #1f7a45; } .tline .s3 { background: #5b6678; }
+.tline .pre { background: repeating-linear-gradient(135deg, #5b6678 0 6px, #485162 6px 12px); } .tline .s0 { background: #5b6678; } .tline .s1 { background: #3150a0; } .tline .s2 { background: #1f7a45; } .tline .s3 { background: #5b6678; }
 @media (max-width: 560px) { .tline-bar { flex-direction: column; min-height: 0; } .tline .seg { flex: none !important; flex-direction: row; justify-content: space-between; } }
 table.keys { min-width: 600px; }
 table.num td { text-align: right; }

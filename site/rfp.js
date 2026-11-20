@@ -19,6 +19,9 @@ const DEF_FIX = Calc.DEF.fix, DEF_LOST = Calc.DEF.lost, WINDOWS_YR = Calc.WINDOW
    where tools/build_site.py also measures what each does on the study's data. */
 const AGREE = "0.9", SIM_RUNS = 20; // the simulation shown: reviewers copy this share; runs per ADR 0017
 const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
+/* Procurement timetable, in weeks from the issue date (my proposal). Its last step, the award, ends the pre-phase. */
+const TT = [["Issue date", 0], ["Questions close", 2], ["Answers published to all proposers", 3], ["Responses due", 4], ["Shortlist and clarifications", 6], ["Award decision", 8]];
+const PROC = TT[TT.length - 1][1];
 /* Rows of the return table: none earned, the replay's observed share (a truncated window), then the scenarios. */
 const scenRows = (g) => [[0, "none earned yet"], [g.earned_share, "observed in the replay; window too short"], ...SCEN.map((x) => [x, x === 1 ? "the on-paper ceiling" : ""])];
 
@@ -38,11 +41,12 @@ function figures(d) {
   const v = Object.fromEntries(Object.entries(b.value).map(([k, x]) => [k, x * R]));
   return { b, R, c, t, b2, firstWk, firstIso, linesYr, v, cOnce: d.cost.c.usd / d.cost.c.calls, ag: d.agreement.alphas[AGREE],
     L: b.lines_per_mistake, g: b.gated, iso: b.footprint.isolated_paid / b.paid, meanWrong: b.anchors.mean_wrong * R,
-    totalWeeks: PH.p0 + firstWk + PH.p2 + PH.p3, dryWeeks: PH.p0 + firstWk, stopWk: firstWk * 2 };
+    totalWeeks: PH.p0 + firstWk + PH.p2 + PH.p3, dryWeeks: PH.p0 + firstWk, stopWk: firstWk * 2,
+    maxWeeks: PH.p0 + firstWk * 2 + PH.p2 + PH.p3 }; // the most before the stop rule ends practice mode (section 7)
 }
 
 function build(d) {
-  const f = figures(d), { b, c, t, b2, firstWk, firstIso, linesYr, v, cOnce, ag, totalWeeks, stopWk, L, g, iso } = f;
+  const f = figures(d), { b, c, t, b2, firstWk, firstIso, linesYr, v, cOnce, ag, totalWeeks, stopWk, maxWeeks, L, g, iso } = f;
   const mc = d.bar.min_calls, ctl = d.controls, er = d.evidence.replay;
   const wkN = (w) => d.replay.weeks.indexOf(w) + 1, isoN = (w) => Number(w.split("-W")[1]);
   const wkL = (w) => `week ${wkN(w)} of the replay (ISO week ${isoN(w)})`;
@@ -70,9 +74,9 @@ function build(d) {
   </div><div></div></section>`);
 
   const phases = [["0 Set-up", PH.p0], ["1 Practice mode", firstWk], ["2 Limited autonomy", PH.p2], ["3 Review", PH.p3]];
-  const timeline = `<figure class="tline"><div class="tline-bar" role="img" aria-label="Pilot plan: ${phases.map(([n, w], i) => `${n}, ${i === 1 ? "at least " : ""}${w} weeks`).join("; ")}">${phases.map(([n, w], i) => `<span class="seg s${i}" style="flex:${w}"><b>${n}</b><i>${i === 1 ? "≥" : ""}${w} wk</i></span>`).join("")}</div><figcaption class="small">At least ${totalWeeks} weeks. Each phase ends at a gate (section 7). Phase 1 ends when a kind of invoice proves the bar under M2. ${firstWk} weeks is the earliest that happened in the replay, under its own single-crossing rule; ${m2Line}, so Phase 1 is at least ${firstWk} weeks, and the stop rule may end the pilot first.</figcaption></figure>`;
+  const timeline = `<figure class="tline"><div class="tline-bar" role="img" aria-label="Plan: procurement, about ${PROC} weeks; then ${phases.map(([n, w], i) => `${n}, ${i === 1 ? `${w} to ${stopWk}` : w} weeks`).join("; ")}"><span class="seg pre" style="flex:${PROC}"><b>Procurement</b><i>~${PROC} wk</i></span>${phases.map(([n, w], i) => `<span class="seg s${i}" style="flex:${w}"><b>${n}</b><i>${i === 1 ? `${w}–${stopWk}` : w} wk</i></span>`).join("")}</div><figcaption class="small">Procurement first: about ${PROC} weeks from issue to the award decision (section 12). Then the pilot: at least ${totalWeeks} weeks and at most ${maxWeeks} before the stop rule ends it. Each phase ends at a gate (section 7). Phase 1 ends when a kind of invoice proves the bar under M2. ${firstWk} weeks is the earliest that happened in the replay, under its own single-crossing rule; ${m2Line}. If no kind has qualified by week ${stopWk} of practice mode, the pilot stops, so Phase 1 runs ${firstWk} to ${stopWk} weeks.</figcaption></figure>`;
   out.push(sec("s1", "1", "Executive summary", `
-  <p class="headline">I ask for approval of a controlled pilot, not a roll-out: at least ${totalWeeks} weeks in four gated phases.</p>
+  <p class="headline">I ask for approval of a controlled pilot, not a roll-out: at least ${totalWeeks} weeks and at most ${maxWeeks} in four gated phases, after about ${PROC} weeks of procurement.</p>
   ${timeline}
   ${tbl("Key figures", ["Question", "Answer", "What it means"], [
     ["What was tested?", `3 pre-registered approaches, ${int(d.held_out_n)} real invoices`, "None proved the 99% bar"],
@@ -154,7 +158,8 @@ function build(d) {
     ["Cost of a late fix", `$${DEF_FIX} of work, plus ${DEF_LOST}% of the line's value never recovered (inputs in section 11)`, "The records don't show it"],
     ["Oversight during the pilot", `${OVERSIGHT_H} hours a week`, "My judgment"],
     ["Phases 0, 2 and 3", `${PH.p0}, ${PH.p2} and ${PH.p3} weeks`, "My judgment"],
-    ["Phase 1 (practice mode)", `At least ${firstWk} weeks`, `The earliest a kind qualified in the replay, under its single-crossing rule; ${m2Line}. Outcomes arrive weeks after invoices`],
+    ["Phase 1 (practice mode)", `At least ${firstWk} weeks, at most ${stopWk}`, `The earliest a kind qualified in the replay, under its single-crossing rule; ${m2Line}. Outcomes arrive weeks after invoices. The stop rule ends the pilot at week ${stopWk} (section 7)`],
+    ["Procurement, before Phase 0", `About ${PROC} weeks`, "The timetable in section 12, from issue to the award decision"],
     ["Shorter pilots", "Not used", "Some supplier-written guides online suggest 30 to 90 days. I have not checked them, and that is unlikely to collect enough outcomes for this bar"],
     ["Volume", "No seasonality", "A simplification"],
   ])}
@@ -204,12 +209,12 @@ function build(d) {
 
   const ph = [
     ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; consult the accounts-payable staff and their representatives (a works council where there is one) on how roles and workload change, and plan redeployment of freed hours; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget, and Phase 0's measured share reviewed, minutes per review and late-fix cost give a positive net after running costs (section 11); otherwise stop"],
-    ["1 Practice mode", `At least ${firstWk} (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}, under its own single-crossing rule, and was switched off again later; ${m2Line}); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
+    ["1 Practice mode", `At least ${firstWk}, at most ${stopWk} under the stop rule (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}, under its own single-crossing rule, and was switched off again later; ${m2Line}); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
     ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind checks run window by window (one month to one quarter) on each kind paid on its own (M9).", "G3: results review; the correction budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
   ];
   out.push(sec("s7", "7", "Pilot plan, gates and decision points", `
-  <p>The plan runs at least ${totalWeeks} weeks (${(totalWeeks * 12 / 52).toFixed(1)} months), with Phase 1 at its minimum of ${firstWk} weeks. It can only take longer, depending on volume; no gate may be skipped.</p>
+  <p>The plan runs at least ${totalWeeks} weeks (${(totalWeeks * 12 / 52).toFixed(1)} months), with Phase 1 at its minimum of ${firstWk} weeks, and at most ${maxWeeks} weeks (${(maxWeeks * 12 / 52).toFixed(1)} months): if no kind has qualified by week ${stopWk} of practice mode, the stop rule ends the pilot. How long it takes between the two depends on volume; no gate may be skipped. Procurement comes first: about ${PROC} weeks from issue to the award decision (section 12).</p>
   ${tbl("Phases and gates", ["Phase", "Weeks", "What happens", "Gate to leave"], ph)}
   <h3>Stop criteria</h3>
   <p>The Pilot Owner shall recommend stopping, and the sponsor shall decide, if any of these holds:</p>
@@ -302,7 +307,7 @@ function build(d) {
     [`Training, staff consultation and change management<span class="small">${req("Yours to estimate")}</span>`, "", fill("US$ amount")],
     ["Total so far", "Phase 0, oversight, the rulebook, blind checks (M9: monthly windows during Phase 2, on the kinds you enter above), and integration if entered. Not the required lines still blank", `<span data-out="total"></span>`],
   ])}
-  <p><strong>No saving for at least ${f.dryWeeks} weeks.</strong> Nothing is paid without a person in Phase 0 (${PH.p0} weeks) or in practice mode (at least ${firstWk} weeks), so the pilot costs money for that long before it can save any. The costs here take Phase 1 at that minimum.</p>
+  <p><strong>No saving for at least ${f.dryWeeks} weeks.</strong> Nothing is paid without a person in Phase 0 (${PH.p0} weeks) or in practice mode (at least ${firstWk} weeks), so the pilot costs money for that long before it can save any. The costs here take Phase 1 at that minimum. <span data-out="oh-max"></span></p>
   ${tbl("Where the on-paper saving comes from", ["Step", "Figure"], [
     [`Order lines the rulebook would have paid, ${b.months} test months`, `${int(b.paid)} (about ${int(b.groups_paid)} invoice groups)`],
     ["Scaled to a year (no seasonality)", `× ${12 / b.months} = ${int(linesYr)}`],
@@ -344,7 +349,7 @@ function build(d) {
 
   out.push(sec("s12", "12", "Instructions to proposers, timetable and evaluation", `
   <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer every M and D requirement in section 6 one by one, and state every assumption it changes.</p>
-  ${tbl("Timetable (proposed offsets from the issue date)", ["Event", "Offset", "Date"], [["Issue date", "T", fill("DD Month YYYY")], ["Questions close", "T + 2 weeks", fill("DD Month YYYY")], ["Answers published to all proposers", "T + 3 weeks", fill("DD Month YYYY")], ["Responses due", "T + 4 weeks", fill("DD Month YYYY")], ["Shortlist and clarifications", "T + 6 weeks", fill("DD Month YYYY")], ["Decision and Gate 1 package", "T + 8 weeks", fill("DD Month YYYY")]])}
+  ${tbl("Timetable (proposed offsets from the issue date)", ["Event", "Offset", "Date"], TT.map(([e, w]) => [e, w ? `T + ${w} weeks` : "T", fill("DD Month YYYY")]))}
   <h3>What a response contains</h3>
   ${list(["Approach, mapped to the requirements.", "How it groups invoices into kinds, and why: each kind needs enough volume to prove the bar (section 3), and lines alike enough to be trusted together.","Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan."])}
   <h3>Evaluation criteria</h3>
@@ -414,6 +419,7 @@ function wire(d) {
     set("p0-cost", usd(x.p0));
     set("oh-basis", `${v.h} hours a week × ${B.totalWeeks - PH.p0} weeks × $${int(v.r)}`);
     set("oh-cost", usd(x.ohRest));
+    set("oh-max", `If Phase 1 runs to the stop rule's ${B.stopWk} weeks, the pilot runs ${B.maxWeeks} weeks and oversight for phases 1 to 3 rises from ${usd(x.ohRest)} to ${usd(x.ohMax)}.`);
     set("blind-h", `${int(x.blindH)} hours`);
     set("blind-cost", usd(x.blindWin));
     set("blind-pilot", `${usd(x.blindPilot)} for ${kTxt} over about ${B.p2Windows.toFixed(1)} monthly windows`);

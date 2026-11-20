@@ -21,7 +21,9 @@ const Calc = (() => {
   function basis(d) {
     const b = d.business, R = b.eur_usd, firstWk = d.replay.weeks.indexOf(d.replay.first) + 1;
     return { b, L: b.lines_per_mistake, g: b.gated, linesYr: b.paid * (12 / b.months), firstWk,
-      totalWeeks: PH.p0 + firstWk + PH.p2 + PH.p3, dryWeeks: PH.p0 + firstWk, p2Windows: (PH.p2 * 12) / 52,
+      totalWeeks: PH.p0 + firstWk + PH.p2 + PH.p3, dryWeeks: PH.p0 + firstWk, stopWk: firstWk * 2,
+      maxWeeks: PH.p0 + firstWk * 2 + PH.p2 + PH.p3, // the stop rule ends practice mode at twice the replay's first promotion
+      p2Windows: (PH.p2 * 12) / 52,
       qWin: d.controls.defaults.blind_quarter_windows, // M9's longest window: a calendar quarter
       meanWrong: b.anchors.mean_wrong * R, meanBelow: b.anchors.mean_wrong_below_top10 * R, cOnce: d.cost.c.usd / d.cost.c.calls };
   }
@@ -94,6 +96,7 @@ const Calc = (() => {
     const hrs = (B.linesYr * sUse * v.m) / 60, saving = hrs * v.r, wrongFull = B.linesYr * bad;
     const blindH = (B.b.blind.n * v.m) / 60, blindWin = blindH * v.r, blindPilot = v.k * B.p2Windows * blindWin, blindYr = v.k * WINDOWS_YR * blindWin;
     const p0 = v.h * PH.p0 * v.r, ohRest = v.h * (B.totalWeeks - PH.p0) * v.r, oversight = p0 + ohRest + B.cOnce;
+    const ohMax = v.h * (B.maxWeeks - PH.p0) * v.r; // oversight, phases 1 to 3, if Phase 1 runs to the stop rule
     const total = oversight + blindPilot + v.i, ohYr = v.h * 52 * v.r, run = ohYr + blindYr;
     const margin = saving - wrongFull * M; // per unit of share earned, before running costs
     // Blind checks a year: one window's lines per kind per window, but never more lines than are paid on their own.
@@ -109,7 +112,7 @@ const Calc = (() => {
     // late fixes (cautious end), oversight and blind checks. need() above is the per-line test, before running costs.
     const needNet = (wrongFull * M + ohYr + blindAt(1)) / (B.linesYr * c);
     const needNetQ = (wrongFull * M + ohYr + blindAt(1, B.qWin)) / (B.linesYr * c); // the same, with quarterly windows
-    return { c, M, sUse, hrs, saving, wrongFull, bad, blindH, blindWin, blindPilot, blindYr, p0, ohRest, oversight, total, ohYr, run, margin, needNet, needNetQ,
+    return { ohMax, c, M, sUse, hrs, saving, wrongFull, bad, blindH, blindWin, blindPilot, blindYr, p0, ohRest, oversight, total, ohYr, run, margin, needNet, needNetQ,
       ask: margin > 0 ? (total + run) / margin : Infinity, row, need, be: (lpm) => lpm * sUse * c };
   }
 
