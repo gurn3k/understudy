@@ -157,7 +157,10 @@ REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)}
   ["switch-off test named", "two-sided 95% Wilson interval"], ["settled defined", "A call is settled once"], ["arrival order", "in the order they arrived"],
   ["promoted then switched off", `${n0(K.demotions[0].recent[0])} of ${n0(K.demotions[0].recent[1])}`],
   ["blind checks mandatory", "M9"], ["blind-check power at the sized window", pc(B.blind.power, 0)], ["blind-check power at 400 lines", pc(K.power_400, 0)],
-  ["two outcome streams", "two outcome streams"], ["sampled by order", "drawn as whole purchase orders"]);
+  ["two outcome streams", "two outcome streams"], ["sampled by order", "drawn as whole purchase orders"],
+  ["calls needed allowing for orders, no mistakes", `about ${n0(K.clustered_calls[0].clustered)}`], ["intervals allow for orders", "cluster-robust at order level"],
+  ["supplier-level design effect", `about ${n0(E.rulebook_by_vendor.deff)} across ${n0(E.rulebook_by_vendor.vendors)} suppliers`],
+  ["whitelist is mandatory", "Requirement M11"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);

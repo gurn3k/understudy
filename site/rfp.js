@@ -49,6 +49,7 @@ function build(d) {
   const wkN = (w) => d.replay.weeks.indexOf(w) + 1, isoN = (w) => Number(w.split("-W")[1]);
   const wkL = (w) => `week ${wkN(w)} of the replay (ISO week ${isoN(w)})`;
   const [pr1, pr2] = ctl.promotions, dm = ctl.demotions[0];
+  const cl = d.evidence.clustering, rv = d.evidence.rulebook_by_vendor, wl = d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked);
   const out = [];
 
   /* Document control and 1. summary */
@@ -111,7 +112,8 @@ function build(d) {
   ])}
   <h3>Acceptance</h3>
   <p>A kind of invoice may be paid without a check only when the worst likely case of its settled calls (those it would have paid) reaches 99%, by a promotion rule that stays valid when it is checked every week (requirement M2). In practice that means at least:</p>
-  ${tbl("Settled calls a kind needs before it is trusted", ["Mistakes among them", "Calls needed, at least"], mc.map((m) => [word(m.errors), int(m.calls)]), "num")}
+  ${tbl("Settled calls a kind needs before it is trusted", ["Mistakes among them", "Calls needed, if independent", `Allowing for orders (design effect ${cl.deff.toFixed(2)})`], ctl.clustered_calls.map((m) => [word(m.errors), int(m.calls), `about ${int(m.clustered)}`]), "num")}
+  <p class="small">Invoices on one order succeed or fail together, so a kind needs more calls than the independent count (requirement M10). The right-hand column uses the design effect measured on the rulebook's paid lines in the study; a proposal measures its own.</p>
   <p>The pilot as a whole is accepted when the Gate 4 review (section 7) is signed.</p>`));
 
   const ev = [
@@ -122,7 +124,7 @@ function build(d) {
   out.push(sec("s4", "4", "Evidence base", `
   <p>All figures come from the main report. Each approach could only pay an invoice without a check or hold it for a person, and each was scored against what really happened.</p>
   ${tbl("The three approaches on the test invoices (the bar: worst likely case of at least 99%)", ["Approach", "What it is", "Invoices judged", "Paid without a check", "Of those, wrong", "Worst likely case", "Cost to run"], ev)}
-  <p><strong>The baseline to beat.</strong> The study's simple rule could not use the supplier. After the fact, a non-AI rule grouped by ${esc(d.evidence.vendor.picked)} paid ${pct(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).coverage, 1)} of the test invoices with a worst likely case of ${pct(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).lower, 2)}, resting on ${int(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).vendors)} suppliers (post hoc, to be confirmed). Any proposal must beat a supplier whitelist like this, built on the issuer's own data.</p>
+  <p><strong>The baseline to beat.</strong> The study's simple rule could not use the supplier. After the fact, a non-AI rule grouped by ${esc(d.evidence.vendor.picked)} paid ${pct(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).coverage, 1)} of the test invoices with a worst likely case of ${pct(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).lower, 2)}, resting on ${int(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).vendors)} suppliers (post hoc, to be confirmed). Requirement M11: any proposal must beat a supplier whitelist like this, built on the issuer's own data.</p>
   <h3>Three ways to grant trust, on the same test invoices</h3>
   ${tbl("How trust was granted, and what it let through", ["Way", "Invoices paid", "Wrong", "Wrong rate", "Note"], [
     ["Trusted from day one (on paper)", int(b.paid), int(b.wrong), pct(b.wrong / b.paid, 2), "The ceiling; never tested live"],
@@ -137,6 +139,7 @@ function build(d) {
     ["Forking paths", `${int(d.post_result.length)} changes were made after a test result was known (listed in the main report's Method section), including a new comparison rule and a second run.`],
     ["Repeated looks", `The replay's gate looked ${int(ctl.looks)} times (${int(ctl.kinds)} kinds × ${int(d.replay.weeks.length)} weeks), and both promotions came the first time a worst likely case crossed 99% (${pct(pr1.lower, 3)} and ${pct(pr2.lower, 3)}): an early pass by chance (${wkL(pr1.week)}); a borderline kind passing on its best week (${wkL(pr2.week)}). A test repeated every week passes by chance more often than once, so M2 asks for a margin or a sequential method.`],
     ["Clustering", `Invoices on the same order fail together. Allowing for that, the rulebook's worst likely case falls from ${pct(c.held_out.precision_lower, 2)} to ${pct(d.evidence.clustering.clustered_lower, 2)}. Intervals in a proposal must allow for it.`],
+    ["Suppliers", `Counted with whole suppliers as the units, the rulebook's paid lines have a design effect of about ${int(Math.round(rv.deff))} across ${int(rv.vendors)} suppliers (worst likely case ${pct(rv.clustered_lower, 2)}). The whitelist above holds at ${pct(wl.by_vendor.clustered_lower, 2)} that way, but rests on ${int(wl.vendors)} suppliers. A policy built on a list of suppliers relies on those suppliers staying as they were (M10).`],
     ["Label", `"Needed a correction" is broad. Moving it one way at a time does not prove the bar: dropping delivery-indicator-only corrections gives ${pct(d.evidence.sensitivity.drop_cdi.clustered_lower, 2)} allowing for orders; counting corrections after clearing gives ${pct(d.evidence.sensitivity.post_clear_lower, 2)}.`],
   ], "fit")}
   ${list(["One company's records, from 2018. The method carries over; the numbers are theirs.", `"Fine" means no one corrected the invoice before payment. Counting corrections made after clearing, which the label leaves out, lowers the rulebook's worst likely case to ${pct(d.evidence.sensitivity.post_clear_lower, 2)}; corrections outside these records can't be counted.`, "The records hold no invoice text, so the AI never read an invoice document.", "The share of lines a person reviews, minutes per review and hourly cost are inputs, not measurements. The records hold logins and times, and most clearing steps in them are bulk postings."])}`));
@@ -171,6 +174,8 @@ function build(d) {
     ["M7", `Confirm in writing, before Gate 1, the 99% bar, the cost of a late fix, the correction budget (section 7), any value limit and when a call counts as settled. The budget is binding: going over it switches every kind off at once until the sponsor decides.`, "A signed Gate 1 record exists; a seeded breach of the budget switches every kind off."],
     ["M8", "Provide a kill switch that the Pilot Owner and the Finance Controller can use without the supplier.", "Tested in Phase 0."],
     ["M9", `Check a sample of the lines each kind paid on its own blind, every month: ${int(b.blind.n)} lines a kind a month, drawn as whole purchase orders, by a reviewer who does not see the AI's call. Keep two outcome streams and log both: corrections raised by suppliers and purchasing, and blind-check findings. The switch-off (M3) runs on both.`, "The blind-check log shows each sample, who checked it, that the call was hidden, and which stream each outcome came from."],
+    ["M10", `Give every interval allowing for purchase orders (cluster-robust at order level), state the method, and show a worked example. With no mistakes, ${int(mc[0].calls)} independent calls prove 99%; at the study's design effect of ${cl.deff.toFixed(2)} that is about ${int(ctl.clustered_calls[0].clustered)} lines, so about ${int(Math.round(ctl.clustered_calls[0].clustered / 100) * 100)}. For a policy built on a list of suppliers, also give the bound with suppliers as the units, or state that it relies on the suppliers listed.`, "Every promotion record shows the order-level bound, the method, and the supplier-level bound where it applies."],
+    ["M11", "Pay more lines than a supplier whitelist built by the same selection rule on the issuer's own earlier months, at a worst likely case of at least 99% allowing for orders, on the same test months.", "Both are scored on the same held-out months before Gate 2; a proposal that does not beat the whitelist is disqualified."],
     ["M12", `Pay at most ${word(ORDER_CAP).toLowerCase()} lines of one purchase order on their own before a person sees one of them (my default; the issuer sets the number at Gate 1). This is a lesson from the replay, where ${int(er.top_order)} of the ${int(er.wrong)} mistakes were on one order, not a tested control.`, "A seeded order with more lines than the cap stops at the cap."],
   ])}
   <h3>How the switch-off test works (M3), in numbers</h3>
@@ -353,6 +358,7 @@ function build(d) {
   ${tbl("Terms", ["Term", "Meaning"], [
     ["Practice mode (shadow mode)", "The rulebook makes its calls, but people still handle every invoice."],
     ["Kind of invoice", "Which department made the purchase, and whether the invoice arrived before or after the goods."],
+    ["Allowing for orders", "An interval that treats each purchase order, not each line, as the independent unit, because lines on one order succeed or fail together. It is wider, so more calls are needed."],
     ["Worst likely case", "The lowest the true share of paid invoices that turn out fine is likely to be, given how many were checked (95% sure). Also called the lower bound."],
     ["The 99% bar", "Of the invoices paid without a check, at least 99 in 100 must turn out fine, judged by the worst likely case."],
     ["Settled call", `A call whose outcome is known: its line was cleared for payment ${SETTLE_DAYS} days ago or more (my default; set at Gate 1), and any correction in that time counts against it. For acceptance, only calls the rulebook would have paid without a check count; for the switch-off rule, only calls it paid on its own, in arrival order.`],
