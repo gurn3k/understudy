@@ -376,7 +376,31 @@ function build(d) {
   ${list(["Approach, mapped to the requirements.", "How it groups invoices into kinds, and why: each kind needs enough volume to prove the bar (section 3), and lines alike enough to be trusted together.","Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan.", "Answers to the commercial terms below, row by row."])}
   <h3>Evaluation criteria</h3>
   <p><strong>Failing any M requirement disqualifies the proposal.</strong> The M requirements carry no points: they are checked first, pass or fail, and only proposals that meet every one are scored, on the criteria below. The weights are my proposal; the issuer sets its own and publishes them to proposers.</p>
-  ${tbl("Proposed weights, for proposals that meet every M requirement", ["Criterion", "Weight (points of 100)"], [["How the controls are run (D1, section 10)", "25"], ["Approach and measurement", "25"], ["Cost", "20"], ["Delivery plan and governance", "15"], ["Team and experience", "10"], ["Exit and portability", "5"]])}
+  ${tbl("Proposed weights, for proposals that meet every M requirement", ["Criterion", "Weight (points of 100)", "What is scored"], [
+    ["How the controls are run (D1, section 10)", "25", "How the M controls run day to day, the value limit (D1), segregation of duties and the audit trail"],
+    ["Approach and measurement", "25", "How the decision component works; how it groups invoices into kinds, and why; how calls are matched to outcomes; the promotion rule (M2) and the interval method (M10)"],
+    ["Cost", "20", "By the price formula below, not on the scale"],
+    ["Delivery plan and governance", "15", "The plan against the phases and gates of section 7, with named people and roles (section 8)"],
+    ["Team and experience", "10", "Relevant past work and references"],
+    ["Exit and portability", "5", "The exit plan and the data the company keeps (D4)"],
+  ])}
+  <h3>Scoring scale and price formula</h3>
+  <p>Each evaluator scores every criterion but cost on the scale below, alone, before the panel agrees one score per criterion. A criterion's points are its weight × score ÷ 5.</p>
+  ${tbl("Scoring scale", ["Score", "Meaning"], [
+    ["0", "Not answered, or the answer does not address the criterion"],
+    ["1", "Major gaps or risks; little evidence"],
+    ["2", "Partly meets the need; significant gaps"],
+    ["3", "Meets the need; minor gaps"],
+    ["4", "Meets the need fully, with evidence"],
+    ["5", "Meets the need fully, with strong evidence, and lowers a risk in section 9"],
+  ], "fit")}
+  ${list([
+    `<strong>Price.</strong> Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price. The evaluated price is the total of every cost line in section 11 the proposer prices, over the pilot at its longest (${maxWeeks} weeks). A price far below the others is checked for what it leaves out before it is scored.`,
+    `<strong>Minimum.</strong> A proposal scoring below 3 on "How the controls are run" or "Approach and measurement", or below ${fill("e.g. 60")} points in all, is not shortlisted (my proposal; the issuer sets its own).`,
+    "<strong>Tie-break.</strong> On equal points, the higher score on \"How the controls are run\" wins; then the lower evaluated price.",
+  ])}
+  <h3>Reservations</h3>
+  ${list(["The issuer is not bound to award a contract, and may cancel or change this request; any change goes to every proposer at once.", "The issuer may ask shortlisted proposers to clarify, and may negotiate with one or more of them.", "Each proposer bears its own costs of responding.", "Responses are kept confidential and used only to evaluate them."])}
   <h3>Commercial terms</h3>
   <p>The issuer completes the left column before issue; a response answers the right column for each row and states any departure. This is a model for a pilot, not a contract: the contract itself is the issuer's own.</p>
   ${tbl("Commercial terms", ["Term", "The issuer sets", "The proposer states"], [
@@ -433,7 +457,7 @@ function build(d) {
     ["Blind check", "A person decides on a line the AI paid on its own without seeing the AI's call, so the result measures the AI, not the reviewer (M9)."],
   ])}
   <h3>B. Where each figure comes from</h3>
-  ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017; evidence per rulebook version: 0026; calls hidden in practice mode, and the override rate dropped: 0027.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "The controls in sections 3, 6, 7 and 8 (promotion, switch-off, blind checks, intervals, data protection, roles, Gate 4): 0025.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
+  ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017; evidence per rulebook version: 0026; calls hidden in practice mode, and the override rate dropped: 0027.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "The controls in sections 3, 6, 7 and 8 (promotion, switch-off, blind checks, intervals, data protection, roles, Gate 4): 0025.", "Who reads which sections, the ask, outcome requirements and how proposals are scored: 0028.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
   <h3>C. Benchmarks to collect</h3>
   <p>See the table at the end of section 11.</p>
   <h3>D. Change log</h3>
