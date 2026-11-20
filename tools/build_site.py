@@ -19,6 +19,7 @@ from understudy.analyse import iter_jsonl  # noqa: E402
 from understudy.evaluate import Z, case_type, wilson  # noqa: E402
 from understudy.files import load_json, save_json, verify  # noqa: E402
 from understudy.replay import replay  # noqa: E402
+import money  # noqa: E402  (tools/money.py)
 
 DATA = Path(os.environ["LOCALAPPDATA"]) / "understudy" / "data"
 OUT = ROOT / "site" / "data.json"
@@ -145,23 +146,46 @@ def main():
         "replay_autonomous": [inv(by_id[x["id"]], week=x["week"]) for x in log],
     }
 
-    # Business case (ADR 0019): written after the verdict, for a business reader. Changes no result.
+    # Business case (ADR 0019, re-based on order lines in ADR 0021): written after the verdict. Changes no result.
     paid = [r for r in held if decide(r)]
     wrong = [r for r in paid if not r["straight_through"]]
     val = lambda rs: [r.get("invoice_value") or 0 for r in rs]  # noqa: E731
     pv = sorted(val(paid))
     top_line = pv[int(len(pv) * 0.9)]
     top_wrong = [v for v in val(wrong) if v >= top_line]
-    c_lower = wilson(len(paid) - len(wrong), len(paid))[0]
+    paper, paper_cautious, _ = money.lines_per_mistake(len(paid), len(wrong))
+    tot = again["totals"]
+    gated, gated_cautious, gated_generous = money.lines_per_mistake(tot["passed"], tot["wrong"])
+    auto_wrong_po = Counter(x["id"].split("_")[0] for x in log if not by_id[x["id"]]["straight_through"])
+    fp = money.footprint(iter_jsonl(DATA / "cases.jsonl"), {r["id"] for r in paid}, set(by_id))
+    if fp["paid_lines"] != len(paid) or fp["held_lines"] != len(held):
+        sys.exit("footprint: every held-out line should have a clearing window")
+    blind_n = money.blind_sample(q=0.02, power=0.8)
     business = {
-        "paid": len(paid), "wrong": len(wrong), "problems_all": sum(1 for r in held if not r["straight_through"]),
-        "checks_per_mistake": len(paid) / len(wrong), "checks_per_mistake_lower": 1 / (1 - c_lower),
+        "unit": "order line",
+        # LEGACY until the pilot request is re-based (next commit).
         "manual_clear_share": 1 - cands["ranked"][0]["batch_share"],
-        "touches_paid": sum(tm[r["id"]]["manual_touches"] for r in paid), "months": 3,
-        # Invoice values are recorded in EUR; the page shows USD at the ECB's 2018 average reference rate.
+        "touches_paid": sum(tm[r["id"]]["manual_touches"] for r in paid),
+        "checks_per_mistake": paper, "checks_per_mistake_lower": paper_cautious,
+        "paid": len(paid), "wrong": len(wrong), "problems_all": sum(1 for r in held if not r["straight_through"]),
+        "months": 3,
+        # The log has no invoice-document field: (purchase order, first-receipt minute) groups stand in for documents.
+        "groups_paid": fp["groups_paid"], "groups_held": fp["groups_held"],
+        # What the log shows of people's hands on these lines: a footprint, not proof of review.
+        "footprint": {k: fp[k] for k in ("isolated_paid", "rpb_manual_paid", "rpb_manual_held")},
+        # Paid lines per mistake: on paper (the test, trusted from day one) and gated (the replay, trust earned).
+        "lines_per_mistake": {"paper": paper, "paper_cautious": paper_cautious,
+                              "gated": gated, "gated_cautious": gated_cautious, "gated_generous": gated_generous},
+        "gated": {"passed": tot["passed"], "wrong": tot["wrong"], "top_order_wrong": auto_wrong_po.most_common(1)[0][1],
+                  "orders_wrong": len(auto_wrong_po), "earned_share": tot["passed"] / len(paid)},
+        # Blind checks per kind per window to catch a true 2% error rate 80% of the time with the switch-off test.
+        "blind": {"n": blind_n, "q": 0.02, "power": money.switch_off_power(blind_n, 0.02),
+                  "fires_at": money.switch_off_threshold(blind_n)},
+        # Invoice values are recorded in EUR (order-line net value); the page shows USD at the ECB's 2018 average.
         "eur_usd": 1.1810,
         "value": {"held": sum(val(held)), "paid": sum(pv), "wrong": sum(val(wrong)),
                   "median_paid": statistics.median(pv), "median_wrong": statistics.median(val(wrong))},
+        "anchors": money.value_anchors(pv, val(wrong)),
         "top10": {"line": top_line, "count": sum(1 for v in pv if v >= top_line), "wrong": len(top_wrong), "wrong_value": sum(top_wrong),
                   "paid_value": sum(v for v in pv if v >= top_line)},
     }
