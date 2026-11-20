@@ -20,6 +20,7 @@ from understudy.evaluate import Z, case_type, wilson  # noqa: E402
 from understudy.files import load_json, save_json, verify  # noqa: E402
 from understudy.replay import replay  # noqa: E402
 import money  # noqa: E402  (tools/money.py)
+import evidence  # noqa: E402  (tools/evidence.py)
 
 DATA = Path(os.environ["LOCALAPPDATA"]) / "understudy" / "data"
 OUT = ROOT / "site" / "data.json"
@@ -187,8 +188,27 @@ def main():
                   "paid_value": sum(v for v in pv if v >= top_line)},
     }
 
+    # Limits of the evidence (ADR 0022): label sensitivity, clustering by purchase order, a post-hoc vendor baseline,
+    # where the replay's mistakes fell, and the agreement-gate sweep (tools/run_sweep.py). None changes the verdict.
+    paid_ids, wrong_ids = [r["id"] for r in paid], {r["id"] for r in wrong}
+    scan = evidence.label_scan(iter_jsonl(DATA / "cases.jsonl"), set(paid_ids), wrong_ids)
+    fit = list(iter_jsonl(DATA / "invoice_triage_fit.jsonl"))
+    b_pass = [r for r in sample if b_dec[r["id"]]]
+    sweep = load_json(DATA / "agreement_sweep.json") if (DATA / "agreement_sweep.json").exists() else None
+    ev = {
+        "mix": scan["mix"], "clustering": evidence.clustering(paid_ids, wrong_ids),
+        "sensitivity": evidence.sensitivity(paid_ids, wrong_ids, scan),
+        "vendor": evidence.vendor_panel(fit, held),
+        "replay": evidence.replay_errors(log, by_id),
+        # Claude checking each invoice, on the first sample: how many of its passes the rulebook also paid.
+        "b_in_c": {"b_passed": len(b_pass), "also_c": sum(1 for r in b_pass if decide(r)),
+                   "c_on_b": sum(1 for r in b_pass if decide(r) and not r["straight_through"])},
+        "sweep": sweep["cells"] if sweep else None,
+    }
+
     data = {
         "built": time.strftime("%Y-%m-%d"),
+        "evidence": ev,
         "business": business,
         "source": {"name": "BPI Challenge 2019", "licence": "CC BY 4.0",
                    "doi": "10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1"},
