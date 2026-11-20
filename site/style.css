@@ -360,11 +360,36 @@ table.scen td { text-align: right; }
 table.scen { min-width: 600px; }
 .blank { display: inline-block; min-width: 7em; border-bottom: 1px dashed var(--ink-2); color: var(--ink-2); font-style: italic; line-height: 1.3; }
 @media print {
-  .bar, .cues, .skip, .theme, .drawer { display: none !important; }
+  /* Paper is always light: the light tokens win over a dark theme or a dark system setting. */
+  :root, :root[data-theme], :root:not([data-theme="light"]) {
+    --paper: #fff; --ink: #16202e; --ink-2: #3a4656; --rule: #c9ced6; --wash: #eceee8;
+    --pencil: #3150a0; --standby: #b8322a; --go: #1f7a45; --cut: #b8322a; --unlit: #c3c8cf; --sel: #cfd9f2;
+    color-scheme: light;
+  }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bar, .cues, .skip, .theme, .drawer, .replay { display: none !important; }
   body, .script { background: #fff !important; color: #000 !important; }
   .tablewrap { overflow: visible; }
-  table.rfp { min-width: 0; }
+  table.rfp, table.raci, table.scen, table.keys, table.how { min-width: 0; }
   section { break-inside: avoid-page; }
+  /* Every fold prints open (app.js also opens them on beforeprint). */
+  details::details-content { content-visibility: visible; display: block; }
+  summary::after { content: none !important; }
+  /* Inputs print as their values, not as boxes. */
+  input, select { border: 0 !important; background: none !important; appearance: none; -webkit-appearance: none; padding: 0; font-weight: 700; color: #000; }
+  input[type="range"] { display: none; }
+  /* Charts that animate in print in their finished state. */
+  .journey.ready .dots i, .race.ready .end, .race.ready .mk, .race.ready .mk-t { opacity: 1 !important; transform: none !important; }
+}
+/* Phone: long requirement and risk tables stack each row as a card, labelled by its column. */
+@media screen and (max-width: 600px) {
+  table.cards, table.cards tbody, table.cards tr, table.cards th, table.cards td { display: block; width: auto; }
+  table.cards { min-width: 0; }
+  table.cards caption { display: block; }
+  table.cards thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  table.cards tr { border-top: 1px solid var(--rule); padding: 10px 0; }
+  table.cards tbody th, table.cards td { border: 0; padding: 2px 0; text-align: left; }
+  table.cards td[data-label]::before { content: attr(data-label) ": "; font: 700 12px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
 }
 .warn { font-weight: 700; color: var(--standby); margin: 12px 0 0; }
 .warn:empty { display: none; }

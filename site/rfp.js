@@ -25,8 +25,12 @@ const PROC = TT[TT.length - 1][1];
 /* Rows of the return table: none earned, the replay's observed share (a truncated window), then the scenarios. */
 const scenRows = (g) => [[0, "none earned yet"], [g.earned_share, "observed in the replay; window too short"], ...SCEN.map((x) => [x, x === 1 ? "the on-paper ceiling" : ""])];
 
-const tbl = (caption, heads, rows, cls = "") =>
-  `<div class="tablewrap"><table class="rfp ${cls}"><caption>${caption}</caption><thead><tr>${heads.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i === 0 ? `<th scope="row">${c}</th>` : `<td>${c}</td>`)).join("")}</tr>`).join("")}</tbody></table></div>`;
+// cls "cards": on a phone each row stacks as a card; cells carry their column's name, and ARIA roles keep the table's meaning.
+const tbl = (caption, heads, rows, cls = "") => {
+  const cards = cls.split(" ").includes("cards"), r = (x) => (cards ? ` role="${x}"` : "");
+  const lab = (i) => (cards ? ` data-label="${esc(heads[i].replace(/<[^>]+>/g, ""))}"` : "");
+  return `<div class="tablewrap"><table class="rfp ${cls}"${r("table")}><caption>${caption}</caption><thead${r("rowgroup")}><tr${r("row")}>${heads.map((h) => `<th scope="col"${r("columnheader")}>${h}</th>`).join("")}</tr></thead><tbody${r("rowgroup")}>${rows.map((row) => `<tr${r("row")}>${row.map((c, i) => (i === 0 ? `<th scope="row"${r("rowheader")}>${c}</th>` : `<td${r("cell")}${lab(i)}>${c}</td>`)).join("")}</tr>`).join("")}</tbody></table></div>`;
+};
 const sec = (id, n, title, body) => `<section id="${id}" aria-labelledby="${id}-h"><div class="col"><h2 id="${id}-h"><span class="marg" aria-hidden="true">${n}</span>${title}</h2>${body}</div><div></div></section>`;
 /* Bars drawn to scale (the main report's component). rows: [name, value, label, highlight] */
 const bars = (label, rows, scale) => { const max = scale || Math.max(...rows.map((r) => r[1])) || 1; return `<p class="bars-title">${label}</p><ul class="bars" aria-label="${label}">${rows.map(([n, x, l, hit]) => `<li class="${hit ? "hit" : ""}"><span class="name">${n}</span><span class="track" aria-hidden="true"><span class="fill" style="width:${(x / max) * 100}%"></span></span><span class="val">${l}</span></li>`).join("")}</ul>`; };
@@ -186,7 +190,7 @@ function build(d) {
     ["M13", "Meet every data-protection requirement in the table below before any invoice, supplier or call data leaves the company, and keep to them for as long as any of it is held.", "Each item has the evidence named in the table, checked by Risk and Compliance before Phase 0 uses real data."],
       ["M14", "Run the company's existing duplicate-payment and fraud checks on every line paid on its own, before it is paid, exactly as on lines a person pays. The pilot does not replace, skip or reorder them.", "In Phase 0, a seeded duplicate of a line already paid, sent down the path for lines paid on its own, is stopped before payment."],
     ["M15", "Hold for a person any line with no goods receipt recorded when its invoice arrives, whatever its kind's record. No goods receipt yet means hold. This is a hard rule written outside the rulebook, not a tested control: the study's rulebook had no such rule.", "A seeded line with no goods receipt, in a kind that is paid on its own, is held."],
-  ], "fit")}
+  ], "fit cards")}
   ${tbl("Data protection (all mandatory, under M13)", ["Ref", "The proposer shall", "Evidence"], [
     ["DP1 Retention and training use", `Keep invoice, supplier and call data only as long as the pilot and the retention period in section 10 need it, delete it on request, and never use it to train or improve any model without the company's written consent.`, "Contract terms, and the model provider's written data-use terms for the plan used"],
     ["DP2 Residency", `Store and process the data only in ${fill("permitted countries or regions")}, including backups and any model calls.`, "A data-flow map naming each location"],
@@ -274,7 +278,7 @@ function build(d) {
   ];
   out.push(sec("s9", "9", "Risk register", `
   <p>The ratings are my judgment, not measurements. Replace them with the company's own scale in Phase 0.</p>
-  ${tbl("Risks", ["Ref", "Risk", "Likelihood", "Impact", "Evidence", "Mitigation", "Owner"], risks)}
+  ${tbl("Risks", ["Ref", "Risk", "Likelihood", "Impact", "Evidence", "Mitigation", "Owner"], risks, "cards")}
   <p class="small">Risks beyond lines paid that need a correction (R4 to R13) are not measured by the study. They are what I would expect a risk committee to ask about.</p>`));
 
   out.push(sec("s10", "10", "Controls and compliance", `

@@ -1020,6 +1020,10 @@ async function boot() {
     else if (e.target.closest("[data-close]")) closeDrawer();
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#drawer").hidden) closeDrawer(); });
+  // Print every fold open (the Method section's Limits among them), then put them back.
+  const printOpened = [];
+  addEventListener("beforeprint", () => document.querySelectorAll("details:not([open])").forEach((x) => { x.open = true; printOpened.push(x); }));
+  addEventListener("afterprint", () => { printOpened.splice(0).forEach((x) => { x.open = false; }); });
 
   const verdictGo = d.policies.some((p) => p.chosen && p.held_out.precision_lower >= 0.99);
   const LAMPS = { q1: verdictGo ? "go" : "standby", q3: verdictGo ? "go" : "standby", q5: endState(d.replay.states), q6: endState(d.agreement.example_states) };
