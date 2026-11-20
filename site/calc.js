@@ -5,7 +5,7 @@
 const Calc = (() => {
   const PH = { p0: 4, p2: 12, p3: 2 }; // weeks of phases 0, 2 and 3 (phase 1 is the replay's wait for the first kind)
   const DEF = { min: 5, rate: 40, fix: 100, lost: 0, oh: 8, kinds: 1 };
-  const WINDOWS_YR = 12; // blind-check windows a year: monthly, as the pilot request's M9 sets (ADR 0025)
+  const WINDOWS_YR = 12; // blind-check windows a year at the cost default: monthly, M9's shortest window (ADR 0025)
   const int = (n) => Math.round(n).toLocaleString("en-US");
   const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
   const usd = (x) => (x >= 1e6 ? `$${(x / 1e6).toFixed(2)}M` : x >= 1e4 ? `$${int(Math.round(x / 1000))}k` : `$${int(x)}`);
@@ -22,6 +22,7 @@ const Calc = (() => {
     const b = d.business, R = b.eur_usd, firstWk = d.replay.weeks.indexOf(d.replay.first) + 1;
     return { b, L: b.lines_per_mistake, g: b.gated, linesYr: b.paid * (12 / b.months), firstWk,
       totalWeeks: PH.p0 + firstWk + PH.p2 + PH.p3, dryWeeks: PH.p0 + firstWk, p2Windows: (PH.p2 * 12) / 52,
+      qWin: d.controls.defaults.blind_quarter_windows, // M9's longest window: a calendar quarter
       meanWrong: b.anchors.mean_wrong * R, meanBelow: b.anchors.mean_wrong_below_top10 * R, cOnce: d.cost.c.usd / d.cost.c.calls };
   }
 
@@ -81,16 +82,20 @@ const Calc = (() => {
     const p0 = v.h * PH.p0 * v.r, ohRest = v.h * (B.totalWeeks - PH.p0) * v.r, oversight = p0 + ohRest + B.cOnce;
     const total = oversight + blindPilot + v.i, ohYr = v.h * 52 * v.r, run = ohYr + blindYr;
     const margin = saving - wrongFull * M; // per unit of share earned, before running costs
+    // Blind checks a year: one window's lines per kind per window, but never more lines than are paid on their own.
+    const blindAt = (x, windows = WINDOWS_YR) => (Math.min(x * B.linesYr, v.k * windows * B.b.blind.n) * v.m / 60) * v.r;
     const row = (x) => {
-      const gross = x * saving, fixes = x * wrongFull * M, net = gross - fixes - ohYr - (x > 0 ? blindYr : 0);
-      return { lines: x * B.linesYr, wrong: x * wrongFull, gross, fixes, netBefore: gross - fixes, net,
-        roi: v.hasInt && total ? (net - total) / total : null, pay: v.hasInt && net > 0 ? total / (net / 12) : null };
+      const gross = x * saving, fixes = x * wrongFull * M, blind = blindAt(x), net = gross - fixes - ohYr - blind;
+      return { lines: x * B.linesYr, wrong: x * wrongFull, gross, fixes, blind, netBefore: gross - fixes, net,
+        // ROI on a pilot costing under $1,000 is not a meaningful percentage.
+        roi: v.hasInt && total >= 1000 ? (net - total) / total : null, pay: v.hasInt && net > 0 ? total / (net / 12) : null };
     };
     const need = (lpm) => M / (lpm * c);
     // The decision figure: the share reviewed today at which the yearly net, with everything earned, reaches zero after
     // late fixes (cautious end), oversight and blind checks. need() above is the per-line test, before running costs.
-    const needNet = (wrongFull * M + ohYr + blindYr) / (B.linesYr * c);
-    return { c, M, sUse, hrs, saving, wrongFull, bad, blindH, blindWin, blindPilot, blindYr, p0, ohRest, oversight, total, ohYr, run, margin, needNet,
+    const needNet = (wrongFull * M + ohYr + blindAt(1)) / (B.linesYr * c);
+    const needNetQ = (wrongFull * M + ohYr + blindAt(1, B.qWin)) / (B.linesYr * c); // the same, with quarterly windows
+    return { c, M, sUse, hrs, saving, wrongFull, bad, blindH, blindWin, blindPilot, blindYr, p0, ohRest, oversight, total, ohYr, run, margin, needNet, needNetQ,
       ask: margin > 0 ? (total + run) / margin : Infinity, row, need, be: (lpm) => lpm * sUse * c };
   }
 
@@ -116,11 +121,11 @@ const Calc = (() => {
     set("n-be", `cautious end · on paper; a late fix costs you about $${int(x.M)}`);
     set("r-need", x.needNet > 1 ? "Doesn't pay at these inputs" : needTxt(x.needNet));
     set("s-need", dflt([...costD, ...fixD, ...runD]).replace(/^ · d/, "D") || "Your inputs");
-    set("n-need", `${x.needNet > 1 ? "Even with every line reviewed today and everything earned, late fixes, oversight and blind checks cost more than the time saved." : "With everything earned, after late fixes (cautious end), oversight and blind checks; before the pilot's one-off cost."} Late fixes alone, before running costs: ${needTxt(x.need(B.L.gated_cautious))} (cautious end), ${needTxt(x.need(B.L.paper))} on paper.`);
+    set("n-need", `${x.needNet > 1 ? "Even with every line reviewed today and everything earned, late fixes, oversight and blind checks cost more than the time saved." : "With everything earned, after late fixes (cautious end), oversight and blind checks; before the pilot's one-off cost."} With quarterly blind-check windows instead of monthly: ${x.needNetQ > 1 ? "still doesn't pay" : `needs ${pct(x.needNetQ, 1)}`}. Late fixes alone, before running costs: ${needTxt(x.need(B.L.gated_cautious))} (cautious end), ${needTxt(x.need(B.L.paper))} on paper.`);
     set("r-pilot", usd(x.total));
     set("s-pilot", (v.hasInt ? "Integration entered" : "No integration") + dflt([...(v.costDefault ? ["time and rate"] : []), ...runD]));
-    set("n-pilot", `${v.runDefault ? "default" : "your"} oversight and blind checks (${v.k} kind${v.k === 1 ? "" : "s"}, monthly)${v.hasInt ? "" : "; add integration for ROI"}; other required lines are still blank`);
-    set("r-roi", !v.hasInt ? "Enter integration" : full.roi === null ? "n/a" : `${full.roi < 0 ? "−" : ""}${int(Math.abs(full.roi) * 100)}% · ${full.pay ? `${full.pay.toFixed(1)} months` : "no payback"}`);
+    set("n-pilot", `${v.runDefault ? "default" : "your"} oversight and blind checks (${v.k} kind${v.k === 1 ? "" : "s"}, monthly)${v.hasInt ? "" : "; add integration for ROI"}; other required lines are still blank${v.k === 0 ? ". With no kinds entered there are no blind checks, which M9 requires for every kind paid on its own" : ""}`);
+    set("r-roi", !v.hasInt ? "Enter integration" : full.roi === null ? "n/a (pilot under $1k)" : `${full.roi < 0 ? "−" : ""}${int(Math.abs(full.roi) * 100)}% · ${full.pay ? `${full.pay.toFixed(1)} months` : "no payback"}`);
     set("s-roi", !v.hasInt ? "Not entered" : (v.sh === null ? "Upper limit" : "Ceiling") + dflt([...costD, ...fixD, ...runD]));
     set("n-roi", `at 100% earned; it needs ${x.ask <= 1 ? pct(x.ask, 1) : "more than 100%"} of the on-paper volume to repay in its first year after the pilot`);
   }
