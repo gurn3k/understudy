@@ -66,6 +66,12 @@ function build(d) {
   <h1 id="s0-h">Request for Proposals: a controlled pilot of AI-assisted invoice clearing</h1>
   <p class="jump"><a href="./">&larr; Back to the main report</a></p>
   <p class="small">This is a model document. I wrote it from my study, to show how a company with a formal process could ask for a pilot. It is not issued by any organisation, and every placeholder in [brackets] is for the company that adopts it to complete. I wrote it after every result was known (decision record 0020); it changes no result.</p>
+  <div class="callout rec howto" role="note" aria-label="How to use this document"><p><strong>How to use this document.</strong> It holds two documents on one page.</p>
+  ${list([
+    "<strong>The internal case: sections 1 and 13.</strong> Section 1 asks the sponsor to approve issuing this request, with Phase 0 funded on award; section 13 records the sign-off. They are not sent to proposers.",
+    "<strong>The request: sections 2 to 12, section 14 and the appendices.</strong> These go to every proposer, the same text to each, with the placeholders completed.",
+    "<strong>Before issue.</strong> The issuer completes every placeholder in [brackets], and confirms or replaces every figure marked as my assumption, my default or my proposal: phase lengths, control defaults, evaluation weights and dates.",
+  ])}</div>
   ${tbl("Document control", ["Item", "Entry"], [
     ["Title", "Request for Proposals: controlled pilot of AI-assisted invoice clearing"],
     ["Reference", fill("Procurement reference, e.g. RFP-YYYY-NNN")],
@@ -80,7 +86,7 @@ function build(d) {
   const phases = [["0 Set-up", PH.p0], ["1 Practice mode", firstWk], ["2 Limited autonomy", PH.p2], ["3 Review", PH.p3]];
   const timeline = `<figure class="tline"><div class="tline-bar" role="img" aria-label="Plan: procurement, about ${PROC} weeks; then ${phases.map(([n, w], i) => `${n}, ${i === 1 ? `${w} to ${stopWk}` : w} weeks`).join("; ")}"><span class="seg pre" style="flex:${PROC}"><b>Procurement</b><i>~${PROC} wk</i></span>${phases.map(([n, w], i) => `<span class="seg s${i}" style="flex:${w}"><b>${n}</b><i>${i === 1 ? `${w}–${stopWk}` : w} wk</i></span>`).join("")}</div><figcaption class="small">Procurement first: about ${PROC} weeks from issue to the award decision (section 12). Then the pilot: at least ${totalWeeks} weeks and at most ${maxWeeks} before the stop rule ends it. Each phase ends at a gate (section 7). Phase 1 ends when a kind of invoice proves the bar under M2. ${firstWk} weeks is the earliest that happened in the replay, under its own single-crossing rule; ${m2Line}. If no kind has qualified by week ${stopWk} of practice mode, the pilot stops, so Phase 1 runs ${firstWk} to ${stopWk} weeks.</figcaption></figure>`;
   out.push(sec("s1", "1", "Executive summary", `
-  <p class="headline">I ask for approval of a controlled pilot, not a roll-out: at least ${totalWeeks} weeks and at most ${maxWeeks} in four gated phases, after about ${PROC} weeks of procurement.</p>
+  <p class="headline">I ask for approval to procure a controlled pilot, not a roll-out: at least ${totalWeeks} weeks and at most ${maxWeeks} in four gated phases, after about ${PROC} weeks of procurement.</p>
   ${timeline}
   ${tbl("Key figures", ["Question", "Answer", "What it means"], [
     ["What was tested?", `3 pre-registered approaches: the simple rule and the rulebook on ${int(d.held_out_n)} real test invoices, Claude checking each invoice on ${b2 ? int(b2.b_alone.n) + " (a follow-up sample)" : int(d.sample_n)}`, "None proved the 99% bar"],
@@ -92,7 +98,7 @@ function build(d) {
     ["Pilot cost", `<span data-out="total"></span>: internal oversight and the rulebook (my assumptions), blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
     ["Return", `<span data-out="return-line"></span>`, `At your inputs, including blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
   ], "keys")}
-  <p class="ask"><strong>The decision I ask for:</strong> approve Phase 0 to measure the inputs that decide it: the share of lines a person reviews today, minutes per review and the cost of a late fix. <span data-out="ask-note"></span> Gate 1 goes ahead only if those measurements give a positive net after running costs. Every later phase waits for a gate.</p>
+  <p class="ask"><strong>The decision I ask for:</strong> approve issuing this request, and on award fund Phase 0 to measure the inputs that decide it: the share of lines a person reviews today, minutes per review and the cost of a late fix. <span data-out="ask-note"></span> Gate 1 goes ahead only if those measurements give a positive net after running costs. Every later phase waits for a gate.</p>
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, under controls, whether its own invoices would.</p>`));
 
   out.push(sec("s2", "2", "Purpose and background", `

@@ -205,7 +205,7 @@ REQUIRED.rfp.push(
   ["the replay's first kind a month", `pays about ${n0(K.first_kind_month)}`],
   ["fixed count budget", "a fixed count"], ["the replay's count budget", `the count would have been ${n0(K.budget_count_replay)}`],
   ["quarterly sensitivity in section 1", needNetQ > 1 ? "With quarterly blind-check windows instead of monthly: still not" : `With quarterly blind-check windows instead of monthly: at ${pc(needNetQ, 1)}`],
-  ["the ask funds the measurements", "approve Phase 0 to measure the inputs that decide it"], ["Gate 1 money test", "give a positive net after running costs"],
+  ["the ask funds the measurements", "on award fund Phase 0 to measure the inputs that decide it"], ["Gate 1 money test", "give a positive net after running costs"],
   ["M11 built by the issuer", "the issuer, not the proposer, builds"],
 );
 REQUIRED.q9.push(["quarterly sensitivity in the readout", `With quarterly blind-check windows instead of monthly: ${qTxt}`],
@@ -252,6 +252,8 @@ REQUIRED.rfp.push(["R8 rated Medium", "Fraud or duplicate paymentsMediumHigh"], 
 REQUIRED.rfp.push(["no goods receipt means hold", "No goods receipt yet means hold"], ["variance as a data input", "price and quantity differences between invoice, order and goods receipt"]);
 // Practice calls hidden, override rate dropped (Should 8, ADR 0027).
 REQUIRED.rfp.push(["practice calls hidden", "The rulebook's calls are hidden from the people who handle invoices"], ["override rate dropped", "D3, the override rate, is dropped"]);
+// Procurement readiness (Should 9): who reads which sections.
+REQUIRED.rfp.push(["how to use: internal case", "The internal case: sections 1 and 13."], ["how to use: the request", "The request: sections 2 to 12, section 14 and the appendices."], ["ask: issue the request", "approve issuing this request"]);
 // The README names the business case and the pilot request (Should 20).
 REQUIRED.readme = [["README: business case", "a business case (Q9)"], ["README: pilot request", "`site/rfp.html`"]];
 // Q1's dot chart prints exact counts per lane (Should 7): the dots round the AI's mistakes away.
