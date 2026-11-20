@@ -93,7 +93,7 @@ function biz(d) {
   <p><strong>Keeping it honest.</strong> I locked the test invoices before any approach ran, wrote each rule down before the run it governed, except one: I changed how the approaches are compared after one result was known, so I show the verdict under both rules (they agree). I published the results that went against me. A second program recounted the records independently.</p>
   <h3>The result</h3>
   ${summaryStrip(d)}
-  <p>None of the three proved the 99% bar. The simple rule paid nothing. Claude checking each invoice paid only ${b2 ? `${int(b2.b_alone.passed)} of ${int(b2.b_alone.n)} invoices in the follow-up (${int(b2.b_alone.wrong)} wrong)` : `${int(d.b.sample.passed)} of ${int(d.sample_n)}`}, too few to prove the bar, and costs about $${bPer1k.toFixed(2)} for every 1,000 invoices, for as long as it runs. Claude's rulebook paid ${pct(c.held_out.coverage[0] / d.held_out_n, 1)} of invoices and got ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} of those right, a hair under the proof I asked for (worst likely case ${pct(c.held_out.precision_lower, 2)}). The rest of this section is about the rulebook, the only approach close enough to be worth a pilot.</p>
+  <p>None of the three proved the 99% bar. The simple rule paid nothing. Claude checking each invoice paid only ${b2 ? `${int(b2.b_alone.passed)} of ${int(b2.b_alone.n)} invoices in the follow-up (${int(b2.b_alone.wrong)} wrong)` : `${int(d.b.sample.passed)} of ${int(d.sample_n)}`}, too few to prove the bar, and costs about $${bPer1k.toFixed(2)} for every 1,000 invoices, for as long as it runs. Claude's rulebook paid ${pct(c.held_out.coverage[0] / d.held_out_n, 1)} of invoices and got ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} of those right. That is not proven: its worst likely case is ${pct(c.held_out.precision_lower, 2)}, about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order, against ${pct(d.bar.pass_everything.full.precision[0] / d.bar.pass_everything.full.precision[1], 2)} for paying every invoice. The rest of this section is about the rulebook, the only approach close enough to be worth a pilot.</p>
   <div class="cost biz-tiles">
   ${tile("Order lines it would have paid", `>${int(b.paid)}`, `of ${int(d.held_out_n)} in the ${word(b.months)} test months (${pct(b.paid / d.held_out_n, 1)}), in about ${int(b.groups_paid)} invoice groups`)}
   ${tile("Lines where the records show a person's own step", `>${pct(iso, 1)}`, `${int(fp.isolated_paid)} of ${int(b.paid)}: a step besides the clearing, not part of a bulk posting. A footprint, not proof of review.`)}
@@ -259,7 +259,8 @@ function q1(d) {
   const no = (t) => `<span class="state standby">${t}</span>`;
   const plain = `<h1 id="q1-h">Can an AI decide which invoices are safe to pay without a person checking?</h1>
   <p class="jump"><a href="#biz">Here for the business decision? Jump to the business case &rarr;</a><br><a href="rfp.html">Ready to run a pilot? Read the formal pilot request (RFP) &rarr;</a></p>
-  <p class="headline">Not at the bar I set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, just short of the proof I asked for.</p>
+  <p class="headline">Not proven at the bar I set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, but its worst likely case is under 99%.</p>
+  <p>${notProven(d)}</p>
   ${summaryStrip(d)}
   <h2 class="sub">Why this study</h2>
   <p>Many companies are deciding where AI should take on work that people do today. The evidence is often a demo, or a pilot that "looked good". I wanted a stricter test on real records: take one decision staff make thousands of times, let an AI make it, and check every call against what really happened.</p>
@@ -278,18 +279,18 @@ function q1(d) {
   <div class="tablewrap"><table class="score"><caption>What each AI did</caption><thead><tr><th>Approach</th><th>Paid without a check</th><th>Later needed fixing</th><th>Proved 99%?</th></tr></thead><tbody>
   <tr><td>Pay every invoice (for comparison)</td><td>${int(pe[1])}</td><td>${int(peWrong)} (${oneIn(pe[1], peWrong)})</td><td>${no("No")}</td></tr>
   <tr><td>1. Simple rule</td><td>${int(aPasses)}</td><td>&ndash;</td><td>${no("Paid nothing")}</td></tr>
-  <tr><td>2. Claude checking each invoice*</td><td>${int(bp)} of ${int(d.sample_n)}</td><td>${int(be)}</td><td>${no("Too few to tell")}</td></tr>
-  <tr class="chosen"><td>3. Claude's rulebook</td><td>${int(cn)} (${pct(cn / d.held_out_n, 0)})</td><td>${int(cWrong)} (${oneIn(cn, cWrong)})</td><td>${no("Just short")}</td></tr>
+  <tr><td>2. Claude checking each invoice*</td><td>${int(bp)} of ${int(d.sample_n)}</td><td>${int(be)}</td><td>${no("Not proven")}</td></tr>
+  <tr class="chosen"><td>3. Claude's rulebook</td><td>${int(cn)} (${pct(cn / d.held_out_n, 0)})</td><td>${int(cWrong)} (${oneIn(cn, cWrong)})</td><td>${no("Not proven")}</td></tr>
   </tbody></table></div>
   <p class="small">* Checking each invoice costs a request to the AI every time, so it was first tested on ${int(d.sample_n)} invoices, not all ${int(d.held_out_n)}. A follow-up on ${d.b2 && d.b2.b_alone ? int(d.b2.b_alone.n) : "more"} new invoices is in Q3.</p>
-  <p>Why "just short"? The rulebook paid ${int(cn)} invoices. To prove 99% with that many, at most ${int(allowed)} could need fixing. ${int(cWrong)} did: ${int(cWrong - allowed)} too many.</p>
+  <p>Why not proven? The rulebook paid ${int(cn)} invoices. To prove 99% with that many, at most ${int(allowed)} could need fixing; ${int(cWrong)} did. That count treats every invoice as independent. Many share an order, and allowing for that the worst likely case falls further, to ${pct(d.evidence.clustering.clustered_lower, 2)}.</p>
   <ul class="bars budget" aria-label="Rulebook mistakes against the most it could make and still prove 99%">
   <li><span class="name">Most it could make</span><span class="track" aria-hidden="true"><span class="fill ok" style="width:${(allowed / cWrong) * 100}%"></span></span><span class="val">${int(allowed)}</span></li>
   <li class="hit"><span class="name">What it made</span><span class="track" aria-hidden="true"><span class="fill" style="width:100%"></span></span><span class="val">${int(cWrong)}</span></li>
   </ul>
   ${openButton("c_wrong_held_out", `See the ${int(cWrong)} invoices the rulebook paid wrongly`)}`;
   const detail = `<p class="headline">${esc(headline)}</p>
-  <p><strong>What this means.</strong> None of the three earned trust. The simple rule never paid anything, so it never made a mistake, but it never saved any work either. Claude's rulebook paid ${pct(cn / d.held_out_n, 1)} of the test invoices without a check, and ${pct(ck / cn, 2)} of those were fine, so on average it met the bar. But its worst likely case (the "lower bound" above) is ${pct(c.held_out.precision_lower, 2)}, a hair under 99%. ${int(cWrong - allowed)} fewer mistakes out of ${int(cn)} would have changed the answer.</p>
+  <p><strong>What this means.</strong> None of the three earned trust. The simple rule never paid anything, so it never made a mistake, but it never saved any work either. Claude's rulebook paid ${pct(cn / d.held_out_n, 1)} of the test invoices without a check, and ${pct(ck / cn, 2)} of those were fine, so on average it met the bar. But its worst likely case (the "lower bound" above) is ${pct(c.held_out.precision_lower, 2)}, under 99%, so it is not proven. ${fitDrop(d)} ${clusterNote(d)}</p>
   ${boundPlot(d)}
   <div class="verdict">
   <p class="say"><b><s>First comparison rule</s> <em>replaced, kept on the record</em></b><span>Nothing reached a worst likely case of 99% on the shared sample (rulebook ${pct(cs, 1)}, checking each invoice ${pct(d.b.lower, 1)}), so the simple rule wins by default.</span></p>
@@ -303,14 +304,28 @@ function q1(d) {
   ]);
 }
 
+/* ---------- Not proven: the rulebook's result in plain words, with the figures that qualify it ---------- */
+function notProven(d) {
+  const c = d.policies.find((p) => p.chosen), [ck, cn] = c.held_out.precision, pe = d.bar.pass_everything.full.precision;
+  return `It was about 99% right on what it paid (${pct(ck / cn, 2)}), but not proven: the worst likely case is ${pct(c.held_out.precision_lower, 2)}, and about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order. Paying every invoice with no checks at all would have been ${pct(pe[0] / pe[1], 2)} right. ${fitDrop(d)}`;
+}
+function fitDrop(d) {
+  const c = d.policies.find((p) => p.chosen);
+  return `In the learning months its worst likely case was ${pct(c.fit_lower, 2)}; on the test months it fell to ${pct(c.held_out.precision_lower, 2)}.`;
+}
+function clusterNote(d) {
+  const k = d.evidence.clustering;
+  return `The bound treats each invoice as independent. ${int(k.n)} invoices sit on ${int(k.orders)} orders, and mistakes cluster on orders (design effect ${k.deff.toFixed(2)}): allowing for that, the worst likely case is ${pct(k.clustered_lower, 2)}, and resampling whole orders gives ${pct(k.boot[0], 2)} to ${pct(k.boot[1], 2)}.`;
+}
+
 /* ---------- Q1 summary strip and invoice journey ---------- */
 function summaryStrip(d) {
-  const c = d.policies.find((p) => p.chosen), [ck, cn] = c.held_out.precision, short = cn - ck - maxErrors(cn);
+  const c = d.policies.find((p) => p.chosen), [ck, cn] = c.held_out.precision, pe = d.bar.pass_everything.full.precision[0] / d.bar.pass_everything.full.precision[1];
   const b2 = d.b2 && d.b2.b_alone ? d.b2.b_alone : null;
   const items = [
     ["A simple rule", "Paid nothing", "No kind of invoice had a clean enough record."],
-    ["Claude checking each invoice", "Too few to tell", b2 ? `Paid ${pct(b2.coverage, 1)} of ${int(b2.n)} new invoices; not proven.` : "Paid too few to prove anything."],
-    ["Claude's rulebook", `${int(short)} mistakes short`, `Paid ${pct(cn / d.held_out_n, 0)} of invoices, ${pct(ck / cn, 2)} fine.`],
+    ["Claude checking each invoice", b2 ? `About ${pct(b2.wrong / b2.passed, 0)} wrong` : "Not proven", b2 ? `On what it paid, about the same as the rulebook (${pct((cn - ck) / cn, 2)}), paying far fewer: ${pct(b2.coverage, 1)} of ${int(b2.n)} new invoices. Not proven.` : "Paid too few to prove anything."],
+    ["Claude's rulebook", "Not proven", `About 99% right on the ${pct(cn / d.held_out_n, 0)} it paid (worst likely case ${pct(c.held_out.precision_lower, 2)}; about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for orders). Paying everything: ${pct(pe, 2)}.`],
   ];
   const r = d.evidence.replay, t = d.replay.totals;
   const replayLine = `<p class="strip-note"><strong>Trust earned on outcomes (replay):</strong> ${int(t.passed)} paid, ${int(t.wrong)} needed correction, ${r.kinds === 1 ? `all in one kind` : `in ${word(r.kinds)} kinds`}, ${word(r.top_order)} on one order. Not proven either: ${pct(t.wrong / t.passed, 1)} needed correction.</p>`;
@@ -483,7 +498,7 @@ function paths(d) {
       verdict: `Not proven. It paid only ${int(each.paid)} of ${int(each.n)}, and ${int(each.fix)} needed fixing. Its worst likely case is ${pct(each.lower, 1)}, under 99%.` },
     { key: "c", label: "Rulebook", n: d.held_out_n, paid: cn, fix: cn - ck, where: `all ${int(d.held_out_n)} test invoices`,
       does: "Claude writes a short set of rules once; ordinary software applies them to every invoice.",
-      verdict: `Just short. It paid about half, and ${pct(ck / cn, 2)} of those were fine. Its worst likely case is ${pct(c.held_out.precision_lower, 2)}, a hair under 99%: ${int(cn - ck - allowed)} fewer mistakes would have passed.` },
+      verdict: `Not proven. It paid about half, and ${pct(ck / cn, 2)} of those were fine. Its worst likely case is ${pct(c.held_out.precision_lower, 2)}, under 99%, and about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order.` },
   ];
 }
 const per1k = (x, n) => { const v = (x / n) * 1000; return v === 0 ? "0" : v < 10 ? v.toFixed(1) : int(v); };
