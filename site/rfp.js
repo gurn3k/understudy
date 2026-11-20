@@ -17,6 +17,7 @@ const OVERSIGHT_H = Calc.DEF.oh, DEF_MIN = Calc.DEF.min, DEF_RATE = Calc.DEF.rat
 const DEF_FIX = Calc.DEF.fix, DEF_LOST = Calc.DEF.lost, WINDOWS_YR = Calc.WINDOWS_YR;
 /* Control defaults (ADR 0025): my assumptions, not tested values; the issuer sets its own at Gate 1. */
 const MARGIN = 0.993, CONSEC = 3; // promotion: worst likely case, allowing for orders, at or above this at this many weekly looks in a row
+const SETTLE_DAYS = 30; // a call is settled this many days after its line is cleared for payment
 const ORDER_CAP = 3; // lines of one purchase order autonomy may pay before a person sees one
 const AGREE = "0.9", SIM_RUNS = 20; // the simulation shown: reviewers copy this share; runs per ADR 0017
 const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
@@ -47,7 +48,7 @@ function build(d) {
   const mc = d.bar.min_calls, ctl = d.controls, er = d.evidence.replay;
   const wkN = (w) => d.replay.weeks.indexOf(w) + 1, isoN = (w) => Number(w.split("-W")[1]);
   const wkL = (w) => `week ${wkN(w)} of the replay (ISO week ${isoN(w)})`;
-  const [pr1, pr2] = ctl.promotions;
+  const [pr1, pr2] = ctl.promotions, dm = ctl.demotions[0];
   const out = [];
 
   /* Document control and 1. summary */
@@ -163,14 +164,21 @@ function build(d) {
   ${tbl("Mandatory requirements", ["Ref", "The pilot shall", "Test"], [
     ["M1", "Start in practice mode on every kind of invoice, with people handling every invoice.", "No invoice is paid on the rulebook's say-so before Gate 2."],
     ["M2", `Promote a kind of invoice only on its real outcomes, never on how often reviewers agree, by a rule that stays valid when it is checked every week: a named sequential method (a confidence sequence or alpha spending), or this default of mine: its worst likely case, allowing for orders, at or above ${pct(MARGIN, 1)} at ${word(CONSEC).toLowerCase()} weekly looks in a row.`, "Each promotion record cites outcome counts and every look taken. Run on the issuer's earlier months, the rule shows how often it would have promoted a kind that later failed."],
-    ["M3", "Switch a kind off automatically when the best likely case (95% upper bound) of its last 200 settled calls that it paid on its own falls below 99%. After promotion, also switch it off when its rate of lines needing a correction, among those paid on its own, rises above the practice-mode interval it was promoted on.", "A seeded failure switches the kind off; so does a seeded rise above the practice-mode interval."],
+    ["M3", `Switch a kind off automatically when the upper end of the two-sided 95% Wilson interval of its last ${int(ctl.window)} settled calls paid on its own, taken in arrival order, falls below 99%. After promotion, also switch it off when its rate of lines needing a correction, among those paid on its own, rises above the practice-mode interval it was promoted on.`, "A seeded failure switches the kind off; so does a seeded rise above the practice-mode interval."],
     ["M4", "Log every call, its inputs and its outcome, and keep the log for the retention period in section 10.", "An auditor can trace any paid invoice back to its call."],
     ["M5", "Have a named person read and sign off each rulebook version before use, under change control.", "Every version in use has a signed record."],
     ["M6", "Count corrections made after payment as mistakes.", "The outcome feed includes post-payment corrections."],
-    ["M7", "Confirm in writing, before Gate 1, the 99% bar, the cost of a late fix, the wrong-payment budget and any value limit.", "A signed Gate 1 record exists."],
+    ["M7", `Confirm in writing, before Gate 1, the 99% bar, the cost of a late fix, the correction budget (section 7), any value limit and when a call counts as settled. The budget is binding: going over it switches every kind off at once until the sponsor decides.`, "A signed Gate 1 record exists; a seeded breach of the budget switches every kind off."],
     ["M8", "Provide a kill switch that the Pilot Owner and the Finance Controller can use without the supplier.", "Tested in Phase 0."],
     ["M12", `Pay at most ${word(ORDER_CAP).toLowerCase()} lines of one purchase order on their own before a person sees one of them (my default; the issuer sets the number at Gate 1). This is a lesson from the replay, where ${int(er.top_order)} of the ${int(er.wrong)} mistakes were on one order, not a tested control.`, "A seeded order with more lines than the cap stops at the cap."],
   ])}
+  <h3>How the switch-off test works (M3), in numbers</h3>
+  <p>The test uses the two-sided 95% Wilson interval. A call is <em>settled</em> once its line has been cleared for payment and ${SETTLE_DAYS} days have passed (my default; the issuer sets it at Gate 1), with any correction in that time counted against it. Only the last ${int(ctl.window)} settled calls the kind paid on its own count, in the order they arrived.</p>
+  ${tbl("The switch-off at the edge", ["Wrong in the last " + int(ctl.window), "Right", "Interval", "Result"], [
+    [word(ctl.fires_at - 1), `${pct(1 - (ctl.fires_at - 1) / ctl.window, 1)}`, `${pct(ctl.tolerated_lower, 2)} to ${pct(ctl.tolerated_upper, 2)}`, "Upper end above 99%: the kind stays on"],
+    [word(ctl.fires_at), `${pct(1 - ctl.fires_at / ctl.window, 1)}`, `up to ${pct(ctl.fires_upper, 2)}`, "Upper end below 99%: the kind is switched off"],
+  ], "fit")}
+  <p><strong>In plain words:</strong> a kind may run at up to ${int(ctl.fires_at - 1)} wrong in ${int(ctl.window)} (${pct((ctl.fires_at - 1) / ctl.window, 0)}), ${word(Math.round((ctl.fires_at - 1) / ctl.window / (1 - d.bar.bar))).toLowerCase()} times the ${pct(1 - d.bar.bar, 0)} the bar allows, and still stay on; the ${int(ctl.fires_at)}th switches it off. On ${int(ctl.window)} calls the test catches a kind truly running at 2% only ${pct(ctl.power_window, 0)} of the time. That is why the budget in M7 is binding and the blind checks are sized larger. In the replay, the first kind was promoted in ${wkL(pr1.week)} on ${int(pr1.evidence[0])} of ${int(pr1.evidence[1])} right, and switched off in ${wkL(dm.week)} at ${int(dm.recent[0])} of ${int(dm.recent[1])}, after its recent calls had run well past the edge.</p>
   ${tbl("Desirable requirements", ["Ref", "The pilot should", "Why"], [
     ["D1", "Set a value limit above which a person always checks.", "Most of the mistakes' value sat in the largest invoices in the study. A proposal I did not test."],
     ["D2", "Run monthly blind spot-checks of paid invoices.", "It guards against reviewers copying the AI."],
@@ -182,7 +190,7 @@ function build(d) {
   const ph = [
     ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget"],
     ["1 Practice mode", `About ${firstWk} (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}; that kind was switched off again later, so this length rests on a promotion later withdrawn); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
-    ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind spot-checks run monthly.", "G3: results review; the wrong-payment budget was respected"],
+    ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind spot-checks run monthly.", "G3: results review; the correction budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
   ];
   out.push(sec("s7", "7", "Pilot plan, gates and decision points", `
@@ -191,7 +199,7 @@ function build(d) {
   <h3>Stop criteria</h3>
   <p>The Pilot Owner shall recommend stopping, and the sponsor shall decide, if any of these holds:</p>
   ${list([
-    "The wrong-payment budget fixed at Gate 1 is exceeded.",
+    "The correction budget fixed at Gate 1 is exceeded. This also switches every kind off at once (M7).",
     "The pilot's own measured cost of a late fix exceeds the break-even in section 11, recalculated at the pilot's own measured mistake rate.",
     `No kind of invoice has qualified by week ${stopWk} of practice mode (my judgment: twice the replay's ${firstWk}; the issuer sets its own).`,
     "Outcome data, including corrections after payment, cannot be obtained.",
@@ -199,7 +207,7 @@ function build(d) {
   ])}`));
 
   const raci = [
-    ["Approve the bar, the pilot budget and the wrong-payment budget", "A", "R", "C", "C", "C", "I", "I"],
+    ["Approve the bar, the pilot budget and the correction budget", "A", "R", "C", "C", "C", "I", "I"],
     ["Sign off a rulebook version", "I", "A", "C", "C", "C", "C", "R"],
     ["Approve a promotion of a kind", "I", "A/R", "R", "C", "I", "I", "C"],
     ["Trigger a switch-off", "I", "A/R", "R", "I", "I", "C", "C"],
@@ -347,7 +355,8 @@ function build(d) {
     ["Kind of invoice", "Which department made the purchase, and whether the invoice arrived before or after the goods."],
     ["Worst likely case", "The lowest the true share of paid invoices that turn out fine is likely to be, given how many were checked (95% sure). Also called the lower bound."],
     ["The 99% bar", "Of the invoices paid without a check, at least 99 in 100 must turn out fine, judged by the worst likely case."],
-    ["Settled call", "A call whose outcome is known. For acceptance, only calls the rulebook would have paid without a check count; for the switch-off rule, only calls it paid on its own."],
+    ["Settled call", `A call whose outcome is known: its line was cleared for payment ${SETTLE_DAYS} days ago or more (my default; set at Gate 1), and any correction in that time counts against it. For acceptance, only calls the rulebook would have paid without a check count; for the switch-off rule, only calls it paid on its own, in arrival order.`],
+    ["Two-sided 95% Wilson interval", "The range the true share right is likely to sit in, 95% sure, given the calls counted. Its lower end is the worst likely case; its upper end is the best likely case."],
     ["Order line", "The unit of every count and amount here. The study's records have no invoice-document field, so one \"invoice\" in the study is one order line."],
     ["Late fix", "Correcting a line after it was paid instead of before. Its cost is the work to fix it plus any share of its value never recovered."],
     ["Gate", "A formal decision point in section 7."],
