@@ -78,6 +78,7 @@ const FORBIDDEN = [
   [/30 to 90 days|supplier-written guides/i, "an outside claim with no checked source: the study's own replay sets the shortest pilot", "review round, Should 24"],
   [/Out of scope; existing controls stay/i, "the existing duplicate and fraud checks must run on lines paid on their own (M14)", "review round, Should 18"],
   [/overrule|rising override rate|show the override rate|The AI suggests, and a person still decides/i, "the AI's calls are hidden in practice mode, so there is nothing to overrule; the override rate is dropped", "ADR 0027"],
+  [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
@@ -253,6 +254,11 @@ REQUIRED.rfp.push(["no goods receipt means hold", "No goods receipt yet means ho
 REQUIRED.rfp.push(["practice calls hidden", "The rulebook's calls are hidden from the people who handle invoices"], ["override rate dropped", "D3, the override rate, is dropped"]);
 // The README names the business case and the pilot request (Should 20).
 REQUIRED.readme = [["README: business case", "a business case (Q9)"], ["README: pilot request", "`site/rfp.html`"]];
+// Q1's dot chart prints exact counts per lane (Should 7): the dots round the AI's mistakes away.
+const cP = chosen.held_out.precision, bA = D.b2.b_alone;
+REQUIRED.page = [["Q1 lane: rulebook exact", `${n0(cP[1])} of ${n0(D.held_out_n)} paid; ${n0(cP[1] - cP[0])} needed fixing (1 in ${n0(cP[1] / (cP[1] - cP[0]))} paid)`],
+  ["Q1 lane: B exact", `${n0(bA.passed)} of ${n0(bA.n)} paid; ${n0(bA.wrong)} needed fixing (1 in ${n0(bA.passed / bA.wrong)} paid), on a follow-up sample`],
+  ["Q1 lane: simple rule exact", `0 of ${n0(D.held_out_n)} paid`]];
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"], readme: [read("README.md"), "README.md"] }[where];
