@@ -7,7 +7,10 @@ const int = (n) => Math.round(n).toLocaleString("en-US");
 const half = (n) => (Number.isInteger(n) ? int(n) : n.toLocaleString("en-US", { maximumFractionDigits: 1 }));
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const ratio = ([k, n], d = 1) => pct(k / n, d);
-const wk = (label) => "week " + Number(label.split("-W")[1]);
+const wk = (label) => "week " + Number(label.split("-W")[1]); // ISO week: only inside the decision records' fixed sentences
+/* Plain text: the replay's own week number first, then the ISO week, e.g. "week 13 of the replay (ISO week 35)". */
+const wkL = (label) => { const i = DATA && DATA.replay ? DATA.replay.weeks.indexOf(label) : -1, iso = Number(label.split("-W")[1]);
+  return i >= 0 ? `week ${i + 1} of the replay (ISO week ${iso})` : `ISO week ${iso}`; };
 const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 const word = (n) => WORDS[n] || int(n);
 const ICON_OPEN = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h12M2 8h12M2 13h8" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>';
@@ -127,7 +130,7 @@ function biz(d) {
   <p data-out="anchor"></p>
   <h3>4. What the first months really look like</h3>
   <p>The figures above assume the rulebook is trusted from day one. That is not how I would run it, so I also tested trust earned on outcomes. In a week-by-week replay of the test months, it started in practice mode: it made its calls while people still checked everything. It earned the right to pay one kind of invoice on its own only once that kind's real outcomes proved the bar, and lost it when results slipped. ${esc(plainEvents(d))}</p>
-  <p class="small">In the decision record's words ("the written policy" is the rulebook):</p>
+  <p class="small">In the decision record's words ("the written policy" is the rulebook; its weeks are ISO weeks, so week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay):</p>
   <p>${esc(eventSentence(d))}</p>
   <p>While trusted it paid ${int(t.passed)} lines on its own, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar). On the same test lines, that is ${pct(g.earned_share, 1)} of the ${int(b.paid)} it would have paid on paper. Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion. The test window was too short to show the steady state, so ${pct(g.earned_share, 1)} understates it, and I do not estimate it here.</p>
   <div class="tablewrap"><table class="score num money"><caption>Gross and net a year, at your inputs, by share of lines the rulebook earns the right to pay</caption><thead><tr><th scope="col">Share earned</th><th scope="col">Lines paid on its own</th><th scope="col">Gross saving</th><th scope="col">Late fixes</th><th scope="col">Net</th></tr></thead><tbody>
@@ -435,9 +438,9 @@ function race(d) {
   const wi = (w) => d.replay.weeks.indexOf(w);
   const fa = wi(d.agreement.example_first), fr = wi(d.replay.first);
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="race-t race-d"><title id="race-t">Paid lines that needed a correction, added up week by week</title>
-  <desc id="race-d">Switched on by agreement (one example run): ${int(ca[n - 1])} wrong payments by the end, first switched on in ${wk(d.agreement.example_first)}. Switched on by real results: ${int(cr[n - 1])}, first switched on in ${wk(d.replay.first)}.</desc>`;
+  <desc id="race-d">Switched on by agreement (one example run): ${int(ca[n - 1])} wrong payments by the end, first switched on in ${wkL(d.agreement.example_first)}. Switched on by real results: ${int(cr[n - 1])}, first switched on in ${wkL(d.replay.first)}.</desc>`;
   for (let v = 0; v <= top; v += top / 2) s += `<line class="tick" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${int(v)}</text>`;
-  s += `<text x="${L}" y="${H - 8}">${esc(wk(d.replay.weeks[0]))}</text><text x="${x(n - 1)}" y="${H - 8}" text-anchor="end">${esc(wk(d.replay.weeks[n - 1]))}</text>`;
+  s += `<text x="${L}" y="${H - 8}">replay week 1</text><text x="${x(n - 1)}" y="${H - 8}" text-anchor="end">week ${n}</text>`;
   s += `<path class="ln real" pathLength="1" d="${path(cr)}"/><path class="ln agr" pathLength="1" d="${path(ca)}"/>`;
   if (fa >= 0) s += `<circle class="mk agr" cx="${x(fa)}" cy="${y(ca[fa])}" r="4.5"/><text class="mk-t" x="${x(fa) + 6}" y="${y(ca[fa]) - 8}">on</text>`;
   if (fr >= 0) s += `<circle class="mk real" cx="${x(fr)}" cy="${y(cr[fr])}" r="4.5"/><text class="mk-t" x="${x(fr) + 6}" y="${y(cr[fr]) - 8}">on</text>`;
@@ -680,9 +683,9 @@ function plainEvents(d) {
   const gap = (a, b) => (yr(b) - yr(a)) * 52 + wnum(b) - wnum(a);
   if (!proms.length) return "The rulebook never earned trust for any kind of invoice.";
   const first = proms[0], dem = ev.find((e) => e.event === "demoted" && e.type === first.type && e.week > first.week);
-  let s = `The rulebook earned trust for ${word(proms.length)} kind${proms.length === 1 ? "" : "s"} of invoice. The first came in ${wk(first.week)}, after ${int(first.evidence[0])} of its ${int(first.evidence[1])} practice calls proved right.`;
+  let s = `The rulebook earned trust for ${word(proms.length)} kind${proms.length === 1 ? "" : "s"} of invoice. The first came in ${wkL(first.week)}, after ${int(first.evidence[0])} of its ${int(first.evidence[1])} practice calls proved right.`;
   if (dem) s += ` That trust was taken back ${word(gap(first.week, dem.week))} weeks later, when ${int(dem.recent[1] - dem.recent[0])} of its last ${int(dem.recent[1])} calls turned out wrong.`;
-  if (proms[1]) s += ` The second came in ${wk(proms[1].week)}, near the end of the records.`;
+  if (proms[1]) s += ` The second came in ${wkL(proms[1].week)}, near the end of the records.`;
   return s;
 }
 
@@ -720,10 +723,11 @@ function q5(d) {
   <p>${esc(plainEvents(d))}</p>
   <p>While switched on, it paid ${int(t.passed)} invoices by itself and ${int(t.wrong)} needed fixing (about ${oneIn(t.passed, t.wrong)}). That is worse than the 1 in 100 bar.</p>
   <h3>What it means</h3>
-  <p>Switching an AI on one kind at a time limits how much it can get wrong before it is caught, but it is slow and no guarantee. You only learn whether an invoice was paid correctly weeks after it arrives, so the proof builds slowly. Here the AI was first switched on in ${wk(d.replay.first)}${dem ? `, and switched off again ${word(wnum(dem.week) - wnum(proms[0].week))} weeks later` : ""}. A company taking this route should expect months of practice before the AI does real work, and should keep checking it after it is switched on.</p>
+  <p>Switching an AI on one kind at a time limits how much it can get wrong before it is caught, but it is slow and no guarantee. You only learn whether an invoice was paid correctly weeks after it arrives, so the proof builds slowly. Here the AI was first switched on in ${wkL(d.replay.first)}${dem ? `, and switched off again ${word(wnum(dem.week) - wnum(proms[0].week))} weeks later` : ""}. A company taking this route should expect months of practice before the AI does real work, and should keep checking it after it is switched on.</p>
   <p class="small">All ${int(t.wrong)} mistakes came from one kind of invoice, ${word(d.evidence.replay.top_order)} of them on one purchase order, and the records end soon after the second kind was switched on, so ${int(t.passed)} is lower than a full year would give. This replay does not change the answer at the top.</p>
   ${openButton("replay_autonomous", `See the ${int(t.passed)} invoices it paid by itself`)}`;
   const detail = `<p>Each kind of invoice earns trust on its own, not all at once. A kind is switched on once its settled practice calls clear the bar. If even the best likely case (the 95% upper bound) of its last 200 settled calls falls below the bar, it is switched off again. A call only counts as evidence once its outcome is known.</p>
+  <p class="small">The decision records count ISO weeks: week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
   <p>${esc(eventSentence(d))}</p>
   <p class="small">In plain words: the simple rule never earned trust for any kind of invoice. The rulebook earned it for two kinds. The first was switched off again later, after too many of its recent calls were wrong.</p>
   <p>While autonomous it passed ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar), and removed ${int(t.touches_removed)} manual touches.</p>
@@ -731,7 +735,7 @@ function q5(d) {
   <p>Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion.</p>`;
   return section("q5", `Q5 ${PLAIN_STATE[endState(d.replay.states)]}`, "Earning trust one kind of invoice at a time", plain, detail, [
     `Replayed with the picked rulebook over the test months, ${esc(d.replay.weeks[0])} to ${esc(d.replay.weeks[d.replay.weeks.length - 1])}`,
-    `The replay is too short for results that arrive weeks late: the second kind was switched on in ${wk(proms.slice(-1)[0].week)} with few invoices left, so ${int(t.passed)} understates a normal year`,
+    `The replay is too short for results that arrive weeks late: the second kind was switched on in ${wkL(proms.slice(-1)[0].week)} with few invoices left, so ${int(t.passed)} understates a normal year`,
     `The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} mistakes, mostly from one kind of invoice`,
     `The rulebook was written from January to May rates, about half of which rest on outcomes that became known after the replay's first week`,
     `This replay cannot overturn the answer above`,
@@ -773,6 +777,7 @@ function q6(d) {
   <p class="small">This is a simulation. How often real reviewers copy is an assumption here, not a measurement. The steps under "What to do instead" follow from this but were not tested here.</p>`;
   const detail = `<p>The simulation runs the same replay with agreement as the switch instead of outcomes. A simulated reviewer copies the suggestion some share of the time. Otherwise the reviewer catches a wrong "pay" 4 times in 5, and wrongly flags a right one 1 time in 50. The chart shows one example run with reviewers copying 9 times in 10.</p>
   ${cueSheet("sheet-agree", d, d.agreement.example_states, { label: "Simulated agreement shortcut, one example run, reviewers copying 9 in 10" })}
+  <p class="small">The decision records count ISO weeks: week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
   <p>Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about ${int(med(gaps9))} weeks sooner (median ${wk(medWeek(a9.first))} against ${wk(d.replay.first)}; range ${int(Math.min(...gaps9))}\u2013${int(Math.max(...gaps9))} weeks across 20 runs) and passed ${half(a9.passed_median)} invoices, ${half(a9.wrong_median)} of them wrong (medians of 20 runs; range ${int(a9.wrong_range[0])}\u2013${int(a9.wrong_range[1])}), against ${int(t.passed)} and ${int(t.wrong)} on outcomes. That is ${word(times)} times the wrong payments, at a lower rate per pass (${pct(a9.wrong_median / a9.passed_median, 2)} against ${pct(t.wrong / t.passed, 1)}).</p>
   <p>At 0.7 it promoted in ${int(a7.promoted_runs)} of 20 runs, the earliest in ${wk(a7.first[0])}, and passed ${half(a7.passed_median)} invoices, ${half(a7.wrong_median)} of them wrong (medians of 20 runs; range ${int(a7.wrong_range[0])}\u2013${int(a7.wrong_range[1])}). At 0.5 it promoted in ${int(a5.promoted_runs)} of 20 runs.</p>
   <p class="small">In plain words: when reviewers copy 7 times in 10, the AI was still switched on in most runs. When they copy half the time, it almost never was, because honest checking caught enough mistakes to keep agreement low.</p>

@@ -31,16 +31,16 @@ const list = (xs, tag = "ul") => `<${tag} class="plainlist">${xs.map((x) => `<li
 function figures(d) {
   const b = d.business, R = b.eur_usd, c = d.policies.find((p) => p.chosen), t = d.replay.totals;
   const b2 = d.b2 && d.b2.b_alone && d.b2.cost ? d.b2 : null;
-  const firstWk = d.replay.weeks.indexOf(d.replay.first) + 1;
+  const firstWk = d.replay.weeks.indexOf(d.replay.first) + 1, firstIso = Number(d.replay.first.split("-W")[1]);
   const linesYr = b.paid * (12 / b.months);
   const v = Object.fromEntries(Object.entries(b.value).map(([k, x]) => [k, x * R]));
-  return { b, R, c, t, b2, firstWk, linesYr, v, cOnce: d.cost.c.usd / d.cost.c.calls, ag: d.agreement.alphas[AGREE],
+  return { b, R, c, t, b2, firstWk, firstIso, linesYr, v, cOnce: d.cost.c.usd / d.cost.c.calls, ag: d.agreement.alphas[AGREE],
     L: b.lines_per_mistake, g: b.gated, iso: b.footprint.isolated_paid / b.paid, meanWrong: b.anchors.mean_wrong * R,
     totalWeeks: PH.p0 + firstWk + PH.p2 + PH.p3, dryWeeks: PH.p0 + firstWk, stopWk: firstWk * 2 };
 }
 
 function build(d) {
-  const f = figures(d), { b, c, t, b2, firstWk, linesYr, v, cOnce, ag, totalWeeks, stopWk, L, g, iso } = f;
+  const f = figures(d), { b, c, t, b2, firstWk, firstIso, linesYr, v, cOnce, ag, totalWeeks, stopWk, L, g, iso } = f;
   const mc = d.bar.min_calls;
   const out = [];
 
@@ -70,7 +70,7 @@ function build(d) {
     ["How close did the best get?", `Rulebook paid ${pct(b.paid / d.held_out_n, 1)}; ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} right; worst likely case ${pct(c.held_out.precision_lower, 2)}`, "Below the bar: not proved"],
     ["The saving", `Not known yet. It rests on the share of order lines a person reviews today, which the records can't show. ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step`, "A footprint, not proof of review. Phase 0 measures it"],
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
-    ["Trust earned on outcomes (replay)", `${int(t.passed)} paid, ${int(t.wrong)} needed correction (${pct(t.wrong / t.passed, 1)}), ${d.evidence.replay.kinds === 1 ? "all in one kind" : `in ${int(d.evidence.replay.kinds)} kinds`}, ${int(d.evidence.replay.top_order)} on one order; first kind in week ${firstWk}`, "Not proven either; expect errors in the first months"],
+    ["Trust earned on outcomes (replay)", `${int(t.passed)} paid, ${int(t.wrong)} needed correction (${pct(t.wrong / t.passed, 1)}), ${d.evidence.replay.kinds === 1 ? "all in one kind" : `in ${int(d.evidence.replay.kinds)} kinds`}, ${int(d.evidence.replay.top_order)} on one order; first kind in week ${firstWk} of the replay (ISO week ${firstIso})`, "Not proven either; expect errors in the first months"],
     ["When it pays off", `Only if a person today reviews at least <span data-out="need-low"></span> of these lines`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate (section 11)`],
     ["Pilot cost", `<span data-out="total"></span>: internal oversight, monthly blind checks on <span data-out="kinds-lab"></span> and the rulebook (my assumptions), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
     ["Return", `Repays itself in its first year after the pilot if it earns <span data-out="need"></span> of the on-paper volume`, `At your inputs, including monthly blind checks on <span data-out="kinds-lab"></span> (my assumption)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
@@ -119,7 +119,7 @@ function build(d) {
   <h3>Three ways to grant trust, on the same test invoices</h3>
   ${tbl("How trust was granted, and what it let through", ["Way", "Invoices paid", "Wrong", "Wrong rate", "Note"], [
     ["Trusted from day one (on paper)", int(b.paid), int(b.wrong), pct(b.wrong / b.paid, 2), "The ceiling; never tested live"],
-    ["Earned on outcomes (replay)", int(t.passed), int(t.wrong), pct(t.wrong / t.passed, 1), `First kind in week ${firstWk} of ${d.replay.weeks.length}; all ${int(t.wrong)} mistakes in one kind, ${int(d.evidence.replay.top_order)} on one order; window too short for the steady state`],
+    ["Earned on outcomes (replay)", int(t.passed), int(t.wrong), pct(t.wrong / t.passed, 1), `First kind in week ${firstWk} of the replay's ${d.replay.weeks.length} (ISO week ${firstIso}); all ${int(t.wrong)} mistakes in one kind, ${int(d.evidence.replay.top_order)} on one order; window too short for the steady state`],
     ["Trusted on agreement (simulation)", half(ag.passed_median), half(ag.wrong_median), `about ${pct(ag.wrong_median / ag.passed_median, 2)}`, `Reviewers copy ${Math.round(+AGREE * 10)} in 10; medians of ${SIM_RUNS} runs; assumed behaviour, not a study of people`],
   ])}
   ${bars("Wrong payments let through", [["Earned on outcomes", t.wrong, int(t.wrong)], ["Trusted on agreement (simulation, assumed behaviour)", ag.wrong_median, half(ag.wrong_median), true]])}
@@ -173,7 +173,7 @@ function build(d) {
 
   const ph = [
     ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget"],
-    ["1 Practice mode", `About ${firstWk} (the replay's first kind qualified in week ${firstWk}); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
+    ["1 Practice mode", `About ${firstWk} (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}; that kind was switched off again later, so this length rests on a promotion later withdrawn); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
     ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind spot-checks run monthly.", "G3: results review; the wrong-payment budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
   ];
@@ -263,7 +263,7 @@ function build(d) {
     ["What it assumes", "Trust from day one: a ceiling, not a forecast"],
   ], "num")}
   ${bars(`Order lines paid without a person in the same ${b.months} months`, [["On paper (trusted from day one)", b.paid, int(b.paid)], ["Earned in the replay", g.passed, `${int(g.passed)} (${pct(g.earned_share, 1)})`, true]])}
-  <p class="small">In the replay, trust began only in week ${firstWk}, so the window shows the slow start, not the steady state. I do not estimate the steady state.</p>
+  <p class="small">In the replay, trust began only in week ${firstWk} of the replay (ISO week ${firstIso}), so the window shows the slow start, not the steady state. I do not estimate the steady state.</p>
   <h3>For the executive decision: return on the pilot, by scenario</h3>
   <p>How much of the on-paper volume a company would earn the right to pay is what the pilot finds out. So the table shows scenarios, not a forecast.</p>
   ${tbl("Error rate used for the scenarios", ["Source", "Wrong rate"], [
