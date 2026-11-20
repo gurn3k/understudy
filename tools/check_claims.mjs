@@ -56,6 +56,7 @@ const FORBIDDEN = [
   [/too few to tell/i, "it was about as accurate as the rulebook on what it paid, paying far fewer", "ADR 0022"],
   [/say, 95%/i, "an unexplained example threshold", "ADR 0022"],
   [/Safety and controls \(M1|answer M1 to M8/i, "M requirements are pass/fail, not scored", "ADR 0025"],
+  [/as the replay (did|does)\b|which took \d+ weeks in the replay|since Phase 2 began|looked 330 times/i, "the plan and the gate the request now rules out (batch 3 ruling)", "ADR 0025"],
   [/mostly from one kind/i, "all of the replay's mistakes were in one kind", "ADR 0022"],
   [/Trigger a switch-off/i, "the switch-off is automatic: confirm or override it", "ADR 0025"],
   [/wrong[- ]payment budget/i, "say the correction budget", "ADR 0025"],
@@ -152,14 +153,14 @@ const REQUIRED = {
 };
 // The pilot request's controls (ADR 0025), from data.json's "controls" block.
 const K = D.controls;
-REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)} times`],
+REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.gate_looks)} times across ${n0(K.gate_kinds)} kinds`],
   ["first promotion's worst likely case", pc(K.promotions[0].lower, 3)], ["second promotion's worst likely case", pc(K.promotions[1].lower, 3)],
   ["early pass by chance", "an early pass by chance"], ["borderline kind on its best week", "a borderline kind passing on its best week"],
-  ["per-order cap, a lesson not a tested control", "not a tested control"],
+  ["per-order cap, a lesson not a tested control", `This is a lesson from the replay, where ${n0(E.replay.top_order)} of the ${n0(E.replay.wrong)} mistakes were on one order, not a tested control`],
   ["switch-off: tolerated upper end", pc(K.tolerated_upper, 2)], ["switch-off: power on its window", pc(K.power_window, 0)],
   ["switch-off test named", "two-sided 95% Wilson interval"], ["settled defined", "A call is settled once"], ["arrival order", "in the order they arrived"],
   ["promoted then switched off", `${n0(K.demotions[0].recent[0])} of ${n0(K.demotions[0].recent[1])}`],
-  ["blind checks mandatory", "M9"], ["blind-check power at the sized window", pc(B.blind.power, 0)], ["blind-check power at 400 lines", pc(K.power_400, 0)],
+  ["blind checks mandatory", "Check a sample of the lines each kind paid on its own blind"], ["blind-check power at the sized window", pc(B.blind.power, 0)], ["blind-check power at 400 lines", pc(K.power_400, 0)],
   ["two outcome streams", "two outcome streams"], ["sampled by order", "drawn as whole purchase orders"],
   ["calls needed allowing for orders, no mistakes", `about ${n0(K.clustered_calls[0].clustered)}`], ["intervals allow for orders", "cluster-robust at order level"],
   ["supplier-level design effect", `about ${n0(E.rulebook_by_vendor.deff)} across ${n0(E.rulebook_by_vendor.vendors)} suppliers`],
@@ -169,7 +170,32 @@ REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)}
   ["RACI: switch-off row renamed", "Confirm or override an automatic switch-off"], ["RACI: writing row", "Write or regenerate a rulebook version"],
   ["RACI: AP team lead", "Accounts-payable team lead"], ["RACI: control owner", "Finance Controller or Internal Control"],
   ["Gate 4 success box", "Success at Gate 4"], ["budget in count and value", "two parts, count and value"],
-  ["default count budget breached in the replay", `${n0(D.replay.totals.wrong)} of ${n0(D.replay.totals.passed)} (${pc(D.replay.totals.wrong / D.replay.totals.passed, 1)})`]);
+  ["default count budget breached in the replay", `the replay had ${n0(D.replay.totals.wrong)} (${pc(D.replay.totals.wrong / D.replay.totals.passed, 1)}), so it would have been exceeded`]);
+// What each default does on the study's data (the batch 3 ruling), each default with its label, and the quarterly
+// blind-check sensitivity beside the decision.
+const DF = K.defaults, runYrQ = 8 * 52 * 40 + DF.blind_quarter_windows * ((B.blind.n * 5) / 60) * 40;
+const needNetQ = (linesYr / B.lines_per_mistake.gated_cautious * 100 + runYrQ) / (linesYr * cReview);
+const qTxt = needNetQ > 1 ? "still doesn't pay" : `needs ${pc(needNetQ, 1)}`;
+REQUIRED.rfp.push(
+  ["M2 default, labelled", `this default of mine: its worst likely case, allowing for orders, at or above ${pc(DF.margin, 1)}`],
+  ["M2 pass mark", "at or below 5%"], ["M2 default on the replay", K.m2_default.promotions === 0 ? "would not have promoted any kind" : "would have come in"],
+  ["calls at M2's default, allowing for orders", `about ${n0(K.clustered_calls[0].margin_clustered)}`],
+  ["M12 default, labelled", "(my default; the issuer sets the number at Gate 1)"], ["M12 release", "the order's later lines go to a person"],
+  ["M12 effect on the replay", `from ${n0(D.replay.totals.passed)} to ${n0(K.order_cap.passed)} and mistakes from ${n0(D.replay.totals.wrong)} to ${n0(K.order_cap.wrong)}`],
+  ["settled default, labelled", `${DF.settle_days} days have passed (my default`], ["settled re-scoring", "the call is re-scored"],
+  ["settled: share corrected within the default", `${pc(K.settle.within[String(DF.settle_days)], 0)} were corrected within ${DF.settle_days} days`],
+  ["M3 second test defined", "of its error rate, on every settled call it has paid on its own since promotion"],
+  ["M3 second test on 1,000 calls", `at ${n0(K.second_test[0].fires_1000)} in 1,000`],
+  ["M9 window in lines with a ceiling", "no longer than a calendar quarter"], ["kinds that reach a full monthly window", `reach ${n0(B.blind.n)} lines a month`],
+  ["the replay's first kind a month", `pays about ${n0(K.first_kind_month)}`],
+  ["fixed count budget", "a fixed count"], ["the replay's count budget", `the count would have been ${n0(K.budget_count_replay)}`],
+  ["quarterly sensitivity in section 1", needNetQ > 1 ? "With quarterly blind-check windows instead of monthly: still not" : `With quarterly blind-check windows instead of monthly: at ${pc(needNetQ, 1)}`],
+  ["the ask funds the measurements", "approve Phase 0 to measure the inputs that decide it"], ["Gate 1 money test", "give a positive net after running costs"],
+  ["M11 built by the issuer", "the issuer, not the proposer, builds"],
+);
+REQUIRED.q9.push(["quarterly sensitivity in the readout", `With quarterly blind-check windows instead of monthly: ${qTxt}`],
+  ["Q9: a rule that holds under weekly looks", "by a rule that holds when checked every week"], ["Q9: blind checks", "Check a sample of what it pays on its own, blind"],
+  ["Q9: per-order cap", "Cap how many lines of one order it pays on its own"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);
