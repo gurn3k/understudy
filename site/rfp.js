@@ -372,7 +372,7 @@ function build(d) {
     ["Length", `${fill("Page limit set at issue, e.g. 20 pages")}, not counting CVs, references and certificates`],
     ["Questions", `In writing only, to ${fill("contact role and address set at issue")}, by Questions close (T + ${TT[1][1]} weeks). Answers go to every proposer at once (T + ${TT[2][1]}), without saying who asked. No other contact with the issuer's staff about this request before the award.`],
     ["Signature", "Signed by a person with authority to commit the proposer, naming the legal entity that would contract"],
-  ])}
+  ], "fit")}
   <h3>What a response contains</h3>
   ${list(["Approach, mapped to the requirements.", "How it groups invoices into kinds, and why: each kind needs enough volume to prove the bar (section 3), and lines alike enough to be trusted together.","Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan.", "Answers to the commercial terms below, row by row."])}
   <h3>Evaluation criteria</h3>
@@ -384,7 +384,7 @@ function build(d) {
     ["Delivery plan and governance", "15", "The plan against the phases and gates of section 7, with named people and roles (section 8)"],
     ["Team and experience", "10", "Relevant past work and references"],
     ["Exit and portability", "5", "The exit plan and the data the company keeps (D4)"],
-  ])}
+  ], "cards")}
   <h3>Scoring scale and price formula</h3>
   <p>Each evaluator scores every criterion but cost on the scale below, alone, before the panel agrees one score per criterion. A criterion's points are its weight × score ÷ 5.</p>
   ${tbl("Scoring scale", ["Score", "Meaning"], [
@@ -403,7 +403,7 @@ function build(d) {
   <h3>Reservations</h3>
   ${list(["The issuer is not bound to award a contract, and may cancel or change this request; any change goes to every proposer at once.", "The issuer may ask shortlisted proposers to clarify, and may negotiate with one or more of them.", "Each proposer bears its own costs of responding.", "Responses are kept confidential and used only to evaluate them."])}
   <h3>Commercial terms</h3>
-  <p>The issuer completes the left column before issue; a response answers the right column for each row and states any departure. This is a model for a pilot, not a contract: the contract itself is the issuer's own.</p>
+  <p>The issuer completes what it sets before issue; a response gives what the proposer states for each term, and any departure. This is a model for a pilot, not a contract: the contract itself is the issuer's own.</p>
   ${tbl("Commercial terms", ["Term", "The issuer sets", "The proposer states"], [
     ["Pricing model", `${fill("Pricing basis set at issue, e.g. fixed price per phase")}`, "Its pricing model and every rate, priced on the cost lines of section 11, and whether any fee rises with the number of lines paid on their own"],
     ["Payment milestones", `Payment follows the work done to each gate, not the gate's result: stopping at a gate is a valid outcome. ${fill("Share of the price paid at each gate, set at issue")}`, "What it delivers at each gate, against those milestones"],
@@ -414,7 +414,7 @@ function build(d) {
     ["Data return and deletion", `On stop or at the end, the data and the call log are returned in ${fill("open format set at issue")} within ${fill("e.g. 30")} days; every copy is then deleted, including backups and sub-processors' copies, and deletion is confirmed in writing.`, "How it returns the data, deletes it and confirms the deletion (with its exit plan, D4)"],
     ["Confidentiality and start of work", "The issuer's data is confidential. No work starts before a signed contract.", "Acceptance, or any departure"],
     ["Contract", fill("The issuer's standard terms, named at issue"), "Any departure from them"],
-  ])}
+  ], "cards")}
   <p class="small">Changes to this document follow the change log in Appendix D.</p>`));
 
   out.push(sec("s13", "13", "Approvals and sign-off", `
@@ -471,7 +471,7 @@ function build(d) {
     ["Versions", "A new rulebook is a new version, signed before use (M5); a kind keeps its record only if its rules are unchanged."],
     ["Cost in the study", `About $${cOnce.toFixed(2)} to write one rulebook, at the model's API list prices on the run date; nothing per line.`],
     ["Result in the study", `It paid ${pct(b.paid / d.held_out_n, 1)} of the test lines with a worst likely case of ${pct(c.held_out.precision_lower, 2)}: below the 99% bar, not proved (section 4).`],
-  ])}`));
+  ], "fit")}`));
   return out;
 }
 
