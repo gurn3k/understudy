@@ -39,7 +39,7 @@ POST_RESULT = [
     ["fix", "The replay's last 200 calls", "ADR 0013, amendment 2", "Clarified after the replay ran: counted in arrival order, as run. A different order was considered and not adopted.", "None."],
     ["fix", "The replay's touch count", "ADR 0013, amendment 3; ADR 0017, erratum 2", "Code corrected after the replay ran: 788 became 785.", "One figure."],
     ["fix", "Agreement-gate sentences", "ADR 0017, erratum 1", "A misread list corrected after the ruling.", "Wording and two figures."],
-    ["added", "The business case and the pilot request", "ADRs 0019, 0020, 0021", "Written after the verdict, and re-based after an outside review.", "None: no verdict, bar or fixed sentence."],
+    ["added", "The business case and the pilot request", "ADRs 0019, 0020, 0021, 0025", "Written after the verdict, and re-based and tightened after outside reviews.", "None: no verdict, bar or fixed sentence."],
     ["added", "How the page words its limits", "ADRs 0022 to 0024", "Rewritten after an outside review: this table, the sensitivity checks, a supplier baseline checked after the fact, and the plain wording.", "None."],
 ]
 
@@ -234,6 +234,37 @@ def main():
     from understudy.evaluate import wilson as _wilson
     from understudy.replay import DEMOTE_WINDOW
     fires = money.switch_off_threshold(DEMOTE_WINDOW)
+    # Control defaults: my assumptions, not tested values; the page reads them from here (one source).
+    dflt = {"margin": 0.993, "consec": 3, "order_cap": 3, "settle_days": 30, "budget_share": 0.01, "blind_quarter_windows": 4}
+
+    # M2's default on the replay: worst likely case allowing for orders at or above the margin at `consec` looks in a row.
+    streak = {}
+
+    def m2_default(t, settled, w):
+        ids = [i for _, i in settled]
+        wrong_ids = {i for c, i in settled if not c}
+        ok = bool(ids) and evidence.clustered_lower(evidence.clusters(ids, wrong_ids)) >= dflt["margin"]
+        streak[t] = streak.get(t, 0) + 1 if ok else 0
+        return streak[t] >= dflt["consec"]
+    m2 = replay(held, tm, decide, promote=m2_default)
+    capped = replay(held, tm, decide, order_cap=dflt["order_cap"])
+
+    def calls_at(bar, errors):
+        n = errors + 1
+        while wilson(n - errors, n)[0] < bar:
+            n += 1
+        return n
+
+    # M3's second test: the lower end of the error interval on calls paid alone since promotion rises above the upper
+    # end of the error interval the kind was promoted on. Errors at which it fires, on 200 and on 1,000 calls.
+    def second_test(k, n, calls):
+        up = 1 - wilson(k, n)[0]
+        return next(e for e in range(calls + 1) if 1 - wilson(calls - e, calls)[1] > up)
+
+    lags = evidence.settle_lags(iter_jsonl(DATA / "cases.jsonl"), set(paid_ids))
+    per_kind = Counter(case_type(r) for r in paid)
+    first_kind = next(e["type"] for e in again["events"] if e["event"] == "promoted")
+    first_kind_month = per_kind[first_kind] / business["months"]
     controls = {
         "window": DEMOTE_WINDOW, "fires_at": fires,
         "tolerated_upper": _wilson(DEMOTE_WINDOW - (fires - 1), DEMOTE_WINDOW)[1],
@@ -244,7 +275,24 @@ def main():
         "promotions": [{**e, "lower": _wilson(*e["evidence"])[0]} for e in again["events"] if e["event"] == "promoted"],
         "demotions": [{**e, "upper": _wilson(*e["recent"])[1]} for e in again["events"] if e["event"] == "demoted"],
         "looks": sum(len(v) for v in states(again["events"]).values()), "kinds": len(states(again["events"])),
-        "clustered_calls": [{"errors": e, "calls": min_calls(e), "clustered": min_calls(e) * ev["clustering"]["deff"]} for e in range(4)],
+        "clustered_calls": [{"errors": e, "calls": min_calls(e), "clustered": min_calls(e) * ev["clustering"]["deff"],
+                             "margin_calls": calls_at(dflt["margin"], e), "margin_clustered": calls_at(dflt["margin"], e) * ev["clustering"]["deff"]}
+                            for e in range(4)],
+        "defaults": dflt,
+        # Weekly looks the gate itself took: shadow-mode kind-weeks with at least one settled call.
+        "gate_looks": again["looks"], "gate_kinds": again["looked_types"],
+        "m2_default": {"promotions": sum(1 for e in m2["events"] if e["event"] == "promoted"), "passed": m2["totals"]["passed"],
+                       "wrong": m2["totals"]["wrong"], "first": m2["first_promotion"]},
+        "order_cap": {"passed": capped["totals"]["passed"], "wrong": capped["totals"]["wrong"]},
+        "budget_count_replay": int(dflt["budget_share"] * again["totals"]["passed"]),
+        "second_test": [{"week": e["week"], "evidence": e["evidence"], "err_upper": 1 - wilson(*e["evidence"])[0],
+                         "fires_200": second_test(*e["evidence"], 200), "fires_1000": second_test(*e["evidence"], 1000)}
+                        for e in again["events"] if e["event"] == "promoted"],
+        "settle": {"lines": len(lags), "median_days": statistics.median(lags) if lags else None,
+                   "within": {str(d): (sum(1 for x in lags if x <= d) / len(lags)) if lags else None for d in (30, 60, 90)}},
+        "kinds_paid": len(per_kind), "kinds_month_full": sum(1 for v in per_kind.values() if v / business["months"] >= blind_n),
+        "first_kind_month": first_kind_month, "power_first_kind_month": money.switch_off_power(int(first_kind_month), 0.02),
+        "kind_months": sorted((v / business["months"] for v in per_kind.values()), reverse=True),
     }
 
     pe_rate = sum(1 for r in held if r["straight_through"]) / len(held)

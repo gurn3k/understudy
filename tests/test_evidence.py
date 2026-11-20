@@ -78,3 +78,12 @@ class Replay(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Settling(unittest.TestCase):
+    def test_lag_from_clearing_to_first_later_correction(self):
+        from understudy.triage import CLR, IR
+        evs = [ev(IR, "2018-06-01T10:00:00+00:00"), ev(CLR, "2018-06-05T10:00:00+00:00"),
+               ev("Change Price", "2018-07-15T10:00:00+00:00"), ev("Change Price", "2018-08-30T10:00:00+00:00")]
+        cases = [{"id": "1_00001", "events": evs}, {"id": "2_00001", "events": evs[:2]}, {"id": "3_00001", "events": evs}]
+        self.assertEqual(E.settle_lags(cases, {"1_00001", "2_00001"}), [40.0])

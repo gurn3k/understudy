@@ -54,6 +54,28 @@ def label_scan(cases, paid_ids, wrong_ids):
     return {"mix": dict(mix.most_common()), "cdi_only": sorted(cdi_only), "post_clear": post, "post_clear_multi_ir": post_multi}
 
 
+def settle_lags(cases, paid_ids):
+    """Days from the clearing to the first correction after it, for paid lines that have one. Tells how long a call
+    must wait before its outcome is mostly known (the pilot request's "settled")."""
+    from datetime import datetime
+    out = []
+    for c in cases:
+        if c["id"] not in paid_ids:
+            continue
+        evs = c["events"]
+        fi = next((i for i, e in enumerate(evs) if e["act"] == IR), None)
+        if fi is None:
+            continue
+        cl = next((i for i in range(fi + 1, len(evs)) if evs[i]["act"] == CLR), None)
+        if cl is None:
+            continue
+        nxt = next((e for e in evs[cl + 1:] if is_corrective(e["act"])), None)
+        if nxt is not None:
+            d = datetime.fromisoformat(nxt["ts"]) - datetime.fromisoformat(evs[cl]["ts"])
+            out.append(d.total_seconds() / 86400)
+    return sorted(out)
+
+
 def clusters(ids, wrong_ids):
     """[(lines, wrong)] per purchase order."""
     po = defaultdict(lambda: [0, 0])

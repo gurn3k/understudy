@@ -55,10 +55,16 @@ def reviewer(alpha, catch=0.8, false_flag=0.02, seed=20261115):
     return agree
 
 
-def replay(records, timing, decide, gate="outcome", agree=None, log=None):
+def replay(records, timing, decide, gate="outcome", agree=None, log=None, promote=None, order_cap=None):
     """records: labelled held-out invoices. timing: {id: {invoice_ts, clear_ts, manual_touches}}.
     decide(record) -> bool. gate: "outcome" or "agreement" (needs agree).
-    log: optional list; each autonomous pass is appended as {id, type, week, correct}."""
+    log: optional list; each autonomous pass is appended as {id, type, week, correct}.
+
+    Optional, for the pilot request's controls (ADR 0025); left unset, the replay is exactly the pre-registered one:
+    - promote(type, settled, week) -> bool replaces the single-crossing test of the outcome gate; settled is the
+      list of (correct, line id) known by that week. It is asked once per weekly look.
+    - order_cap: at most this many lines of one purchase order are paid on their own; later lines of that order
+      go to a person, as they do today."""
     arrivals = defaultdict(list)
     for r in records:
         arrivals[week(timing[r["id"]]["invoice_ts"])].append(r)
@@ -70,6 +76,8 @@ def replay(records, timing, decide, gate="outcome", agree=None, log=None):
     agreement = defaultdict(list)     # type -> [agreed] since last reset (agreement gate)
     autonomous = defaultdict(list)    # type -> [(resolve_week, correct)] while autonomous
     promoted_week = {}
+    paid_by_order = defaultdict(int)
+    looks, looked = 0, set()          # weekly looks in shadow mode with at least one settled call
     timeline, events = [], []
     totals = {"passed": 0, "wrong": 0, "touches_removed": 0}
 
@@ -79,8 +87,11 @@ def replay(records, timing, decide, gate="outcome", agree=None, log=None):
             t = case_type(r)
             if not decide(r):
                 continue
-            item = (resolve_at[r["id"]], bool(r["straight_through"]))
+            item = (resolve_at[r["id"]], bool(r["straight_through"]), r["id"])
+            if mode[t] == "autonomous" and order_cap is not None and paid_by_order[r["id"].split("_")[0]] >= order_cap:
+                continue                    # over the cap: a person handles it
             if mode[t] == "autonomous":
+                paid_by_order[r["id"].split("_")[0]] += 1
                 autonomous[t].append(item)
                 passed += 1
                 if log is not None:
@@ -97,17 +108,24 @@ def replay(records, timing, decide, gate="outcome", agree=None, log=None):
         for t in sorted(set(evidence) | set(autonomous) | set(agreement)):
             if mode[t] == "shadow":
                 if gate == "outcome":
-                    done = [c for wk, c in evidence[t] if wk <= w]
+                    done = [c for wk, c, _ in evidence[t] if wk <= w]
                     k, n = sum(done), len(done)
+                    if n:
+                        looks += 1
+                        looked.add(t)
                 else:
                     k, n = sum(agreement[t]), len(agreement[t])
                 lo, _ = wilson(k, n)
-                if lo is not None and lo >= BAR:
+                if promote is not None and gate == "outcome":
+                    ok = promote(t, [(c, i) for wk, c, i in evidence[t] if wk <= w], w)
+                else:
+                    ok = lo is not None and lo >= BAR
+                if ok:
                     mode[t] = "autonomous"
                     promoted_week.setdefault(t, w)
                     events.append({"week": w, "type": t, "event": "promoted", "evidence": [k, n]})
             else:
-                done = [c for wk, c in autonomous[t] if wk <= w][-DEMOTE_WINDOW:]
+                done = [c for wk, c, _ in autonomous[t] if wk <= w][-DEMOTE_WINDOW:]
                 if len(done) >= DEMOTE_WINDOW:
                     _, hi = wilson(sum(done), len(done))
                     if hi < BAR:
@@ -121,4 +139,4 @@ def replay(records, timing, decide, gate="outcome", agree=None, log=None):
                          "passed": passed, "wrong": wrong, "touches_removed": removed})
     first = min(promoted_week.values()) if promoted_week else None
     return {"gate": gate, "timeline": timeline, "events": events, "totals": totals,
-            "first_promotion": first, "promoted_types": sorted(promoted_week)}
+            "first_promotion": first, "promoted_types": sorted(promoted_week), "looks": looks, "looked_types": len(looked)}

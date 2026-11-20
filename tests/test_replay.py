@@ -97,3 +97,30 @@ class AgreementGate(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ControlHooks(unittest.TestCase):
+    """Optional hooks for the pilot request's controls (ADR 0025); unset, the replay is unchanged."""
+
+    def test_promote_hook_can_require_looks_in_a_row(self):
+        from understudy.evaluate import wilson
+        recs, timing = merge(batch("x", 400, "X", 23, 24), batch("y", 100, "X", 26, 27))
+        streak = {}
+
+        def two_in_a_row(t, settled, w):
+            lo = wilson(sum(c for c, _ in settled), len(settled))[0]
+            ok = lo is not None and lo >= 0.99
+            streak[t] = streak.get(t, 0) + 1 if ok else 0
+            return streak[t] >= 2
+        self.assertEqual(replay(recs, timing, lambda r: True)["first_promotion"], "2018-W24")
+        self.assertEqual(replay(recs, timing, lambda r: True, promote=two_in_a_row)["first_promotion"], "2018-W25")
+
+    def test_order_cap_sends_later_lines_of_one_order_to_a_person(self):
+        recs, timing = merge(batch("x", 400, "X", 23, 24), batch("PO9_", 10, "X", 26, 27))
+        self.assertEqual(replay(recs, timing, lambda r: True)["totals"]["passed"], 10)
+        self.assertEqual(replay(recs, timing, lambda r: True, order_cap=3)["totals"]["passed"], 3)
+
+    def test_looks_count_shadow_weeks_with_settled_calls(self):
+        recs, timing = batch("x", 380, "X", 23, 25)
+        res = replay(recs, timing, lambda r: True)
+        self.assertEqual((res["looks"], res["looked_types"]), (1, 1))   # W23, W24: nothing settled yet; W25: one look
