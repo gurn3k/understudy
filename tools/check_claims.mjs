@@ -1,5 +1,6 @@
-// Checks that every sentence fixed in the decision records appears verbatim on the rendered page.
-// Usage: node tools/check_claims.mjs <url>   (exit 1 on any missing sentence)
+// Checks that every sentence fixed in the decision records appears verbatim on the rendered page, and that
+// wording the records rule out appears on neither the page nor the pilot request (rfp.html).
+// Usage: node tools/check_claims.mjs <url>   (exit 1 on any missing sentence or forbidden phrase)
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -38,6 +39,22 @@ if (b2 && b2.b_alone) {
   for (const k of keys) want.push({ src: "docs/adr/0018-b-follow-up-run.md", text: tpl[k].replace(/\{(\w+)\}/g, (_, x) => vals[x]) });
 }
 
+// Wording the records rule out, on either page. Each entry: a pattern, why, and where the rule comes from.
+// "Safe" is allowed only in the page's question, "which invoices are safe to pay": a question, not a claim.
+const FORBIDDEN = [
+  [/\bsafe(r|ly)?\b(?<!invoices are safe)/i, "safe/safer/safely as a claim (the replay shows trust earned on outcomes, not safety)", "ADR 0017, Don't claim; ADR 0022"],
+  [/\d+ mistakes short/i, "near-miss framing; say not proven, with the worst likely case", "ADR 0022"],
+  [/\ba hair under\b|\bjust short of the proof\b/i, "near-miss framing", "ADR 0022"],
+  [/\bexcept one\b/i, "overstates the discipline; give the count of changes made after results", "ADR 0022"],
+  [/\bunseen/i, "the test months were held out, but not unseen in every sense (look-ahead)", "ADR 0022"],
+  [/only what was known|facts known then|known at that moment/i, "ignores the look-ahead in the inputs", "ADR 0022"],
+  [/made fewer wrong payments/i, "coverage artefact: it paid only what the rulebook also paid", "ADR 0023"],
+  [/most of the 15\b/i, "all 15 replay mistakes were in one kind", "ADR 0022"],
+  [/could not measure by how much/i, "the floor is measured: give it", "ADR 0022"],
+  [/too few to tell/i, "it was about as accurate as the rulebook on what it paid, paying far fewer", "ADR 0022"],
+  [/say, 95%/i, "an unexplained example threshold", "ADR 0022"],
+  [/the safer way|trust earned safely/i, "the replay is not shown to be safer", "ADR 0017, Don't claim"],
+];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
 const proc = spawn(CHROME, ["--headless=new", "--disable-gpu", `--remote-debugging-port=${port}`, `--user-data-dir=${join(tmpdir(), "us-claims")}`, "about:blank"], { stdio: "ignore" });
@@ -56,28 +73,71 @@ const send = (method, params = {}) => new Promise((r) => { const i = ++id; pendi
 await send("Page.enable");
 await send("Network.enable");
 await send("Network.setCacheDisabled", { cacheDisabled: true });
-await send("Page.navigate", { url });
-let loaded = false;
-for (let i = 0; i < 120 && !loaded; i++) {
-  await sleep(250);
-  const r = await send("Runtime.evaluate", { expression: "!document.querySelector('[data-loading]') && !!document.querySelector('main section')", returnByValue: true });
-  loaded = r.result.result.value;
+async function pageText(u) {
+  await send("Page.navigate", { url: u });
+  let loaded = false;
+  for (let i = 0; i < 120 && !loaded; i++) {
+    await sleep(250);
+    const r = await send("Runtime.evaluate", { expression: "!document.querySelector('[data-loading]') && !!document.querySelector('main section')", returnByValue: true });
+    loaded = r.result.result.value;
+  }
+  if (!loaded) return null;
+  await sleep(300);
+  const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '' })", returnByValue: true });
+  return JSON.parse(res.result.result.value || "{}");
 }
-if (!loaded) {
+const pageAll = await pageText(url), rfpAll = await pageText(new URL("rfp.html", url).href);
+const texts = { page: pageAll && pageAll.main, rfp: rfpAll && rfpAll.main };
+if (!pageAll || !rfpAll) {
   console.log("PAGE DID NOT LOAD within 30 s: no sentences checked");
   ws.close();
   proc.kill();
   process.exit(2);
 }
-const res = await send("Runtime.evaluate", { expression: "document.querySelector('main').textContent", returnByValue: true });
 ws.close();
 proc.kill();
 
 const norm = (s) => s.replace(/\s+/g, " ").replace(/[‘’]/g, "'").trim();
-const page = norm(res.result.result.value || "");
+const page = norm(texts.page);
 let missing = 0;
 for (const w of want) {
   if (!page.includes(norm(w.text))) { missing++; console.log(`MISSING (${w.src}): ${w.text}`); }
 }
 console.log(`${want.length - missing}/${want.length} fixed sentences found on the page`);
-process.exit(missing ? 1 : 0);
+let banned = 0;
+for (const [name, t] of Object.entries(texts)) {
+  const text = norm(t);
+  for (const [re, why, src] of FORBIDDEN) {
+    const g = new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g");
+    for (const m of text.matchAll(g)) {
+      banned++;
+      console.log(`FORBIDDEN on ${name} (${src}): "${text.slice(Math.max(0, m.index - 50), m.index + m[0].length + 30)}" (${why})`);
+    }
+  }
+}
+console.log(`${FORBIDDEN.length} forbidden patterns checked on the page and rfp.html: ${banned} found`);
+
+// Required figures: the business case (Q9) and the pilot request must each carry the key figures, computed here
+// from site/data.json the same way the pages format them, so the two parts can't drift apart or drop a qualifier.
+const D = JSON.parse(read("site/data.json")), B = D.business, E = D.evidence, chosen = D.policies.find((p) => p.chosen);
+const pc = (x, dp) => (x * 100).toFixed(dp) + "%", n0 = (x) => Math.round(x).toLocaleString("en-US");
+const cReview = (5 / 60) * 40, needLow = 100 / (B.lines_per_mistake.gated_cautious * cReview); // the calculators' defaults
+const REQUIRED = {
+  q9: [["lines it would have paid", n0(B.paid)], ["lines that needed a correction", n0(B.wrong)], ["worst likely case", pc(chosen.held_out.precision_lower, 2)],
+    ["worst likely case allowing for orders", pc(E.clustering.clustered_lower, 1)], ["paying every invoice", pc(D.bar.pass_everything.full.precision[0] / D.bar.pass_everything.full.precision[1], 2)],
+    ["replay lines paid", n0(D.replay.totals.passed)], ["earned share in the replay", pc(B.gated.earned_share, 1)], ["share reviewed needed, cautious end", pc(needLow, 1)]],
+  rfp: [["lines it would have paid", n0(B.paid)], ["lines that needed a correction", n0(B.wrong)], ["worst likely case", pc(chosen.held_out.precision_lower, 2)],
+    ["worst likely case allowing for orders", pc(E.clustering.clustered_lower, 2)], ["label moved: post-clearing corrections", pc(E.sensitivity.post_clear_lower, 2)],
+    ["replay lines paid", n0(D.replay.totals.passed)], ["earned share in the replay", pc(B.gated.earned_share, 1)], ["share reviewed needed, cautious end", pc(needLow, 1)],
+    ["blind-check lines a kind a window", n0(B.blind.n)], ["supplier whitelist to beat, worst likely case", pc(E.vendor.rows.find((r) => r.key === E.vendor.picked).lower, 2)]],
+};
+let absent = 0, nreq = 0;
+for (const [where, list] of Object.entries(REQUIRED)) {
+  const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);
+  for (const [label, fig] of list) {
+    nreq++;
+    if (!text.includes(fig)) { absent++; console.log(`REQUIRED FIGURE MISSING on ${where === "q9" ? "Q9" : "rfp.html"}: ${label} (${fig})`); }
+  }
+}
+console.log(`${nreq - absent}/${nreq} required figures found in Q9 and rfp.html`);
+process.exit(missing || banned || absent ? 1 : 0);
