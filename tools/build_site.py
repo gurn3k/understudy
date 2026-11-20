@@ -28,8 +28,10 @@ KEYS = ("precision", "coverage", "precision_lower")
 
 
 # Changes made after a held-out result was known, one per decision record or amendment (ADR 0022).
-# kind: rule (changed a rule), run (added a run), lookahead (disclosed a look-ahead), fix (corrected), added (written after).
+# kind: bar (moved the bar), rule (changed a rule), run (added a run), lookahead (disclosed a look-ahead), fix (corrected),
+# added (written after). The bar row's base rate is filled in main() from the test months.
 POST_RESULT = [
+    ["bar", "The trust bar", "ADR 0010", "Raised from 90% to 99% after the test months' base rate ({base}) showed a do-nothing rule would pass; before any contender ran.", "A stricter bar; no contender had run."],
     ["rule", "How the approaches are compared", "ADR 0015", "Replaced after the first rulebook's test result was known, before the other contenders ran.", "None: the verdict is shown under both rules, and they agree."],
     ["run", "A second run of Claude checking each invoice", "ADR 0018", "Run on 10,000 new invoices after the first sample proved too small; prompt, model and settings unchanged.", "None: not proven, as before."],
     ["lookahead", "Which decision to study", "ADR 0006, amendment 2", "Found after all runs: how rule-like each decision is was scored on the test months, so test outcomes helped choose invoices as the subject.", "Not rerun. A look-ahead in the choice of subject, not in any contender's inputs."],
@@ -225,10 +227,11 @@ def main():
         "sweep": sweep["cells"] if sweep else None,
     }
 
+    pe_rate = sum(1 for r in held if r["straight_through"]) / len(held)
     data = {
         "built": time.strftime("%Y-%m-%d"),
         "evidence": ev,
-        "post_result": POST_RESULT,
+        "post_result": [[k, w, r, h.format(base=f"{pe_rate:.1%}"), e] for k, w, r, h, e in POST_RESULT],
         "business": business,
         "source": {"name": "BPI Challenge 2019", "licence": "CC BY 4.0",
                    "doi": "10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1"},
