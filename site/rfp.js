@@ -15,6 +15,9 @@ const fill = (t) => `<span class="blank" title="To be completed by the adopting 
 const PH = Calc.PH; // phase weeks, shared with the calculator (calc.js)
 const OVERSIGHT_H = Calc.DEF.oh, DEF_MIN = Calc.DEF.min, DEF_RATE = Calc.DEF.rate; // input defaults: my assumptions
 const DEF_FIX = Calc.DEF.fix, DEF_LOST = Calc.DEF.lost, WINDOWS_YR = Calc.WINDOWS_YR;
+/* Control defaults (ADR 0025): my assumptions, not tested values; the issuer sets its own at Gate 1. */
+const MARGIN = 0.993, CONSEC = 3; // promotion: worst likely case, allowing for orders, at or above this at this many weekly looks in a row
+const ORDER_CAP = 3; // lines of one purchase order autonomy may pay before a person sees one
 const AGREE = "0.9", SIM_RUNS = 20; // the simulation shown: reviewers copy this share; runs per ADR 0017
 const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
 /* Rows of the return table: none earned, the replay's observed share (a truncated window), then the scenarios. */
@@ -41,7 +44,10 @@ function figures(d) {
 
 function build(d) {
   const f = figures(d), { b, c, t, b2, firstWk, firstIso, linesYr, v, cOnce, ag, totalWeeks, stopWk, L, g, iso } = f;
-  const mc = d.bar.min_calls;
+  const mc = d.bar.min_calls, ctl = d.controls, er = d.evidence.replay;
+  const wkN = (w) => d.replay.weeks.indexOf(w) + 1, isoN = (w) => Number(w.split("-W")[1]);
+  const wkL = (w) => `week ${wkN(w)} of the replay (ISO week ${isoN(w)})`;
+  const [pr1, pr2] = ctl.promotions;
   const out = [];
 
   /* Document control and 1. summary */
@@ -103,7 +109,7 @@ function build(d) {
     "<strong>O4.</strong> Leave a complete audit trail of every call and every outcome.",
   ])}
   <h3>Acceptance</h3>
-  <p>A kind of invoice may be paid without a check only when the worst likely case of its settled calls (those it would have paid) reaches 99%. In practice that means:</p>
+  <p>A kind of invoice may be paid without a check only when the worst likely case of its settled calls (those it would have paid) reaches 99%, by a promotion rule that stays valid when it is checked every week (requirement M2). In practice that means at least:</p>
   ${tbl("Settled calls a kind needs before it is trusted", ["Mistakes among them", "Calls needed, at least"], mc.map((m) => [word(m.errors), int(m.calls)]), "num")}
   <p>The pilot as a whole is accepted when the Gate 4 review (section 7) is signed.</p>`));
 
@@ -128,6 +134,7 @@ function build(d) {
   ${tbl("What the evidence can and cannot carry", ["Limit", "What it means for a proposal"], [
     ["Look-ahead", `The learning months' rates include outcomes that landed after the test began, and test outcomes helped choose invoices as the subject. A live system would not have either. Direction of the effect: not established.`],
     ["Forking paths", `${int(d.post_result.length)} changes were made after a test result was known (listed in the main report's Method section), including a new comparison rule and a second run.`],
+    ["Repeated looks", `The replay's gate looked ${int(ctl.looks)} times (${int(ctl.kinds)} kinds × ${int(d.replay.weeks.length)} weeks), and both promotions came the first time a worst likely case crossed 99% (${pct(pr1.lower, 3)} and ${pct(pr2.lower, 3)}): an early pass by chance (${wkL(pr1.week)}); a borderline kind passing on its best week (${wkL(pr2.week)}). A test repeated every week passes by chance more often than once, so M2 asks for a margin or a sequential method.`],
     ["Clustering", `Invoices on the same order fail together. Allowing for that, the rulebook's worst likely case falls from ${pct(c.held_out.precision_lower, 2)} to ${pct(d.evidence.clustering.clustered_lower, 2)}. Intervals in a proposal must allow for it.`],
     ["Label", `"Needed a correction" is broad. Moving it one way at a time does not prove the bar: dropping delivery-indicator-only corrections gives ${pct(d.evidence.sensitivity.drop_cdi.clustered_lower, 2)} allowing for orders; counting corrections after clearing gives ${pct(d.evidence.sensitivity.post_clear_lower, 2)}.`],
   ], "fit")}
@@ -155,13 +162,14 @@ function build(d) {
   <p>A proposer shall state, for each requirement, how the pilot will meet it and how the test will be run.</p>
   ${tbl("Mandatory requirements", ["Ref", "The pilot shall", "Test"], [
     ["M1", "Start in practice mode on every kind of invoice, with people handling every invoice.", "No invoice is paid on the rulebook's say-so before Gate 2."],
-    ["M2", "Promote a kind of invoice only on its real outcomes, never on how often reviewers agree.", "Each promotion record cites outcome counts."],
-    ["M3", "Switch a kind off automatically when the best likely case (95% upper bound) of its last 200 settled calls that it paid on its own falls below 99%.", "A seeded failure switches the kind off."],
+    ["M2", `Promote a kind of invoice only on its real outcomes, never on how often reviewers agree, by a rule that stays valid when it is checked every week: a named sequential method (a confidence sequence or alpha spending), or this default of mine: its worst likely case, allowing for orders, at or above ${pct(MARGIN, 1)} at ${word(CONSEC).toLowerCase()} weekly looks in a row.`, "Each promotion record cites outcome counts and every look taken. Run on the issuer's earlier months, the rule shows how often it would have promoted a kind that later failed."],
+    ["M3", "Switch a kind off automatically when the best likely case (95% upper bound) of its last 200 settled calls that it paid on its own falls below 99%. After promotion, also switch it off when its rate of lines needing a correction, among those paid on its own, rises above the practice-mode interval it was promoted on.", "A seeded failure switches the kind off; so does a seeded rise above the practice-mode interval."],
     ["M4", "Log every call, its inputs and its outcome, and keep the log for the retention period in section 10.", "An auditor can trace any paid invoice back to its call."],
     ["M5", "Have a named person read and sign off each rulebook version before use, under change control.", "Every version in use has a signed record."],
     ["M6", "Count corrections made after payment as mistakes.", "The outcome feed includes post-payment corrections."],
     ["M7", "Confirm in writing, before Gate 1, the 99% bar, the cost of a late fix, the wrong-payment budget and any value limit.", "A signed Gate 1 record exists."],
     ["M8", "Provide a kill switch that the Pilot Owner and the Finance Controller can use without the supplier.", "Tested in Phase 0."],
+    ["M12", `Pay at most ${word(ORDER_CAP).toLowerCase()} lines of one purchase order on their own before a person sees one of them (my default; the issuer sets the number at Gate 1). This is a lesson from the replay, where ${int(er.top_order)} of the ${int(er.wrong)} mistakes were on one order, not a tested control.`, "A seeded order with more lines than the cap stops at the cap."],
   ])}
   ${tbl("Desirable requirements", ["Ref", "The pilot should", "Why"], [
     ["D1", "Set a value limit above which a person always checks.", "Most of the mistakes' value sat in the largest invoices in the study. A proposal I did not test."],

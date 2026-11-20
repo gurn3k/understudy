@@ -145,6 +145,12 @@ const REQUIRED = {
     ["blind-check lines a kind a window", n0(B.blind.n)], ["supplier whitelist to beat, worst likely case", pc(E.vendor.rows.find((r) => r.key === E.vendor.picked).lower, 2)],
     needNet > 1 ? ["decision at the defaults", "Not at these inputs"] : ["decision at the defaults", pc(needNet, 1)]],
 };
+// The pilot request's controls (ADR 0025), from data.json's "controls" block.
+const K = D.controls;
+REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)} times`],
+  ["first promotion's worst likely case", pc(K.promotions[0].lower, 3)], ["second promotion's worst likely case", pc(K.promotions[1].lower, 3)],
+  ["early pass by chance", "an early pass by chance"], ["borderline kind on its best week", "a borderline kind passing on its best week"],
+  ["per-order cap, a lesson not a tested control", "not a tested control"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);
