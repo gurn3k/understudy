@@ -118,12 +118,18 @@ function build(d) {
   <h3>Three ways to grant trust, on the same test invoices</h3>
   ${tbl("How trust was granted, and what it let through", ["Way", "Invoices paid", "Wrong", "Wrong rate", "Note"], [
     ["Trusted from day one (on paper)", int(b.paid), int(b.wrong), pct(b.wrong / b.paid, 2), "The ceiling; never tested live"],
-    ["Earned on outcomes (replay)", int(t.passed), int(t.wrong), pct(t.wrong / t.passed, 1), `First kind in week ${firstWk} of ${d.replay.weeks.length}; mostly one kind; window too short for the steady state`],
+    ["Earned on outcomes (replay)", int(t.passed), int(t.wrong), pct(t.wrong / t.passed, 1), `First kind in week ${firstWk} of ${d.replay.weeks.length}; all ${int(t.wrong)} mistakes in one kind, ${int(d.evidence.replay.top_order)} on one order; window too short for the steady state`],
     ["Trusted on agreement (simulation)", half(ag.passed_median), half(ag.wrong_median), `about ${pct(ag.wrong_median / ag.passed_median, 2)}`, `Reviewers copy ${Math.round(+AGREE * 10)} in 10; medians of ${SIM_RUNS} runs; assumed behaviour, not a study of people`],
   ])}
   ${bars("Wrong payments let through", [["Earned on outcomes", t.wrong, int(t.wrong)], ["Trusted on agreement (simulation, assumed behaviour)", ag.wrong_median, half(ag.wrong_median), true]])}
   <p>Trusting on agreement let through about ten times the wrong payments, though at a lower rate per invoice, because it paid far more. That is why requirement M2 forbids it.</p>
   <h3>Limits of the evidence</h3>
+  ${tbl("What the evidence can and cannot carry", ["Limit", "What it means for a proposal"], [
+    ["Look-ahead", `The learning months' rates include outcomes that landed after the test began, and test outcomes helped choose invoices as the subject. A live system would not have either. Direction of the effect: not established.`],
+    ["Forking paths", `${int(d.post_result.length)} changes were made after a test result was known (listed in the main report's Method section), including a new comparison rule and a second run.`],
+    ["Clustering", `Invoices on the same order fail together. Allowing for that, the rulebook's worst likely case falls from ${pct(c.held_out.precision_lower, 2)} to ${pct(d.evidence.clustering.clustered_lower, 2)}. Intervals in a proposal must allow for it.`],
+    ["Label", `"Needed a correction" is broad. Moving it one way at a time does not prove the bar: dropping delivery-indicator-only corrections gives ${pct(d.evidence.sensitivity.drop_cdi.clustered_lower, 2)} allowing for orders; counting corrections after clearing gives ${pct(d.evidence.sensitivity.post_clear_lower, 2)}.`],
+  ])}
   ${list(["One company's records, from 2018. The method carries over; the numbers are theirs.", "\"Fine\" means no one corrected the invoice before payment. Corrections after payment are not in the records, so the true share could be lower.", "The records hold no invoice text, so the AI never read an invoice document.", "The share of lines a person reviews, minutes per review and hourly cost are inputs, not measurements. The records hold logins and times, and most clearing steps in them are bulk postings."])}`));
 
   out.push(sec("s5", "5", "Assumptions, constraints and dependencies", `

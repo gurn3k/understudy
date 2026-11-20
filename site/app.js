@@ -49,7 +49,7 @@ const WORDS_USED = [
   ["Held for a person", "The cautious choice. It costs a person's time, but it never causes a wrong payment."],
   ["The 99% bar", "Of the invoices an AI pays without a check, at least 99 in 100 must turn out fine."],
   ["Worst likely case", "A short test can be lucky. Given how many invoices were checked, this is the lowest the true share of paid invoices that turn out fine is likely to be (I am 95% sure it is at least this). I judge every AI by this number, not by its average. Statisticians call it the \"lower bound\"; the highest likely value is the \"upper bound\"."],
-  ["Learning months and test months", "January to May 2018 were used to learn from. June to August 2018 were kept aside, unseen, for the test."],
+  ["Learning months and test months", "January to May 2018 were used to learn from. June to August 2018 were held out for the test: no approach saw how those invoices turned out. Some information from those months still reached the setup (a look-ahead, listed in the Method section)."],
   ["Kind of invoice", "Which department made the purchase, and whether the invoice arrived before or after the goods did."],
 ];
 const wordsBox = () => `<details class="words" open><summary>Words used on this page</summary><dl>${WORDS_USED.map(([t, x]) => `<div><dt>${esc(t)}</dt><dd>${esc(x)}</dd></div>`).join("")}</dl></details>`;
@@ -90,7 +90,7 @@ function biz(d) {
   <li><strong>Claude's rulebook</strong>: the AI writes a short set of rules once, and ordinary software applies them.</li>
   </ol>
   <p><strong>The bar.</strong> Of the invoices an approach pays without a check, at least 99 in 100 must turn out fine. A short test can be lucky, so I judged each one by its <em>worst likely case</em>: the lowest its true accuracy is likely to be, given how many invoices it handled. That worst case had to reach 99%.</p>
-  <p><strong>Keeping it honest.</strong> I locked the test invoices before any approach ran, wrote each rule down before the run it governed, except one: I changed how the approaches are compared after one result was known, so I show the verdict under both rules (they agree). I published the results that went against me. A second program recounted the records independently.</p>
+  <p><strong>Keeping it honest.</strong> I locked the test invoices before any approach ran and wrote each rule down before the run it governed. I then made ${word(d.post_result.length)} changes after a test result was known, all listed in the Method section: ${word(postCount(d, "rule"))} changed how the approaches are compared (I show the verdict under both rules; they agree), ${word(postCount(d, "run"))} added a run on new invoices, ${word(postCount(d, "lookahead"))} disclosed that information from the test months reached the setup (a look-ahead), and the rest corrected figures or added these pages. I published the results that went against me. A second program recounted the records independently.</p>
   <h3>The result</h3>
   ${summaryStrip(d)}
   <p>None of the three proved the 99% bar. The simple rule paid nothing. Claude checking each invoice paid only ${b2 ? `${int(b2.b_alone.passed)} of ${int(b2.b_alone.n)} invoices in the follow-up (${int(b2.b_alone.wrong)} wrong)` : `${int(d.b.sample.passed)} of ${int(d.sample_n)}`}, too few to prove the bar, and costs about $${bPer1k.toFixed(2)} for every 1,000 invoices, for as long as it runs. Claude's rulebook paid ${pct(c.held_out.coverage[0] / d.held_out_n, 1)} of invoices and got ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} of those right. That is not proven: its worst likely case is ${pct(c.held_out.precision_lower, 2)}, about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order, against ${pct(d.bar.pass_everything.full.precision[0] / d.bar.pass_everything.full.precision[1], 2)} for paying every invoice. The rest of this section is about the rulebook, the only approach close enough to be worth a pilot.</p>
@@ -220,6 +220,15 @@ function wireBiz(d) {
     });
     set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. Net here is before the pilot's own costs; the readout above and the pilot request count them. The rows are scenarios, not forecasts.`);
   });
+}
+
+/* ---------- Changes made after a test result was known (the study's degrees of freedom) ---------- */
+/* Rows come from data.json (post_result, written in tools/build_site.py from the decision records). */
+const postCount = (d, k) => d.post_result.filter((r) => r[0] === k).length;
+function postTable(d) {
+  return `<div class="tablewrap"><table class="score"><caption>Changes made after a test result was known (${int(d.post_result.length)})</caption><thead><tr><th scope="col">What changed</th><th scope="col">Record</th><th scope="col">When and how</th><th scope="col">Effect on results</th></tr></thead><tbody>
+  ${d.post_result.map(([, what, rec, how, eff]) => `<tr><th scope="row">${esc(what)}</th><td>${esc(rec)}</td><td>${esc(how)}</td><td>${esc(eff)}</td></tr>`).join("")}
+  </tbody></table></div>`;
 }
 
 /* ---------- Q1: the answer ---------- */
@@ -547,7 +556,7 @@ function q3(d) {
   const bvc = d.b_vs_c, bLow = d.b.lower, bic = d.evidence.b_in_c;
   const p1 = d.policies.find((p) => p.policy === 1);
   const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
-  const plain = `<p>Each AI saw only what was known when an invoice arrived, plus how often similar invoices had gone through cleanly from January to May 2018. Then it made its call on each June to August invoice. Pick an approach to see where 1,000 typical invoices end up.</p>
+  const plain = `<p>Each AI saw each invoice's facts as they stood when it arrived, plus how often similar invoices had gone through cleanly from January to May 2018. Those rates include some outcomes that only became known after the test months began, a look-ahead a live system would not have (Method). Then it made its call on each June to August invoice. Pick an approach to see where 1,000 typical invoices end up.</p>
   ${explorer(d)}
   <ul>
   <li><strong>The simple rule</strong> pays a kind of invoice only if that kind had a clean enough record in earlier months to clear the bar. No kind did, so it paid nothing.</li>
@@ -564,7 +573,7 @@ function q3(d) {
   </ul>
   <div class="tablewrap"><table><caption>All ${int(d.held_out_n)} test invoices</caption><thead><tr><th>Approach</th><th>About it</th><th>Paid on its own</th><th>Fine when paid</th><th>Worst likely case</th><th>Proved 99%?</th></tr></thead><tbody>
   ${row("Simple rule", `${int(d.a.cells)} kinds of invoice qualified`, "none", ratio(a.coverage, 1), "none", false)}${pols}</tbody></table></div>
-  <p class="small">One of the three policies (policy ${esc(p1.policy)}) does clear the bar on held-out invoices (lower bound ${pct(p1.held_out.precision_lower, 2)}), but its result had been seen before the rule was rewritten and the earlier-month selection did not choose it, so it does not count towards the verdict; all three are shown.</p>
+  <p class="small">One of the three policies (policy ${esc(p1.policy)}) does clear the bar on held-out invoices (lower bound ${pct(p1.held_out.precision_lower, 2)}), but its result had been seen before the rule was rewritten and the earlier-month selection did not choose it, so it does not count towards the verdict; all three are shown. Its pass is not robust to clustering either: allowing for invoices on the same order, its lower bound is ${pct(d.evidence.policy_clustering[p1.policy].clustered_lower, 2)}.</p>
   <p class="small">In plain words: rulebook ${esc(p1.policy)} passed, but I had already seen its score before the final comparison rule was set, and it was not the one picked in advance. Counting it would be choosing the winner after the race, so it is shown but does not count.</p>
   <h3>Checking each invoice against the rulebook, on the same ${int(d.sample_n)} invoices</h3>
   <p>Checking each invoice paid ${int(bvc.B_passed)} and was wrong ${bvc.B_errors === 1 ? "once" : int(bvc.B_errors) + " times"} (worst likely case ${pct(bLow, 1)}). The rulebook paid ${int(bvc.C_passed)} and was wrong ${int(bvc.C_errors)} times. Looking only at mistakes one made and the other avoided: ${int(bvc.C_only_errors)} were the rulebook's and ${int(bvc.B_only_errors)} were the other's. The rule I wrote down in advance tests that gap (p = ${bvc.p_B_better.toFixed(3)}), but the test is ill-posed here: checking each invoice paid only invoices the rulebook also paid${bic.also_c === bic.b_passed ? "" : ` (${int(bic.also_c)} of its ${int(bic.b_passed)})`}, so every mistake "only the rulebook made" is on an invoice the other simply held. On the ${int(bic.b_passed)} invoices both paid, ${int(bvc.B_errors)} needed fixing for checking each invoice and ${int(bic.c_on_b)} for the rulebook. The gap measures how much less it paid, not how much more accurate it was: it added cost, not accuracy. Under the rule, that is not enough to win, so cost decides: the rulebook.</p>
@@ -788,7 +797,7 @@ function q8(d) {
   const card = (name, wrong, cost, watch) => `<div><h4>${name}</h4><p><strong>How it goes wrong:</strong> ${wrong}</p><p><strong>Cost to run:</strong> ${cost}</p><p><strong>Watch:</strong></p><ul>${watch.map((w) => `<li>${w}</li>`).join("")}</ul></div>`;
   const plain = `<p>Q3 showed what each approach did. This section shows how each one handled an invoice, why all three were judged by the same measures, and what a company should watch if it ran one for real.</p>
   <h3>How each approach handled an invoice</h3>
-  <p>All three decided at the same moment: when the invoice arrived. Each could only pay it without a check or hold it for a person, and each saw only what was known at that moment.</p>
+  <p>All three decided at the same moment: when the invoice arrived. Each could only pay it without a check or hold it for a person. Each saw the invoice as it stood then, plus rates from earlier months that include some later outcomes (a look-ahead; see the Method section).</p>
   <div class="tablewrap"><table class="how"><caption>The three approaches side by side</caption><thead><tr><th scope="col"><span class="vh">Question</span></th><th scope="col">Simple rule</th><th scope="col">Claude checking each invoice</th><th scope="col">Claude's rulebook</th></tr></thead><tbody>
   ${row("What it is", "A fixed checklist built from January to May records", "Claude reads each invoice's details and decides", "Claude writes a short rulebook once; ordinary software applies it")}
   ${row("What it sees", "How often each kind of invoice went through cleanly in earlier months", "The invoice's details (supplier, spend area, value, whether the goods had arrived, earlier corrections), plus how often similar invoices and the same supplier went through cleanly", "Only summary tables from earlier months, never a single invoice")}
@@ -839,7 +848,7 @@ function q8(d) {
   </ul>
   <h3>One limit on every measure</h3>
   <p>"Fine" means no one corrected the invoice before it was paid. Corrections made after payment are not in the records, so the true share could be lower than shown; this test could not measure by how much. A live system should also count corrections made after payment.</p>`;
-  const detail = `<p>Every approach decided at the first invoice receipt on an order line, using only facts known then and rates from order lines created January to May 2018. A wrong call to pay is an invoice that needed a price or quantity change, a cancellation, a debit memo, a payment block or a deletion before it was cleared.</p>
+  const detail = `<p>Every approach decided at the first invoice receipt on an order line, using the line's facts at that moment and rates from order lines created January to May 2018. Those rates include outcomes that landed after the test months began (the look-ahead in the Method limits). A wrong call to pay is an invoice that needed a price or quantity change, a cancellation, a debit memo, a payment block or a deletion before it was cleared.</p>
   <p>Cost for each invoice paid is measured cost divided by invoices paid. Checking each invoice: $${(b2 ? b2.cost.usd : d.cost.b.usd).toFixed(2)} for ${b2 ? int(b2.b_alone.n) : int(d.sample_n)} invoices, of which it paid ${b2 ? int(b2.b_alone.passed) : int(d.b.sample.passed)}. Rulebook: $${cOnce.toFixed(2)} for the picked rulebook, which paid ${int(cPaid)} test invoices.</p>
   <p>In the replay, an AI loses the right to pay alone in a kind of invoice when the best likely case (95% upper bound) of its last 200 settled calls falls below 99%.</p>`;
   return section("q8", "Q8", "How each approach works, and how you'd run it", plain, detail, [
@@ -858,8 +867,10 @@ function method(d) {
   const adrs = d.adrs.map((a) => `<li><span class="n">${esc(a.n)}</span><span class="${a.replaced_by ? "replaced" : ""}">${esc(a.title)}${a.amendments ? ` <em>${int(a.amendments)} amendment${a.amendments > 1 ? "s" : ""}</em>` : ""}${a.replaced_by ? ` <em>partly replaced by ${esc(a.replaced_by)}</em>` : ""}</span></li>`).join("");
   const body = `<p>The data is the ${esc(d.source.name)} event log (DOI ${esc(d.source.doi)}, ${esc(d.source.licence)}). The log was parsed in one pass and every total recounted by a second, independent program; both match the published counts.</p>
   <details><summary>The rules, in the order they were written</summary>
-  <p class="small">Every rule was written down before the run it governs. Rules replaced later stay on the record, struck through, with the reason in the decision record.</p>
+  <p class="small">Each rule was written down before the run it governs. Rules replaced later stay on the record, struck through, with the reason in the decision record. ${word(d.post_result.length).replace(/^./, (c) => c.toUpperCase())} changes came after a test result was known; they are listed in full below.</p>
   <ol class="adrs">${adrs}</ol></details>
+  <details open><summary>Changes made after a test result was known</summary>
+  ${postTable(d)}</details>
   <details><summary>Data checks</summary><ul>
   <li>${int(d.log.excluded.bad_date_events)} events dated outside 2017\u20132019 removed.</li>
   <li>${int(d.log.excluded.duplicate_events)} same-minute identical events collapsed; most were bulk service entries.</li>
