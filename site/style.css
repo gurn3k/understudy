@@ -416,3 +416,7 @@ table th .small { display: block; font-weight: 400; letter-spacing: 0; }
 .strip:has(+ .strip-note) { margin-bottom: 10px; }
 .strip-note { margin: 0 0 28px; font-size: 15px; color: var(--ink-2); max-width: 68ch; }
 .strip-note strong { color: var(--ink); }
+/* "If the label moved": the one-direction sensitivity box, opened by a 2px ink rule. */
+.sens { border-top: 2px solid var(--ink); margin: 28px 0 8px; padding-top: 12px; max-width: 68ch; }
+.sens-head { font: 700 13px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 8px; }
+.sens table { max-width: 32em; }

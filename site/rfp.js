@@ -99,7 +99,7 @@ function build(d) {
   ${list([
     "<strong>O1.</strong> Prove or disprove the 99% bar on the company's own invoices.",
     "<strong>O2.</strong> Measure the share of order lines a person reviews today, minutes per review and the real cost of a late fix, and replace my assumptions with them.",
-    "<strong>O3.</strong> Keep wrong payments within a budget agreed at Gate 1.",
+    "<strong>O3.</strong> Keep lines paid that need a correction within a budget agreed at Gate 1.",
     "<strong>O4.</strong> Leave a complete audit trail of every call and every outcome.",
   ])}
   <h3>Acceptance</h3>
@@ -130,7 +130,7 @@ function build(d) {
     ["Clustering", `Invoices on the same order fail together. Allowing for that, the rulebook's worst likely case falls from ${pct(c.held_out.precision_lower, 2)} to ${pct(d.evidence.clustering.clustered_lower, 2)}. Intervals in a proposal must allow for it.`],
     ["Label", `"Needed a correction" is broad. Moving it one way at a time does not prove the bar: dropping delivery-indicator-only corrections gives ${pct(d.evidence.sensitivity.drop_cdi.clustered_lower, 2)} allowing for orders; counting corrections after clearing gives ${pct(d.evidence.sensitivity.post_clear_lower, 2)}.`],
   ])}
-  ${list(["One company's records, from 2018. The method carries over; the numbers are theirs.", "\"Fine\" means no one corrected the invoice before payment. Corrections after payment are not in the records, so the true share could be lower.", "The records hold no invoice text, so the AI never read an invoice document.", "The share of lines a person reviews, minutes per review and hourly cost are inputs, not measurements. The records hold logins and times, and most clearing steps in them are bulk postings."])}`));
+  ${list(["One company's records, from 2018. The method carries over; the numbers are theirs.", `"Fine" means no one corrected the invoice before payment. Counting corrections made after clearing, which the label leaves out, lowers the rulebook's worst likely case to ${pct(d.evidence.sensitivity.post_clear_lower, 2)}; corrections outside these records can't be counted.`, "The records hold no invoice text, so the AI never read an invoice document.", "The share of lines a person reviews, minutes per review and hourly cost are inputs, not measurements. The records hold logins and times, and most clearing steps in them are bulk postings."])}`));
 
   out.push(sec("s5", "5", "Assumptions, constraints and dependencies", `
   <h3>Assumptions (mine; replace them with your own in Phase 0)</h3>
@@ -171,7 +171,7 @@ function build(d) {
   <p class="jump"><a href="#s14">The findings behind D1 to D4 are in section 14 &rarr;</a></p>`));
 
   const ph = [
-    ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); write the bar and the wrong-payment budget down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget"],
+    ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget"],
     ["1 Practice mode", `About ${firstWk} (the replay's first kind qualified in week ${firstWk}); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
     ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind spot-checks run monthly.", "G3: results review; the wrong-payment budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
@@ -205,7 +205,7 @@ function build(d) {
   <p>The Rulebook Owner who signs a rulebook version shall not approve its promotions (segregation of duties). The Pilot Owner reports to the sponsor at each gate.</p>`));
 
   const risks = [
-    ["R1", "A wrong payment goes out", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7", "Pilot Owner"],
+    ["R1", "A line that needs a correction is paid", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7", "Pilot Owner"],
     ["R2", "A late fix costs more than the break-even", "Medium", "High", `Cautious break-even: ${int(L.gated_cautious)} lines per mistake × share reviewed × cost of a review (section 11)`, "Measure it in Phase 0; stop rule", "Finance Controller"],
     ["R3", "Mistakes concentrate in one kind of invoice", "Medium", "Medium", `The replay's ${int(t.wrong)} mistakes were mostly from one kind`, "Promote kind by kind; M3", "Pilot Owner"],
     ["R4", "The rulebook goes stale", "High", "Medium", "Suppliers, prices and buying habits change", "M5; scheduled retest and rewrite", "Rulebook Owner"],
@@ -221,7 +221,7 @@ function build(d) {
   out.push(sec("s9", "9", "Risk register", `
   <p>The ratings are my judgment, not measurements. Replace them with the company's own scale in Phase 0.</p>
   ${tbl("Risks", ["Ref", "Risk", "Likelihood", "Impact", "Evidence", "Mitigation", "Owner"], risks)}
-  <p class="small">Risks beyond wrong payments (R4 to R12) are not measured by the study. They are what I would expect a risk committee to ask about.</p>`));
+  <p class="small">Risks beyond lines paid that need a correction (R4 to R12) are not measured by the study. They are what I would expect a risk committee to ask about.</p>`));
 
   out.push(sec("s10", "10", "Controls and compliance", `
   ${list([

@@ -46,7 +46,7 @@ const WORDS_USED = [
   ["Understudy", "An AI that stands in for a person on one job, and is trusted only once it has proved itself."],
   ["Paid without a check", "The invoice goes to payment with no person looking at it. In the detail sections this is called passing it \"straight through\"."],
   ["Needed fixing", "Between the invoice arriving and being cleared for payment, someone had to correct it. This is the mistake the AI must avoid."],
-  ["Held for a person", "The cautious choice. It costs a person's time, but it never causes a wrong payment."],
+  ["Held for a person", "The cautious choice. It costs a person's time, but it never pays a line that needed a correction."],
   ["The 99% bar", "Of the invoices an AI pays without a check, at least 99 in 100 must turn out fine."],
   ["Worst likely case", "A short test can be lucky. Given how many invoices were checked, this is the lowest the true share of paid invoices that turn out fine is likely to be (I am 95% sure it is at least this). I judge every AI by this number, not by its average. Statisticians call it the \"lower bound\"; the highest likely value is the \"upper bound\"."],
   ["Learning months and test months", "January to May 2018 were used to learn from. June to August 2018 were held out for the test: no approach saw how those invoices turned out. Some information from those months still reached the setup (a look-ahead, listed in the Method section)."],
@@ -152,7 +152,7 @@ function biz(d) {
   <h3>8. Limits to keep in mind</h3>
   <ul class="plainlist">
   <li>The records are one company's, from 2018. The method carries over; the numbers are theirs.</li>
-  <li>"Fine" means no one corrected the invoice before it was paid. Corrections after payment are not in the records, so the true share could be lower than shown; this test could not measure by how much.</li>
+  <li>"Fine" means no one corrected the invoice before it was paid. Corrections made after clearing are in the records but not in the label: counting them, the rulebook's worst likely case falls to ${pct(d.evidence.sensitivity.post_clear_lower, 2)} (Q1, "If the label moved"). Corrections outside these records can't be counted.</li>
   <li>The share of lines a person reviews, minutes per review and the cost of a late fix are your inputs. The records hold logins and times, not effort, and most clearing steps in them are bulk postings.</li>
   <li>The records hold no invoice text, so the AI never read an invoice document.</li>
   </ul>
@@ -297,7 +297,8 @@ function q1(d) {
   <li><span class="name">Most it could make</span><span class="track" aria-hidden="true"><span class="fill ok" style="width:${(allowed / cWrong) * 100}%"></span></span><span class="val">${int(allowed)}</span></li>
   <li class="hit"><span class="name">What it made</span><span class="track" aria-hidden="true"><span class="fill" style="width:100%"></span></span><span class="val">${int(cWrong)}</span></li>
   </ul>
-  ${openButton("c_wrong_held_out", `See the ${int(cWrong)} invoices the rulebook paid wrongly`)}`;
+  ${openButton("c_wrong_held_out", `See the ${int(cWrong)} invoices the rulebook paid that needed a correction`)}
+  ${labelBox(d)}`;
   const detail = `<p class="headline">${esc(headline)}</p>
   <p><strong>What this means.</strong> None of the three earned trust. The simple rule never paid anything, so it never made a mistake, but it never saved any work either. Claude's rulebook paid ${pct(cn / d.held_out_n, 1)} of the test invoices without a check, and ${pct(ck / cn, 2)} of those were fine, so on average it met the bar. But its worst likely case (the "lower bound" above) is ${pct(c.held_out.precision_lower, 2)}, under 99%, so it is not proven. ${fitDrop(d)} ${clusterNote(d)}</p>
   ${boundPlot(d)}
@@ -325,6 +326,22 @@ function fitDrop(d) {
 function clusterNote(d) {
   const k = d.evidence.clustering;
   return `The bound treats each invoice as independent. ${int(k.n)} invoices sit on ${int(k.orders)} orders, and mistakes cluster on orders (design effect ${k.deff.toFixed(2)}): allowing for that, the worst likely case is ${pct(k.clustered_lower, 2)}, and resampling whole orders gives ${pct(k.boot[0], 2)} to ${pct(k.boot[1], 2)}.`;
+}
+
+/* ---------- How far the verdict moves when the label moves (ADR 0022): one direction at a time ---------- */
+function labelBox(d) {
+  const s = d.evidence.sensitivity, k = d.evidence.clustering, c = d.policies.find((p) => p.chosen), mix = d.evidence.mix;
+  const single = s.post_clear - s.post_clear_multi_ir, cap = mix["Change Approval for PO"] || 0;
+  return `<div class="sens"><p class="sens-head">If the label moved</p>
+  <p>The verdict stays as written in advance: not proven. "Needed a correction" is a broad label, so here is how far it moves when the label is changed, one way at a time.</p>
+  <ul class="plainlist">
+  <li><strong>Narrower:</strong> ${int(s.cdi_only)} of the ${int(k.wrong)} lines needed only a change to the delivery indicator. Dropping them lifts the worst likely case to ${pct(s.drop_cdi.lower, 2)} if each invoice is independent, but allowing for invoices on the same order it is ${pct(s.drop_cdi.clustered_lower, 2)}: still not proven.</li>
+  <li><strong>Wider:</strong> ${int(s.post_clear)} lines scored fine had a correction after they were cleared. Counting them all gives ${pct(s.post_clear_lower, 2)}; counting only the ${int(single)} on lines with a single invoice receipt gives ${pct(s.post_clear_single_lower, 2)}.</li>
+  </ul>
+  <div class="tablewrap"><table class="score num"><caption>What the ${int(k.wrong)} lines needed (a line can need more than one)</caption><thead><tr><th scope="col">Correction</th><th scope="col">Lines</th></tr></thead><tbody>
+  ${Object.entries(mix).map(([a, n]) => `<tr><th scope="row">${esc(a)}</th><td>${int(n)}</td></tr>`).join("")}
+  </tbody></table></div>
+  <p class="small">Every activity whose name begins "Change" or "Cancel" counts, plus debit memos, payment blocks and deletions. "Change Approval for PO" counts under that rule and appears on ${cap === 0 ? "none" : int(cap)} of these lines; a pilot should have an accounts-payable reviewer sign off the list first.</p></div>`;
 }
 
 /* ---------- Q1 summary strip and invoice journey ---------- */
@@ -405,7 +422,7 @@ function race(d) {
   const path = (c) => c.slice(0, n).map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
   const wi = (w) => d.replay.weeks.indexOf(w);
   const fa = wi(d.agreement.example_first), fr = wi(d.replay.first);
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="race-t race-d"><title id="race-t">Wrong payments added up week by week</title>
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="race-t race-d"><title id="race-t">Paid lines that needed a correction, added up week by week</title>
   <desc id="race-d">Switched on by agreement (one example run): ${int(ca[n - 1])} wrong payments by the end, first switched on in ${wk(d.agreement.example_first)}. Switched on by real results: ${int(cr[n - 1])}, first switched on in ${wk(d.replay.first)}.</desc>`;
   for (let v = 0; v <= top; v += top / 2) s += `<line class="tick" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${int(v)}</text>`;
   s += `<text x="${L}" y="${H - 8}">${esc(wk(d.replay.weeks[0]))}</text><text x="${x(n - 1)}" y="${H - 8}" text-anchor="end">${esc(wk(d.replay.weeks[n - 1]))}</text>`;
@@ -413,7 +430,7 @@ function race(d) {
   if (fa >= 0) s += `<circle class="mk agr" cx="${x(fa)}" cy="${y(ca[fa])}" r="4.5"/><text class="mk-t" x="${x(fa) + 6}" y="${y(ca[fa]) - 8}">on</text>`;
   if (fr >= 0) s += `<circle class="mk real" cx="${x(fr)}" cy="${y(cr[fr])}" r="4.5"/><text class="mk-t" x="${x(fr) + 6}" y="${y(cr[fr]) - 8}">on</text>`;
   s += `<text class="end agr" x="${x(n - 1) + 8}" y="${y(ca[n - 1]) + 5}">${int(ca[n - 1])} by agreement</text><text class="end real" x="${x(n - 1) + 8}" y="${y(cr[n - 1]) + 5}">${int(cr[n - 1])} by real results</text>`;
-  return `<figure class="race" id="race"><div class="journey-head"><p class="j-title">Wrong payments, added up week by week</p><button type="button" class="replay" data-replay="race">Play again</button></div>${s}</svg>
+  return `<figure class="race" id="race"><div class="journey-head"><p class="j-title">Paid lines that needed a correction, added up week by week</p><button type="button" class="replay" data-replay="race">Play again</button></div>${s}</svg>
   <figcaption class="small">One example run of the simulation, with reviewers copying 9 times in 10 (across 20 runs the middle result was about ${int(Math.floor(d.agreement.alphas["0.9"].wrong_median / 10) * 10)}). "On" marks the week the AI was first switched on.</figcaption></figure>`;
 }
 
@@ -814,7 +831,7 @@ function q8(d) {
   <li><strong>How many it paid.</strong> The share of invoices it paid without a person. The saving depends on how many of those a person would really have reviewed (Q9).</li>
   <li><strong>Beating the simple rule.</strong> An AI had to pay at least 10 percentage points more invoices while still proving 99%. Between the two Claude approaches, one won only if it paid at least as many invoices as the other and made clearly fewer mistakes. Otherwise they counted as not separated, and the cheaper one was preferred (Q3).</li>
   <li><strong>Cost and time</strong> per 1,000 invoices, measured, not estimated (Q7).</li>
-  <li><strong>Earning trust over time.</strong> In the week-by-week replay: how soon it earned the right to pay alone, how many lines it paid on its own, and how many wrong payments got through (Q5).</li>
+  <li><strong>Earning trust over time.</strong> In the week-by-week replay: how soon it earned the right to pay alone, how many lines it paid on its own, and how many paid lines needed a correction (Q5).</li>
   </ol>
   <p>On this yardstick, none of the three earned trust at the 99% bar (Q3).</p>
   <p>One yardstick answers "which approach does this job best?" It does not answer "how do you keep it in check once it is running?" Each approach goes wrong in a different way, so each needs its own extra checks.</p>
@@ -847,7 +864,7 @@ function q8(d) {
   <li><strong>How often people overrule it:</strong> a warning sign worth looking into, never a measure of accuracy. Q6 shows why agreement misleads.</li>
   </ul>
   <h3>One limit on every measure</h3>
-  <p>"Fine" means no one corrected the invoice before it was paid. Corrections made after payment are not in the records, so the true share could be lower than shown; this test could not measure by how much. A live system should also count corrections made after payment.</p>`;
+  <p>"Fine" means no one corrected the invoice before it was paid. Corrections made after clearing are in the records but not in the label; counting them, the rulebook's worst likely case falls to ${pct(d.evidence.sensitivity.post_clear_lower, 2)}. A live system should count corrections made after payment as mistakes from the start.</p>`;
   const detail = `<p>Every approach decided at the first invoice receipt on an order line, using the line's facts at that moment and rates from order lines created January to May 2018. Those rates include outcomes that landed after the test months began (the look-ahead in the Method limits). A wrong call to pay is an invoice that needed a price or quantity change, a cancellation, a debit memo, a payment block or a deletion before it was cleared.</p>
   <p>Cost for each invoice paid is measured cost divided by invoices paid. Checking each invoice: $${(b2 ? b2.cost.usd : d.cost.b.usd).toFixed(2)} for ${b2 ? int(b2.b_alone.n) : int(d.sample_n)} invoices, of which it paid ${b2 ? int(b2.b_alone.passed) : int(d.b.sample.passed)}. Rulebook: $${cOnce.toFixed(2)} for the picked rulebook, which paid ${int(cPaid)} test invoices.</p>
   <p>In the replay, an AI loses the right to pay alone in a kind of invoice when the best likely case (95% upper bound) of its last 200 settled calls falls below 99%.</p>`;
