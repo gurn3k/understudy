@@ -122,7 +122,7 @@ function build(d) {
     ["Earned on outcomes (replay)", int(t.passed), int(t.wrong), pct(t.wrong / t.passed, 1), `First kind in week ${firstWk} of the replay's ${d.replay.weeks.length} (ISO week ${firstIso}); all ${int(t.wrong)} mistakes in one kind, ${int(d.evidence.replay.top_order)} on one order; window too short for the steady state`],
     ["Trusted on agreement (simulation)", half(ag.passed_median), half(ag.wrong_median), `about ${pct(ag.wrong_median / ag.passed_median, 2)}`, `Reviewers copy ${Math.round(+AGREE * 10)} in 10; medians of ${SIM_RUNS} runs; assumed behaviour, not a study of people`],
   ])}
-  ${bars("Wrong payments let through", [["Earned on outcomes", t.wrong, int(t.wrong)], ["Trusted on agreement (simulation, assumed behaviour)", ag.wrong_median, half(ag.wrong_median), true]])}
+  ${bars("Lines paid that needed a correction", [["Earned on outcomes", t.wrong, int(t.wrong)], ["Trusted on agreement (simulation, assumed behaviour)", ag.wrong_median, half(ag.wrong_median), true]])}
   <p>In the simulation, trusting on agreement let through about ten times as many lines that needed a correction, at a lower rate per line, because it paid far more. The count is not why requirement M2 forbids it: when reviewers copy, agreement carries no information about whether the AI is right.</p>
   <h3>Limits of the evidence</h3>
   ${tbl("What the evidence can and cannot carry", ["Limit", "What it means for a proposal"], [
@@ -274,10 +274,10 @@ function build(d) {
   <p class="small">A kind is only trusted once it proves 99%, so this rate is a cautious stand-in, not what the pilot would aim for. It is the same rate the break-even above uses. The same oversight hours continue after the pilot.</p>
   <div class="cost biz-tiles">
   <div><span class="small">Earned share needed to repay the pilot in its first year after</span><span class="big" data-out="need"></span><span class="small" data-out="need-note"></span></div>
-  <div><span class="small">Wrong payments a year, at the full on-paper volume</span><span class="big" data-out="wrong-yr"></span><span class="small">Order lines, at the cautious rate above. Each is paid before a needed fix; it is not money lost.</span></div>
+  <div><span class="small">Lines paid that need a correction a year, at the full on-paper volume</span><span class="big" data-out="wrong-yr"></span><span class="small">Order lines, at the cautious rate above. Each is paid before a needed fix; it is not money lost.</span></div>
   </div>
   <p class="warn" data-out="roi-warn" role="status"></p>
-  ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Lines paid alone a year", "Wrong payments a year", "Gross saving", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
+  ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Lines paid alone a year", "Needing a correction a year", "Gross saving", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
     scenRows(g).map(([x, why], k) => [`${pct(x, x && x < 0.1 ? 1 : 0)}${why ? `<span class="small">${why}</span>` : ""}`, `<span data-out="sc-checks-${k}"></span>`, `<span data-out="sc-wrong-${k}"></span>`, `<span data-out="sc-gross-${k}"></span>`, `<span data-out="sc-net-${k}"></span>`, `<span data-out="sc-roi-${k}"></span>`, `<span data-out="sc-pay-${k}"></span>`]), "scen")}
   ${tbl("How each figure is worked out", ["Figure", "Formula"], [
     ["Gross saving", "Lines paid alone × share reviewed today × minutes per review ÷ 60 × hourly cost"],
@@ -320,7 +320,7 @@ function build(d) {
     bars("Largest tenth of paid invoices: share of each total", [["Share of invoices paid", b.top10.count / b.paid, pct(b.top10.count / b.paid, 0)], ["Share of mistakes, by count", b.top10.wrong / b.wrong, pct(b.top10.wrong / b.wrong, 0)], ["Share of value paid", topSharePaid, pct(topSharePaid, 0)], ["Share of mistakes' value", topShareWrong, pct(topShareWrong, 0), true]], 1),
     "a value limit is a common accounts-payable control, and on these invoices that tenth held most of the mistakes' value. The line here was drawn from the same invoices after the results, so it describes what happened; it does not show a limit would help.",
     "set the limit from the company's own policy or earlier months, before the pilot, and test it there.")}
-  ${dcard("D2", "Check a sample of paid invoices blind, every month", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} wrong payments, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
+  ${dcard("D2", "Check a sample of paid invoices blind, every month", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} lines that needed a correction, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
     "", "reviewers who can see the AI's answer tend to agree with it. A blind check, where the reviewer does not see the AI's call, measures the AI, not the reviewer.",
     "describe the sample size, who checks, and how the AI's answer is hidden from them.")}
   ${dcard("D3", "Watch how often people overrule it, as a warning sign only", "agreement mostly measured the reviewers in the simulation, not the AI.",

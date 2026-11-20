@@ -424,7 +424,7 @@ function wireJourney() {
   root.querySelector("[data-replay]").addEventListener("click", run);
 }
 
-/* ---------- Q6 race: wrong payments, week by week ---------- */
+/* ---------- Q6 race: paid lines that needed a correction, week by week ---------- */
 function race(d) {
   const real = d.replay.timeline, agr = d.agreement.example_timeline;
   if (!agr) return "";
@@ -438,7 +438,7 @@ function race(d) {
   const wi = (w) => d.replay.weeks.indexOf(w);
   const fa = wi(d.agreement.example_first), fr = wi(d.replay.first);
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="race-t race-d"><title id="race-t">Paid lines that needed a correction, added up week by week</title>
-  <desc id="race-d">Switched on by agreement (one example run): ${int(ca[n - 1])} wrong payments by the end, first switched on in ${wkL(d.agreement.example_first)}. Switched on by real results: ${int(cr[n - 1])}, first switched on in ${wkL(d.replay.first)}.</desc>`;
+  <desc id="race-d">Switched on by agreement (one example run): ${int(ca[n - 1])} paid lines that needed a correction by the end, first switched on in ${wkL(d.agreement.example_first)}. Switched on by real results: ${int(cr[n - 1])}, first switched on in ${wkL(d.replay.first)}.</desc>`;
   for (let v = 0; v <= top; v += top / 2) s += `<line class="tick" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${int(v)}</text>`;
   s += `<text x="${L}" y="${H - 8}">replay week 1</text><text x="${x(n - 1)}" y="${H - 8}" text-anchor="end">week ${n}</text>`;
   s += `<path class="ln real" pathLength="1" d="${path(cr)}"/><path class="ln agr" pathLength="1" d="${path(ca)}"/>`;
@@ -762,7 +762,7 @@ function q6(d) {
   <h3>What I tested</h3>
   <p>I ran the same week-by-week replay as in Q5, but this time the AI was switched on when staff agreed with it, not when real results proved it right. The staff were simulated: they copy the AI's suggestion 9 times in 10. The other time they check properly and catch most of its mistakes. I ran this 20 times; the figures are the middle result of the 20 runs.</p>
   <h3>What happened</h3>
-  ${race(d) || pair("Wrong payments while the AI was switched on", t.wrong, a9.wrong_median, int(t.wrong), `about ${int(down10(a9.wrong_median))}`)}
+  ${race(d) || pair("Lines paid that needed a correction while the AI was switched on", t.wrong, a9.wrong_median, int(t.wrong), `about ${int(down10(a9.wrong_median))}`)}
   ${pair("Invoices it paid by itself", t.passed, a9.passed_median, int(t.passed), `about ${round100(a9.passed_median)}`)}
   <p>Judged on agreement, the AI was switched on about ${word(Math.round(med(gaps9)))} weeks sooner and paid ${half(a9.passed_median)} lines by itself, ${half(a9.wrong_median)} of which needed a correction (${pct(a9.wrong_median / a9.passed_median, 2)}). Judged on real results it paid ${int(t.passed)}, ${int(t.wrong)} needing a correction (${pct(t.wrong / t.passed, 1)}). The rate was lower on agreement only because this rulebook happens to be about 99% right; a much worse AI would have been agreed with nearly as often.</p>
   <p class="callout"><strong>In this simulation, the agreement it was switched on for was mostly copied. It measured the reviewers, not the AI.</strong></p>
