@@ -420,3 +420,4 @@ table th .small { display: block; font-weight: 400; letter-spacing: 0; }
 .sens { border-top: 2px solid var(--ink); margin: 28px 0 8px; padding-top: 12px; max-width: 68ch; }
 .sens-head { font: 700 13px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 8px; }
 .sens table { max-width: 32em; }
+table.rfp.fit { min-width: 0; }

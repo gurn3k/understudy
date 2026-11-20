@@ -801,9 +801,9 @@ function sweepFacts(d) {
 function sweepTable(d) {
   const { sw, ffLo } = sweepFacts(d), t = d.replay.totals;
   const rows = sw.filter((x) => x.false_flag === ffLo);
-  return `<div class="tablewrap"><table class="score num"><caption>In this simulation: the agreement gate by how reviewers behave (medians of ${int(rows[0] ? rows[0].runs : 0)} runs; 1 clean invoice in ${int(1 / ffLo)} wrongly flagged)</caption><thead><tr><th scope="col">Reviewers copy</th><th scope="col">Of the rest, they catch</th><th scope="col">Lines paid on its own</th><th scope="col">Needed a correction</th><th scope="col">Rate</th></tr></thead><tbody>
-  <tr class="chosen"><th scope="row" colspan="2">Switched on by real results (Q5)</th><td>${int(t.passed)}</td><td>${int(t.wrong)}</td><td>${pct(t.wrong / t.passed, 1)}</td></tr>
-  ${rows.map((x) => `<tr><th scope="row">${int(x.alpha * 10)} in 10</th><td>${pct(x.catch, 0)}</td><td>${half(x.passed_median)}</td><td>${half(x.wrong_median)}</td><td>${x.passed_median ? pct(x.wrong_median / x.passed_median, 2) : "never switched on"}</td></tr>`).join("")}
+  return `<div class="tablewrap"><table class="score num"><caption>In this simulation: the agreement gate by how reviewers behave (medians of ${int(rows[0] ? rows[0].runs : 0)} runs; 1 clean invoice in ${int(1 / ffLo)} wrongly flagged. Copy: how many suggestions in 10 reviewers copy; catch: of the rest, the share of the AI's mistakes they catch)</caption><thead><tr><th scope="col">Copy</th><th scope="col">Catch</th><th scope="col">Paid</th><th scope="col">Needed a fix</th><th scope="col">Rate</th></tr></thead><tbody>
+  <tr class="chosen"><th scope="row" colspan="2">By real results (Q5)</th><td>${int(t.passed)}</td><td>${int(t.wrong)}</td><td>${pct(t.wrong / t.passed, 1)}</td></tr>
+  ${rows.map((x) => `<tr><th scope="row">${int(x.alpha * 10)} in 10</th><td>${pct(x.catch, 0)}</td><td>${half(x.passed_median)}</td><td>${half(x.wrong_median)}</td><td>${x.passed_median ? pct(x.wrong_median / x.passed_median, 2) : "never on"}</td></tr>`).join("")}
   </tbody></table></div>`;
 }
 

@@ -130,7 +130,7 @@ function build(d) {
     ["Forking paths", `${int(d.post_result.length)} changes were made after a test result was known (listed in the main report's Method section), including a new comparison rule and a second run.`],
     ["Clustering", `Invoices on the same order fail together. Allowing for that, the rulebook's worst likely case falls from ${pct(c.held_out.precision_lower, 2)} to ${pct(d.evidence.clustering.clustered_lower, 2)}. Intervals in a proposal must allow for it.`],
     ["Label", `"Needed a correction" is broad. Moving it one way at a time does not prove the bar: dropping delivery-indicator-only corrections gives ${pct(d.evidence.sensitivity.drop_cdi.clustered_lower, 2)} allowing for orders; counting corrections after clearing gives ${pct(d.evidence.sensitivity.post_clear_lower, 2)}.`],
-  ])}
+  ], "fit")}
   ${list(["One company's records, from 2018. The method carries over; the numbers are theirs.", `"Fine" means no one corrected the invoice before payment. Counting corrections made after clearing, which the label leaves out, lowers the rulebook's worst likely case to ${pct(d.evidence.sensitivity.post_clear_lower, 2)}; corrections outside these records can't be counted.`, "The records hold no invoice text, so the AI never read an invoice document.", "The share of lines a person reviews, minutes per review and hourly cost are inputs, not measurements. The records hold logins and times, and most clearing steps in them are bulk postings."])}`));
 
   out.push(sec("s5", "5", "Assumptions, constraints and dependencies", `
