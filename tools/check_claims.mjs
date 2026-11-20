@@ -56,6 +56,7 @@ const FORBIDDEN = [
   [/too few to tell/i, "it was about as accurate as the rulebook on what it paid, paying far fewer", "ADR 0022"],
   [/say, 95%/i, "an unexplained example threshold", "ADR 0022"],
   [/wrong[- ]payment budget/i, "say the correction budget", "ADR 0025"],
+  [/blind checks[^.]{0,60}\(my assumption|window is still to be fixed/i, "the blind-check window is a requirement (M9), not an assumption", "ADR 0025"],
   [/the safer way|trust earned safely/i, "the replay is not shown to be safer", "ADR 0017, Don't claim"],
   [/just short|edge of the bar|how close/i, "near-miss framing; say not proven, with the worst likely case", "ADR 0022"],
   [/never seen|had (not|never) seen|none of them (had )?seen|saw their outcomes/i, "the test months were held out, but inputs drew on later outcomes (look-ahead)", "ADR 0022"],
@@ -154,7 +155,9 @@ REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)}
   ["per-order cap, a lesson not a tested control", "not a tested control"],
   ["switch-off: tolerated upper end", pc(K.tolerated_upper, 2)], ["switch-off: power on its window", pc(K.power_window, 0)],
   ["switch-off test named", "two-sided 95% Wilson interval"], ["settled defined", "A call is settled once"], ["arrival order", "in the order they arrived"],
-  ["promoted then switched off", `${n0(K.demotions[0].recent[0])} of ${n0(K.demotions[0].recent[1])}`]);
+  ["promoted then switched off", `${n0(K.demotions[0].recent[0])} of ${n0(K.demotions[0].recent[1])}`],
+  ["blind checks mandatory", "M9"], ["blind-check power at the sized window", pc(B.blind.power, 0)], ["blind-check power at 400 lines", pc(K.power_400, 0)],
+  ["two outcome streams", "two outcome streams"], ["sampled by order", "drawn as whole purchase orders"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);

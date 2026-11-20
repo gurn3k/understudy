@@ -5,7 +5,7 @@
 const Calc = (() => {
   const PH = { p0: 4, p2: 12, p3: 2 }; // weeks of phases 0, 2 and 3 (phase 1 is the replay's wait for the first kind)
   const DEF = { min: 5, rate: 40, fix: 100, lost: 0, oh: 8, kinds: 1 };
-  const WINDOWS_YR = 12; // blind-check windows a year: monthly
+  const WINDOWS_YR = 12; // blind-check windows a year: monthly, as the pilot request's M9 sets (ADR 0025)
   const int = (n) => Math.round(n).toLocaleString("en-US");
   const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
   const usd = (x) => (x >= 1e6 ? `$${(x / 1e6).toFixed(2)}M` : x >= 1e4 ? `$${int(Math.round(x / 1000))}k` : `$${int(x)}`);

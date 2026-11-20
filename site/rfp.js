@@ -79,8 +79,8 @@ function build(d) {
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
     ["Trust earned on outcomes (replay)", `${int(t.passed)} paid, ${int(t.wrong)} needed correction (${pct(t.wrong / t.passed, 1)}), ${d.evidence.replay.kinds === 1 ? "all in one kind" : `in ${int(d.evidence.replay.kinds)} kinds`}, ${int(d.evidence.replay.top_order)} on one order; first kind in week ${firstWk} of the replay (ISO week ${firstIso})`, "Not proven either; expect errors in the first months"],
     ["When it pays off", `<span data-out="pays-off"></span>`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate, after oversight and blind checks (section 11)`],
-    ["Pilot cost", `<span data-out="total"></span>: internal oversight, monthly blind checks on <span data-out="kinds-lab"></span> and the rulebook (my assumptions), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
-    ["Return", `<span data-out="return-line"></span>`, `At your inputs, including monthly blind checks on <span data-out="kinds-lab"></span> (my assumption)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
+    ["Pilot cost", `<span data-out="total"></span>: internal oversight and the rulebook (my assumptions), blind checks on <span data-out="kinds-lab"></span> each month (M9), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
+    ["Return", `<span data-out="return-line"></span>`, `At your inputs, including blind checks on <span data-out="kinds-lab"></span> each month (M9)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
   ], "keys")}
   <p class="ask"><strong>The decision I ask for:</strong> approve Phase 0 (set-up and baseline) now. Every later phase waits for a gate.</p>
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, under controls, whether its own invoices would.</p>`));
@@ -170,6 +170,7 @@ function build(d) {
     ["M6", "Count corrections made after payment as mistakes.", "The outcome feed includes post-payment corrections."],
     ["M7", `Confirm in writing, before Gate 1, the 99% bar, the cost of a late fix, the correction budget (section 7), any value limit and when a call counts as settled. The budget is binding: going over it switches every kind off at once until the sponsor decides.`, "A signed Gate 1 record exists; a seeded breach of the budget switches every kind off."],
     ["M8", "Provide a kill switch that the Pilot Owner and the Finance Controller can use without the supplier.", "Tested in Phase 0."],
+    ["M9", `Check a sample of the lines each kind paid on its own blind, every month: ${int(b.blind.n)} lines a kind a month, drawn as whole purchase orders, by a reviewer who does not see the AI's call. Keep two outcome streams and log both: corrections raised by suppliers and purchasing, and blind-check findings. The switch-off (M3) runs on both.`, "The blind-check log shows each sample, who checked it, that the call was hidden, and which stream each outcome came from."],
     ["M12", `Pay at most ${word(ORDER_CAP).toLowerCase()} lines of one purchase order on their own before a person sees one of them (my default; the issuer sets the number at Gate 1). This is a lesson from the replay, where ${int(er.top_order)} of the ${int(er.wrong)} mistakes were on one order, not a tested control.`, "A seeded order with more lines than the cap stops at the cap."],
   ])}
   <h3>How the switch-off test works (M3), in numbers</h3>
@@ -179,18 +180,17 @@ function build(d) {
     [word(ctl.fires_at), `${pct(1 - ctl.fires_at / ctl.window, 1)}`, `up to ${pct(ctl.fires_upper, 2)}`, "Upper end below 99%: the kind is switched off"],
   ], "fit")}
   <p><strong>In plain words:</strong> a kind may run at up to ${int(ctl.fires_at - 1)} wrong in ${int(ctl.window)} (${pct((ctl.fires_at - 1) / ctl.window, 0)}), ${word(Math.round((ctl.fires_at - 1) / ctl.window / (1 - d.bar.bar))).toLowerCase()} times the ${pct(1 - d.bar.bar, 0)} the bar allows, and still stay on; the ${int(ctl.fires_at)}th switches it off. On ${int(ctl.window)} calls the test catches a kind truly running at 2% only ${pct(ctl.power_window, 0)} of the time. That is why the budget in M7 is binding and the blind checks are sized larger. In the replay, the first kind was promoted in ${wkL(pr1.week)} on ${int(pr1.evidence[0])} of ${int(pr1.evidence[1])} right, and switched off in ${wkL(dm.week)} at ${int(dm.recent[0])} of ${int(dm.recent[1])}, after its recent calls had run well past the edge.</p>
-  ${tbl("Desirable requirements", ["Ref", "The pilot should", "Why"], [
+  ${tbl("Desirable requirements (blind checks, D2 in the first issue, are now mandatory as M9)", ["Ref", "The pilot should", "Why"], [
     ["D1", "Set a value limit above which a person always checks.", "Most of the mistakes' value sat in the largest invoices in the study. A proposal I did not test."],
-    ["D2", "Run monthly blind spot-checks of paid invoices.", "It guards against reviewers copying the AI."],
     ["D3", "Track how often people overrule the rulebook, as a warning sign only.", "Agreement is not accuracy."],
     ["D4", "Provide an exit plan and keep the data portable.", "A supplier or model may change."],
   ])}
-  <p class="jump"><a href="#s14">The findings behind D1 to D4 are in section 14 &rarr;</a></p>`));
+  <p class="jump"><a href="#s14">The findings behind D1, D3, D4 and M9 are in section 14 &rarr;</a></p>`));
 
   const ph = [
     ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget"],
     ["1 Practice mode", `About ${firstWk} (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}; that kind was switched off again later, so this length rests on a promotion later withdrawn); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
-    ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind spot-checks run monthly.", "G3: results review; the correction budget was respected"],
+    ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind checks run every month on each kind paid on its own (M9).", "G3: results review; the correction budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
   ];
   out.push(sec("s7", "7", "Pilot plan, gates and decision points", `
@@ -222,12 +222,12 @@ function build(d) {
   <p>The Rulebook Owner who signs a rulebook version shall not approve its promotions (segregation of duties). The Pilot Owner reports to the sponsor at each gate.</p>`));
 
   const risks = [
-    ["R1", "A line that needs a correction is paid", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7", "Pilot Owner"],
+    ["R1", "A line that needs a correction is paid", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7, M9, M12", "Pilot Owner"],
     ["R2", "A late fix costs more than the break-even", "Medium", "High", `Cautious break-even: ${int(L.gated_cautious)} lines per mistake × share reviewed × cost of a review (section 11)`, "Measure it in Phase 0; stop rule", "Finance Controller"],
     ["R3", "Mistakes concentrate in one kind of invoice", "Medium", "Medium", `The replay's ${int(t.wrong)} mistakes were mostly from one kind`, "Promote kind by kind; M3", "Pilot Owner"],
     ["R4", "The rulebook goes stale", "High", "Medium", "Suppliers, prices and buying habits change", "M5; scheduled retest and rewrite", "Rulebook Owner"],
     ["R5", "Mistakes found after payment go unnoticed", "Medium", "High", "Not in the study's records", "M6", "Finance Controller"],
-    ["R6", "Reviewers copy the AI's suggestion", "Medium", "High", "The agreement simulation", "M2, D2, D3", "Internal Audit"],
+    ["R6", "Reviewers copy the AI's suggestion", "Medium", "High", "The agreement simulation", "M2, M9, D3", "Internal Audit"],
     ["R7", "A few large invoices carry most of the value at risk", "Medium", "High", `${pct(v.wrong / v.paid, 1)} of paid value from ${pct(b.wrong / b.paid, 2)} of invoices`, "D1", "Risk and Compliance"],
     ["R8", "Fraud or duplicate payments", "Low", "High", "Not tested", "Out of scope; existing controls stay", "Risk and Compliance"],
     ["R9", "Privacy or supplier-data terms are breached", "Low", "High", "The study used no invoice text", "Review before any real data is used", "Risk and Compliance"],
@@ -258,7 +258,7 @@ function build(d) {
   ${tbl("Cost lines", ["Line", "Basis", "Amount"], [
     [`Phase 0: set-up and baseline<span class="small">My assumption</span>`, `<span data-out="p0-basis"></span>`, `<span data-out="p0-cost"></span>`],
     [`Oversight, phases 1 to 3<span class="small">My assumption</span>`, `<span data-out="oh-basis"></span>`, `<span data-out="oh-cost"></span>`],
-    [`Blind checks<span class="small">${req("Sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. The switch-off test on ${int(bl.n)} lines catches a true ${pct(bl.q, 0)} error rate ${pct(bl.power, 0)} of the time. Power does not rise smoothly with the window: ${int(bl.first_n)} lines already reach 80%, but ${int(1000)} fall back to ${pct(bl.power_1000, 0)}, so I size in steps of 50 to the first that holds.`, `<span data-out="blind-cost"></span> a kind a window; <span data-out="blind-pilot"></span> in the pilot`],
+    [`Blind checks<span class="small">${req("M9, sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. The switch-off test on ${int(bl.n)} lines catches a true ${pct(bl.q, 0)} error rate ${pct(bl.power, 0)} of the time. Power does not rise smoothly with the window: ${int(bl.first_n)} lines already reach 80%, but ${int(1000)} fall back to ${pct(bl.power_1000, 0)}, so I size in steps of 50 to the first that holds. ${int(ctl.small_n)} lines would catch it only ${pct(ctl.power_400, 0)} of the time. Drawn as whole purchase orders, lines on one order are not independent, so this power holds only if the window is enlarged by the kind's own design effect, measured in practice mode; the cost here uses ${int(bl.n)}.`, `<span data-out="blind-cost"></span> a kind a window; <span data-out="blind-pilot"></span> in the pilot`],
     [`Weekly reconciliation of calls against outcomes<span class="small">${req("Yours to estimate")}</span>`, "Hours a week × the weeks of the pilot", fill("US$ amount")],
     [`Writing the rulebook<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line", `$${cOnce.toFixed(2)}`],
     [`Integration and data access<span class="small">${req("Yours to enter above")}</span>`, "One-off", `<span data-out="int-cost"></span>`],
@@ -268,7 +268,7 @@ function build(d) {
     [`Outcome scoring<span class="small">${req("Proposer to price")}</span>`, "Matching each call to its outcome as it arrives", fill("US$ amount")],
     [`Audit<span class="small">${req("Yours to estimate")}</span>`, "Internal Audit's review before Gate 3 (section 10)", fill("US$ amount")],
     [`Training and change management<span class="small">${req("Yours to estimate")}</span>`, "", fill("US$ amount")],
-    ["Total so far", "Phase 0, oversight, the rulebook, blind checks (my assumption: monthly windows during Phase 2, on the kinds you enter above), and integration if entered. Not the required lines still blank", `<span data-out="total"></span>`],
+    ["Total so far", "Phase 0, oversight, the rulebook, blind checks (M9: monthly windows during Phase 2, on the kinds you enter above), and integration if entered. Not the required lines still blank", `<span data-out="total"></span>`],
   ])}
   <p><strong>No saving for about ${f.dryWeeks} weeks.</strong> Nothing is paid without a person in Phase 0 (${PH.p0} weeks) or in practice mode (about ${firstWk} weeks), so the pilot costs money for that long before it can save any.</p>
   ${tbl("Where the on-paper saving comes from", ["Step", "Figure"], [
@@ -302,7 +302,7 @@ function build(d) {
     ["First-year ROI", "(Net yearly benefit − total pilot cost) ÷ total pilot cost"],
     ["Payback", "Total pilot cost ÷ monthly net benefit, from the end of the pilot"],
     ["Total pilot cost", "The cost lines above with a figure, blind checks included; integration only if entered"],
-    ["Blind checks (my assumption)", `${WINDOWS_YR} windows a year (monthly), about ${(PH.p2 * 12 / 52).toFixed(1)} during Phase 2, each ${int(b.blind.n)} lines a kind × minutes per review, on the kinds you enter. The check window is still to be fixed in the requirements; these figures change with it`],
+    ["Blind checks (M9)", `${WINDOWS_YR} windows a year (M9 sets the window at one month), about ${(PH.p2 * 12 / 52).toFixed(1)} during Phase 2, each ${int(b.blind.n)} lines a kind × minutes per review, on the kinds you enter`],
     ["Not included", "The required lines still blank, discounting, tax, seasonality, benefit during the pilot"],
   ])}
   <p class="small">The ${pct(g.earned_share, 1)} row is what the replay earned on the same test lines; its window was too short to show the steady state, so it is a floor seen once, not an estimate. ${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling. None of these rows changes the verdict: no approach proved the 99% bar.</p>
@@ -327,18 +327,18 @@ function build(d) {
 
   const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
   const topShareWrong = b.top10.wrong_value / b.value.wrong, topSharePaid = b.top10.paid_value / b.value.paid;
-  const dcard = (id, title, found, visual, why, ask) => `<article class="dcard"><p class="dcard-id">${id} · Recommended, not tested</p><h3>${title}</h3><p><strong>What I found:</strong> ${found}</p>${visual}<p><strong>Why it matters:</strong> ${why}</p><p class="dcard-ask"><strong>What I ask proposers:</strong> ${ask}</p></article>`;
+  const dcard = (id, title, found, visual, why, ask, tag = "Recommended, not tested") => `<article class="dcard"><p class="dcard-id">${id} · ${tag}</p><h3>${title}</h3><p><strong>What I found:</strong> ${found}</p>${visual}<p><strong>Why it matters:</strong> ${why}</p><p class="dcard-ask"><strong>What I ask proposers:</strong> ${ask}</p></article>`;
   out.push(sec("s14", "14", "Special findings: the desirable requirements, and why I recommend them", `
-  <p class="headline">The mandatory requirements keep the pilot under control. These four extras come from things I saw in the study, and I would score them.</p>
+  <p class="headline">The mandatory requirements keep the pilot under control. These four come from things I saw in the study. The blind check is now mandatory (M9); I would score the other three.</p>
   <p class="small">Each is a recommendation drawn from the evidence, not a tested result. None changes the verdict: no approach proved the 99% bar.</p>
   <div class="dcards">
   ${dcard("D1", "Send the largest invoices to a person", `the largest tenth of the invoices the rulebook paid (${usd(b.top10.line * f.R)} and up) held ${int(b.top10.wrong)} of its ${int(b.wrong)} mistakes, but ${pct(topShareWrong, 0)} of their value.`,
     bars("Largest tenth of paid invoices: share of each total", [["Share of invoices paid", b.top10.count / b.paid, pct(b.top10.count / b.paid, 0)], ["Share of mistakes, by count", b.top10.wrong / b.wrong, pct(b.top10.wrong / b.wrong, 0)], ["Share of value paid", topSharePaid, pct(topSharePaid, 0)], ["Share of mistakes' value", topShareWrong, pct(topShareWrong, 0), true]], 1),
     "a value limit is a common accounts-payable control, and on these invoices that tenth held most of the mistakes' value. The line here was drawn from the same invoices after the results, so it describes what happened; it does not show a limit would help.",
     "set the limit from the company's own policy or earlier months, before the pilot, and test it there.")}
-  ${dcard("D2", "Check a sample of paid invoices blind, every month", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} lines that needed a correction, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
+  ${dcard("M9", "Check a sample of paid invoices blind, every month", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} lines that needed a correction, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
     "", "reviewers who can see the AI's answer tend to agree with it. A blind check, where the reviewer does not see the AI's call, measures the AI, not the reviewer.",
-    "describe the sample size, who checks, and how the AI's answer is hidden from them.")}
+    "describe the sample size, who checks, and how the AI's answer is hidden from them.", "Mandatory since this issue (it was D2), not tested")}
   ${dcard("D3", "Watch how often people overrule it, as a warning sign only", "agreement mostly measured the reviewers in the simulation, not the AI.",
     "", "a rising override rate is worth looking into. A low one is not proof of accuracy, so it must never be used to grant trust (requirement M2).",
     "show the override rate on the monthly report, next to outcome-based accuracy.")}
@@ -360,6 +360,7 @@ function build(d) {
     ["Order line", "The unit of every count and amount here. The study's records have no invoice-document field, so one \"invoice\" in the study is one order line."],
     ["Late fix", "Correcting a line after it was paid instead of before. Its cost is the work to fix it plus any share of its value never recovered."],
     ["Gate", "A formal decision point in section 7."],
+    ["Blind check", "A person decides on a line the AI paid on its own without seeing the AI's call, so the result measures the AI, not the reviewer (M9)."],
   ])}
   <h3>B. Where each figure comes from</h3>
   ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
@@ -394,7 +395,7 @@ function wire(d) {
     set("return-line", x.ask <= 1 ? `Repays itself in its first year after the pilot if it earns ${pct(x.ask, 1)} of the on-paper volume` : "Does not repay itself in its first year after the pilot at these inputs, even at the full on-paper volume");
     set("pays-off", x.needNet > 1 ? `Not at these inputs: even with every line reviewed today, late fixes, oversight and blind checks cost more than the time saved (late fixes alone would need ${Calc.needTxt(x.need(B.L.gated_cautious))} reviewed)` : `Only if a person today reviews at least ${pct(x.needNet, 1)} of these lines (late fixes alone: ${Calc.needTxt(x.need(B.L.gated_cautious))})`);
     const upper = v.sh === null ? " Share reviewed not entered, so every line counts as reviewed today: an upper limit." : "";
-    const blindTxt = ` It counts blind checks on ${kTxt} each month (${usd(x.blindYr)} a year), my assumption.`;
+    const blindTxt = ` It counts blind checks on ${kTxt} each month (${usd(x.blindYr)} a year), as M9 requires.`;
     set("need-note", (x.ask <= 1 ? `of the on-paper volume, with a late fix at $${int(x.M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(x.M)}, even the full on-paper volume does not repay the pilot in a year.`) + blindTxt + upper);
     set("roi-warn", v.hasInt ? "" : "Integration cost not entered: return and payback are hidden until you enter your integration cost above (0 is allowed).");
     scenRows(B.g).forEach(([e], j) => {
