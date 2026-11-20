@@ -736,7 +736,7 @@ function q5(d) {
   return section("q5", `Q5 ${PLAIN_STATE[endState(d.replay.states)]}`, "Earning trust one kind of invoice at a time", plain, detail, [
     `Replayed with the picked rulebook over the test months, ${esc(d.replay.weeks[0])} to ${esc(d.replay.weeks[d.replay.weeks.length - 1])}`,
     `The replay is too short for results that arrive weeks late: the second kind was switched on in ${wkL(proms.slice(-1)[0].week)} with few invoices left, so ${int(t.passed)} understates a normal year`,
-    `The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} mistakes, mostly from one kind of invoice`,
+    `The ${pct(t.wrong / t.passed, 1)} rests on ${int(t.wrong)} mistakes, ${d.evidence.replay.kinds === 1 ? "all from one kind of invoice" : `from ${int(d.evidence.replay.kinds)} kinds of invoice`}, ${int(d.evidence.replay.top_order)} of them on one purchase order`,
     `The rulebook was written from January to May rates, about half of which rest on outcomes that became known after the replay's first week`,
     `This replay cannot overturn the answer above`,
   ], true);
