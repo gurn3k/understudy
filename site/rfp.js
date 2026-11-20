@@ -70,16 +70,16 @@ function build(d) {
     ["How close did the best get?", `Rulebook paid ${pct(b.paid / d.held_out_n, 1)}; ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} right; worst likely case ${pct(c.held_out.precision_lower, 2)}`, "Below the bar: not proved"],
     ["The saving", `Not known yet. It rests on the share of order lines a person reviews today, which the records can't show. ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step`, "A footprint, not proof of review. Phase 0 measures it"],
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
-    ["Trust earned safely (replay)", `First kind in week ${firstWk}; ${int(t.passed)} lines paid, ${int(t.wrong)} wrong (${pct(t.wrong / t.passed, 1)})`, "Expect errors in the first months"],
+    ["Trust earned on outcomes (replay)", `${int(t.passed)} paid, ${int(t.wrong)} needed correction (${pct(t.wrong / t.passed, 1)}), ${d.evidence.replay.kinds === 1 ? "all in one kind" : `in ${int(d.evidence.replay.kinds)} kinds`}, ${int(d.evidence.replay.top_order)} on one order; first kind in week ${firstWk}`, "Not proven either; expect errors in the first months"],
     ["When it pays off", `Only if a person today reviews at least <span data-out="need-low"></span> of these lines`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate (section 11)`],
     ["Pilot cost", `<span data-out="total"></span>: internal oversight, monthly blind checks on <span data-out="kinds-lab"></span> and the rulebook (my assumptions), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
     ["Return", `Repays itself in its first year after the pilot if it earns <span data-out="need"></span> of the on-paper volume`, `At your inputs, including monthly blind checks on <span data-out="kinds-lab"></span> (my assumption)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
   ], "keys")}
   <p class="ask"><strong>The decision I ask for:</strong> approve Phase 0 (set-up and baseline) now. Every later phase waits for a gate.</p>
-  <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, safely, whether its own invoices would.</p>`));
+  <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, under controls, whether its own invoices would.</p>`));
 
   out.push(sec("s2", "2", "Purpose and background", `
-  <p>Every invoice line is cleared for payment, but the records can't show how many of them a person actually reviews first: most clearing steps are bulk postings, one login clearing many lines in the same minute. I tested whether AI could safely take the routine decisions off people's desks, and how a company would prove it first. The answer at my bar was <em>no</em>, but it shows how to find out, and a pilot is how a company does that on its own invoices.</p>
+  <p>Every invoice line is cleared for payment, but the records can't show how many of them a person actually reviews first: most clearing steps are bulk postings, one login clearing many lines in the same minute. I tested whether AI could take the routine decisions off people's desks and still reach a strict accuracy bar, and how a company would prove it first. The answer at my bar was <em>no</em>, but it shows how to find out, and a pilot is how a company does that on its own invoices.</p>
   ${tbl("The study at a glance", ["Item", "Detail"], [
     ["Data", "One real multinational company's purchasing records, 2018, published for research"],
     ["Size", `${int(d.log.raw.cases)} order lines, ${int(d.log.raw.events)} recorded steps`],
@@ -203,7 +203,7 @@ function build(d) {
     ["R2", "A late fix costs more than the break-even", "Medium", "High", `Cautious break-even: ${int(L.gated_cautious)} lines per mistake × share reviewed × cost of a review (section 11)`, "Measure it in Phase 0; stop rule", "Finance Controller"],
     ["R3", "Mistakes concentrate in one kind of invoice", "Medium", "Medium", `The replay's ${int(t.wrong)} mistakes were mostly from one kind`, "Promote kind by kind; M3", "Pilot Owner"],
     ["R4", "The rulebook goes stale", "High", "Medium", "Suppliers, prices and buying habits change", "M5; scheduled retest and rewrite", "Rulebook Owner"],
-    ["R5", "Mistakes found after payment go unseen", "Medium", "High", "Not in the study's records", "M6", "Finance Controller"],
+    ["R5", "Mistakes found after payment go unnoticed", "Medium", "High", "Not in the study's records", "M6", "Finance Controller"],
     ["R6", "Reviewers copy the AI's suggestion", "Medium", "High", "The agreement simulation", "M2, D2, D3", "Internal Audit"],
     ["R7", "A few large invoices carry most of the value at risk", "Medium", "High", `${pct(v.wrong / v.paid, 1)} of paid value from ${pct(b.wrong / b.paid, 2)} of invoices`, "D1", "Risk and Compliance"],
     ["R8", "Fraud or duplicate payments", "Low", "High", "Not tested", "Out of scope; existing controls stay", "Risk and Compliance"],
@@ -306,7 +306,7 @@ function build(d) {
   const topShareWrong = b.top10.wrong_value / b.value.wrong, topSharePaid = b.top10.paid_value / b.value.paid;
   const dcard = (id, title, found, visual, why, ask) => `<article class="dcard"><p class="dcard-id">${id} · Recommended, not tested</p><h3>${title}</h3><p><strong>What I found:</strong> ${found}</p>${visual}<p><strong>Why it matters:</strong> ${why}</p><p class="dcard-ask"><strong>What I ask proposers:</strong> ${ask}</p></article>`;
   out.push(sec("s14", "14", "Special findings: the desirable requirements, and why I recommend them", `
-  <p class="headline">The mandatory requirements keep the pilot safe. These four extras come from things I saw in the study, and I would score them.</p>
+  <p class="headline">The mandatory requirements keep the pilot under control. These four extras come from things I saw in the study, and I would score them.</p>
   <p class="small">Each is a recommendation drawn from the evidence, not a tested result. None changes the verdict: no approach proved the 99% bar.</p>
   <div class="dcards">
   ${dcard("D1", "Send the largest invoices to a person", `the largest tenth of the invoices the rulebook paid (${usd(b.top10.line * f.R)} and up) held ${int(b.top10.wrong)} of its ${int(b.wrong)} mistakes, but ${pct(topShareWrong, 0)} of their value.`,

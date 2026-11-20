@@ -46,7 +46,7 @@ const WORDS_USED = [
   ["Understudy", "An AI that stands in for a person on one job, and is trusted only once it has proved itself."],
   ["Paid without a check", "The invoice goes to payment with no person looking at it. In the detail sections this is called passing it \"straight through\"."],
   ["Needed fixing", "Between the invoice arriving and being cleared for payment, someone had to correct it. This is the mistake the AI must avoid."],
-  ["Held for a person", "The safe choice. It costs a person's time, but it never causes a wrong payment."],
+  ["Held for a person", "The cautious choice. It costs a person's time, but it never causes a wrong payment."],
   ["The 99% bar", "Of the invoices an AI pays without a check, at least 99 in 100 must turn out fine."],
   ["Worst likely case", "A short test can be lucky. Given how many invoices were checked, this is the lowest the true share of paid invoices that turn out fine is likely to be (I am 95% sure it is at least this). I judge every AI by this number, not by its average. Statisticians call it the \"lower bound\"; the highest likely value is the \"upper bound\"."],
   ["Learning months and test months", "January to May 2018 were used to learn from. June to August 2018 were kept aside, unseen, for the test."],
@@ -77,10 +77,10 @@ function biz(d) {
   const iso = fp.isolated_paid / b.paid, rpb = fp.rpb_manual_paid / b.paid;
   const tile = (label, out, sub) => `<div><span class="small">${label}</span><span class="big" ${out}</span><span class="small">${sub}</span></div>`;
   const shareRows = [...mb.anchorShares.map(([s, why]) => [pct(s, 1), why]), ["Your share", ""], ["100%", "every line: an upper limit, not a plan"]];
-  const plain = `<p class="headline">On paper, an AI-written rulebook could have paid about half of invoices without a person checking them, for almost nothing to run. It is not yet proven safe enough, and proof takes months.</p>
+  const plain = `<p class="headline">On paper, an AI-written rulebook could have paid about half of invoices without a person checking them, for almost nothing to run. It has not proven the 99% bar, and proof takes months.</p>
   <p>This section stands on its own: if you read nothing else, read this. It turns my findings into money, risk and a next step. The rest of the report (Q1 to Q8) holds the evidence. All money is in US dollars.<sup><a href="#usd-note" id="usd-ref">*</a></sup></p>
   <h3>The study in brief</h3>
-  <p><strong>The question.</strong> Every invoice line is cleared for payment, but the records can't show how many of them a person actually looks at first: most clearing steps are bulk postings, one login clearing many lines in the same minute. I wanted to know whether AI could take the routine decisions off people's desks safely, and how a company would prove it before trusting it.</p>
+  <p><strong>The question.</strong> Every invoice line is cleared for payment, but the records can't show how many of them a person actually looks at first: most clearing steps are bulk postings, one login clearing many lines in the same minute. I wanted to know whether AI could take the routine decisions off people's desks and still reach a strict accuracy bar, and how a company would prove it before trusting it.</p>
   <p><strong>The data.</strong> A real multinational company's purchasing records from 2018: ${int(d.log.raw.cases)} order lines and ${int(d.log.raw.events)} recorded steps, published for research. Every line has a known outcome: it either went through cleanly or someone had to correct it before payment.</p>
   <p><strong>The unit.</strong> In this study an "invoice" is one order line, because the records have no invoice-document field. Every count and amount in this section is per order line. One invoice document can cover several lines: the ${int(b.paid)} lines the rulebook would have paid came in about ${int(b.groups_paid)} groups that share an order and a receipt minute, a rough count of documents.</p>
   <p><strong>The test.</strong> Three approaches learned from January to May 2018, then made their calls on ${int(d.held_out_n)} invoices from June to August that none of them had seen. Claude checking each invoice costs too much to run on all of them, so it judged a ${int(d.sample_n)}-invoice sample and then a ${b2 ? int(b2.b_alone.n) : "larger"}-invoice follow-up. Each could only pay an invoice without a check or hold it for a person. I scored every call against what really happened.</p>
@@ -126,7 +126,7 @@ function biz(d) {
   <p class="ask" data-out="verdict"></p>
   <p data-out="anchor"></p>
   <h3>4. What the first months really look like</h3>
-  <p>The figures above assume the rulebook is trusted from day one. That is not how I would run it, so I also tested the safer way. In a week-by-week replay of the test months, it started in practice mode: it made its calls while people still checked everything. It earned the right to pay one kind of invoice on its own only once that kind's real outcomes proved the bar, and lost it when results slipped. ${esc(plainEvents(d))}</p>
+  <p>The figures above assume the rulebook is trusted from day one. That is not how I would run it, so I also tested trust earned on outcomes. In a week-by-week replay of the test months, it started in practice mode: it made its calls while people still checked everything. It earned the right to pay one kind of invoice on its own only once that kind's real outcomes proved the bar, and lost it when results slipped. ${esc(plainEvents(d))}</p>
   <p class="small">In the decision record's words ("the written policy" is the rulebook):</p>
   <p>${esc(eventSentence(d))}</p>
   <p>While trusted it paid ${int(t.passed)} lines on its own, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar). On the same test lines, that is ${pct(g.earned_share, 1)} of the ${int(b.paid)} it would have paid on paper. Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion. The test window was too short to show the steady state, so ${pct(g.earned_share, 1)} understates it, and I do not estimate it here.</p>
@@ -312,7 +312,9 @@ function summaryStrip(d) {
     ["Claude checking each invoice", "Too few to tell", b2 ? `Paid ${pct(b2.coverage, 1)} of ${int(b2.n)} new invoices; not proven.` : "Paid too few to prove anything."],
     ["Claude's rulebook", `${int(short)} mistakes short`, `Paid ${pct(cn / d.held_out_n, 0)} of invoices, ${pct(ck / cn, 2)} fine.`],
   ];
-  return `<ul class="strip" aria-label="The result for each approach">${items.map(([who, what, why], i) => `<li class="${i === 2 ? "near" : ""}"><span class="who">${esc(who)}</span><span class="what">${esc(what)}</span><span class="why">${esc(why)}</span></li>`).join("")}</ul>`;
+  const r = d.evidence.replay, t = d.replay.totals;
+  const replayLine = `<p class="strip-note"><strong>Trust earned on outcomes (replay):</strong> ${int(t.passed)} paid, ${int(t.wrong)} needed correction, ${r.kinds === 1 ? `all in one kind` : `in ${word(r.kinds)} kinds`}, ${word(r.top_order)} on one order. Not proven either: ${pct(t.wrong / t.passed, 1)} needed correction.</p>`;
+  return `<ul class="strip" aria-label="The result for each approach">${items.map(([who, what, why], i) => `<li class="${i === 2 ? "near" : ""}"><span class="who">${esc(who)}</span><span class="what">${esc(what)}</span><span class="why">${esc(why)}</span></li>`).join("")}</ul>${replayLine}`;
 }
 
 function journeyLanes(d) {
@@ -565,7 +567,7 @@ function q4(d) {
   const mc = d.bar.min_calls, top = Math.max(...mc.map((m) => m.calls));
   const bars = mc.map((m) => `<li><span class="name">${m.errors === 0 ? "No mistakes" : `${word(m.errors)[0].toUpperCase() + word(m.errors).slice(1)} mistake${m.errors === 1 ? "" : "s"}`}</span><span class="track" aria-hidden="true"><span class="fill" style="width:${(m.calls / top) * 100}%"></span></span><span class="val">${int(m.calls)}</span></li>`).join("");
   const c = d.policies.find((p) => p.chosen), cn = c.held_out.precision[1];
-  const plain = `<p>A wrong "pay" means paying an invoice that, in the records, had to be corrected before it was cleared. Holding an invoice for a person counts as safe here. It just costs that person's time.</p>
+  const plain = `<p>A wrong "pay" means paying an invoice that, in the records, had to be corrected before it was cleared. Holding an invoice for a person counts as no mistake here. It just costs that person's time.</p>
   <p>Paying every invoice without a check sounds tempting: ${pct(pe.precision[0] / pe.precision[1], 0)} of them were fine. But that still leaves ${int(pe.precision[1] - pe.precision[0])} payments to fix, about ${oneIn(pe.precision[1], pe.precision[1] - pe.precision[0])}. So the bar is 99%: at most 1 in 100.</p>
   <h3>Why the average is not enough</h3>
   <p>A good score on a few invoices could just be luck, the way a coin can land heads five times in a row. An AI that paid 50 invoices with no mistakes has a perfect average, but that is too little evidence to trust it with thousands. So I use the worst likely case: the lowest the true accuracy could reasonably be, given how much evidence there is. More invoices means a tighter range, and a worst case closer to the average.</p>
@@ -665,7 +667,7 @@ function q5(d) {
   <p>While switched on, it paid ${int(t.passed)} invoices by itself and ${int(t.wrong)} needed fixing (about ${oneIn(t.passed, t.wrong)}). That is worse than the 1 in 100 bar.</p>
   <h3>What it means</h3>
   <p>Switching an AI on one kind at a time limits how much it can get wrong before it is caught, but it is slow and no guarantee. You only learn whether an invoice was paid correctly weeks after it arrives, so the proof builds slowly. Here the AI was first switched on in ${wk(d.replay.first)}${dem ? `, and switched off again ${word(wnum(dem.week) - wnum(proms[0].week))} weeks later` : ""}. A company taking this route should expect months of practice before the AI does real work, and should keep checking it after it is switched on.</p>
-  <p class="small">Most of the ${int(t.wrong)} mistakes came from one kind of invoice, and the records end soon after the second kind was switched on, so ${int(t.passed)} is lower than a full year would give. This replay does not change the answer at the top.</p>
+  <p class="small">All ${int(t.wrong)} mistakes came from one kind of invoice, ${word(d.evidence.replay.top_order)} of them on one purchase order, and the records end soon after the second kind was switched on, so ${int(t.passed)} is lower than a full year would give. This replay does not change the answer at the top.</p>
   ${openButton("replay_autonomous", `See the ${int(t.passed)} invoices it paid by itself`)}`;
   const detail = `<p>Each kind of invoice earns trust on its own, not all at once. A kind is switched on once its settled practice calls clear the bar. If even the best likely case (the 95% upper bound) of its last 200 settled calls falls below the bar, it is switched off again. A call only counts as evidence once its outcome is known.</p>
   <p>${esc(eventSentence(d))}</p>
@@ -791,7 +793,7 @@ function q8(d) {
   <li><strong>Earning trust over time.</strong> In the week-by-week replay: how soon it earned the right to pay alone, how many lines it paid on its own, and how many wrong payments got through (Q5).</li>
   </ol>
   <p>On this yardstick, none of the three earned trust at the 99% bar (Q3).</p>
-  <p>One yardstick answers "which approach does this job best?" It does not answer "how do you keep it safe once it is running?" Each approach goes wrong in a different way, so each needs its own extra checks.</p>
+  <p>One yardstick answers "which approach does this job best?" It does not answer "how do you keep it in check once it is running?" Each approach goes wrong in a different way, so each needs its own extra checks.</p>
   <h3>What to watch if you ran one for real</h3>
   <p class="small">These are recommendations, not results from this test.</p>
   <div class="kpis">

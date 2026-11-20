@@ -412,3 +412,7 @@ table th .small { display: block; font-weight: 400; letter-spacing: 0; }
   .calc { grid-template-columns: minmax(0, 14em) minmax(0, 1fr); }
   .calc .biz-inputs { grid-template-columns: 1fr; }
 }
+/* The replay's result, one line under the result strip. */
+.strip:has(+ .strip-note) { margin-bottom: 10px; }
+.strip-note { margin: 0 0 28px; font-size: 15px; color: var(--ink-2); max-width: 68ch; }
+.strip-note strong { color: var(--ink); }
