@@ -322,7 +322,7 @@ function q1(d) {
   return section("q1", "Q1", "<h1", plain, detail, [
     `${int(d.held_out_n)} test invoices, locked with a fingerprint (checksum) before any understudy ran. No understudy saw how they turned out`,
     `Bar: the worst likely case (95% lower bound) of paid invoices being fine must be at least 99%`,
-    `Three rulebooks written separately all landed between ${pct(Math.min(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} and ${pct(Math.max(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} fine`,
+    `Three rulebooks drafted separately by the same model from the same inputs all landed between ${pct(Math.min(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} and ${pct(Math.max(...d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1])), 2)} fine: consistent, but not independent checks`,
   ]);
 }
 
@@ -601,8 +601,8 @@ function q3(d) {
   ${explorer(d)}
   <ul>
   <li><strong>The simple rule</strong> pays a kind of invoice only if that kind had a clean enough record in earlier months to clear the bar. No kind did, so it paid nothing.</li>
-  <li><strong>Claude checking each invoice</strong> paid only invoices the rulebook also paid, and was right on them about as often; it added cost, not accuracy. On the same ${int(d.sample_n)} invoices it paid ${int(bvc.B_passed)}, and the rulebook paid ${bic.also_c === bic.b_passed ? "every one of them" : `${int(bic.also_c)} of them`}, plus ${int(bvc.C_passed - bic.also_c)} more. Of those ${int(bic.b_passed)}, ${int(bvc.B_errors)} needed fixing for checking each invoice and ${int(bic.c_on_b)} for the rulebook. ${int(bvc.B_passed)} invoices are too few to prove 99% either way. The rulebook is far cheaper (see Q7), so it went forward. A larger follow-up, below, did not change this.</li>
-  <li><strong>Claude's rulebook:</strong> Claude wrote three rulebooks separately. I picked one before testing, using only earlier months. All three got between ${pct(Math.min(...rates), 1)} and ${pct(Math.max(...rates), 1)} right on the invoices they paid. None proved 99%; allowing for invoices on the same order, the picked one's worst likely case is ${pct(d.evidence.clustering.clustered_lower, 1)}. One of the other two did prove 99%, but it doesn't count: I had seen its result before the final comparison rule was set, and it wasn't the one picked beforehand.</li>
+  <li><strong>Claude checking each invoice</strong> paid only invoices the rulebook also paid, and was right on them about as often; it added cost, not accuracy. On the same ${int(d.sample_n)} invoices it paid ${int(bvc.B_passed)}, and the rulebook paid ${bic.also_c === bic.b_passed ? "every one of them" : `${int(bic.also_c)} of them`}, plus ${int(bvc.C_passed - bic.also_c)} more. Of those ${int(bic.b_passed)}, ${int(bvc.B_errors)} needed fixing for checking each invoice and ${int(bic.c_on_b)} for the rulebook. ${int(bvc.B_passed)} invoices are too few to prove 99% either way. It was asked once about each invoice, so how much its answers vary from one asking to the next was not measured. The rulebook is far cheaper (see Q7), so it went forward. A larger follow-up, below, did not change this.</li>
+  <li><strong>Claude's rulebook:</strong> Claude wrote three rulebooks separately. I picked one before testing, using only earlier months. All three got between ${pct(Math.min(...rates), 1)} and ${pct(Math.max(...rates), 1)} right on the invoices they paid. The same model drafted all three from the same summaries, so that shows consistency, not independent confirmation. None proved 99%; allowing for invoices on the same order, the picked one's worst likely case is ${pct(d.evidence.clustering.clustered_lower, 1)}. One of the other two did prove 99%, but it doesn't count: I had seen its result before the final comparison rule was set, and it wasn't the one picked beforehand.</li>
   </ul>
   ${openButton("b_passes_sample", `See the ${int(bvc.B_passed)} invoices Claude paid one by one`)}
   ${followUp(d)}`;
@@ -899,14 +899,14 @@ function q8(d) {
   ])}
   ${card("Claude checking each invoice", "its cost grows with every invoice, its answers can vary, and a new version of the AI can behave differently.", `about $${bPerPaid.toFixed(2)} for each invoice it paid, because it held most of them.`, [
     "Cost for each invoice taken off people's desks",
-    "Whether the same invoice gets the same answer twice",
+    "Whether the same invoice gets the same answer twice (not tested here: each invoice was asked once)",
     "How many answers fail the software's checks",
     "Whether its reasons would satisfy an auditor",
     "A fresh test every time the AI model changes",
   ])}
   ${card("Claude's rulebook", "the rules go stale as suppliers, prices and buying habits change.", `about $${cOnce.toFixed(2)} per rulebook: a tiny fraction of a cent for each invoice it paid.`, [
     "How often the rulebook is rewritten and tested again",
-    `Whether rewrites agree. Here, three rulebooks written separately landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine`,
+    `Whether rewrites agree. Here, three drafts from the same inputs landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine: consistent, but not independent checks`,
     "That a person reads and signs off each version before it is used",
   ])}
   </div>

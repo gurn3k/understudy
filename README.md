@@ -16,7 +16,7 @@ Each understudy is held to a trust bar: the 95% lower bound on how often its str
 
 ## The result
 
-No contender earned trust at the 99% bar. The fixed rule passes nothing. The policy Claude wrote passes 48.7% of held-out invoices at 99.07% correct. That does not prove the bar: the worst likely case is 98.95%, or 98.82% allowing for lines on the same order. Three independently written policies all landed between 99.07% and 99.20%. A follow-up run of B on 10,000 new invoices, pre-registered in `docs/adr/0018-b-follow-up-run.md`, did not prove 99% either: it passed 577 (5.8%) with 6 wrong, a lower bound of 97.8%, and was not separated from the written policy, which is far cheaper. The page shows the full result, including the verdict under the rule set before any run, and the cost of each approach per 1,000 invoices.
+No contender earned trust at the 99% bar. The fixed rule passes nothing. The policy Claude wrote passes 48.7% of held-out invoices at 99.07% correct. That does not prove the bar: the worst likely case is 98.95%, or 98.82% allowing for lines on the same order. Three policies the same model drafted separately from the same inputs all landed between 99.07% and 99.20%: consistent, but not independent checks. B was asked once about each invoice, so how much its answers vary was not measured. A follow-up run of B on 10,000 new invoices, pre-registered in `docs/adr/0018-b-follow-up-run.md`, did not prove 99% either: it passed 577 (5.8%) with 6 wrong, a lower bound of 97.8%, and was not separated from the written policy, which is far cheaper. The page shows the full result, including the verdict under the rule set before any run, and the cost of each approach per 1,000 invoices.
 
 ## How it was kept honest
 

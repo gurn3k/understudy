@@ -374,7 +374,7 @@ function build(d) {
   ${dcard("D3", "Watch how often people overrule it, as a warning sign only", "agreement mostly measured the reviewers in the simulation, not the AI.",
     "", "a rising override rate is worth looking into. A low one is not proof of accuracy, so it must never be used to grant trust (requirement M2).",
     "show the override rate on the monthly report, next to outcome-based accuracy.")}
-  ${dcard("D4", "Plan the exit, and keep the data portable", `three rulebooks written separately by the same AI landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine on the same invoices.`,
+  ${dcard("D4", "Plan the exit, and keep the data portable", `three rulebooks the same AI drafted from the same inputs landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine on the same invoices: consistent, but not independent checks.`,
     "", "a new rulebook or a new AI model can behave differently. The company needs to be able to retest, switch supplier or stop, without losing the record of every call.",
     "describe the exit steps, the data the company keeps, and how every rulebook version is retested before use.")}
   </div>

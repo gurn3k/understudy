@@ -70,6 +70,7 @@ const FORBIDDEN = [
   [/made about \d+ times as often|most repeated of the decisions|manual clearing and block-removal events in these records/i, "unlike units: logged steps are not decisions or invoices; count in order lines", "review round, Should 5"],
   [/, (before|after) delivery\b|arrived before or after the goods|came before or after the delivery/i, "the kind is the order's matching setting, not when the invoice came", "review round, Should 6"],
   [/Code: MIT\.|independent program|recounted the records independently/i, "the code is private, and the recount is a second program written separately", "review round, Should 13"],
+  [/written separately all landed|written separately landed|independently written|rulebooks agree/i, "the three rulebooks are drafts by the same model from the same inputs: consistent, not independent", "review round, Should 15"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -216,6 +217,8 @@ REQUIRED.rfp.push(["kind is a setting", `${pc(KS.before_gr_gr_first / KS.before_
 const firstWkC = D.replay.weeks.indexOf(D.replay.first) + 1;
 REQUIRED.q9.push(["in brief: recommendation", "What I recommend:"], ["in brief: cost now", `${"$" + n0(8 * 4 * 40)} of oversight time`],
   ["in brief: stop rule", `no kind proves the bar by week ${firstWkC * 2} of practice mode`]);
+// The three rulebooks (Should 15): consistent, not independent.
+REQUIRED.rfp.push(["three drafts are not independent", "consistent, but not independent checks"]);
 // People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.
 REQUIRED.q9.push(["saving as capacity", "capacity, not jobs"]);
 REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payable staff"], ["consultation in Phase 0", "a works council where there is one"],
