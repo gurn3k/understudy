@@ -74,6 +74,7 @@ const FORBIDDEN = [
   [/Decision and Gate 1 package|\d+ weeks expected/i, "the plan is a range (at least, at most under the stop rule) and procurement ends in the award decision", "review round, Should 26"],
   [/rewritten every month, which is 12 rulebooks a year/i, "a monthly rewrite is a cost ceiling; trust belongs to the version that earned it", "ADR 0026"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
+  [/pre-registered approaches, [\d,]+ real invoices/i, "the three approaches were not all judged on the same invoices: give each its own set", "review round, Should 23"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
@@ -233,6 +234,8 @@ REQUIRED.rfp.push(["three drafts are not independent", "consistent, but not inde
 REQUIRED.q9.push(["saving as capacity", "capacity, not jobs"]);
 REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payable staff"], ["consultation in Phase 0", "a works council where there is one"],
   ["deskilling risk", "Staff lose practice on the kinds the AI pays (deskilling)"], ["saving as capacity", "Capacity, not jobs"]);
+// Each approach's own test set (Should 23): B was judged on its follow-up sample, not on all the test invoices.
+REQUIRED.rfp.push(["B's test set in section 1", `Claude checking each invoice on ${n0(D.b2.b_alone.n)} (a follow-up sample)`]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);

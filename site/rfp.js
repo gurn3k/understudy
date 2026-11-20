@@ -79,7 +79,7 @@ function build(d) {
   <p class="headline">I ask for approval of a controlled pilot, not a roll-out: at least ${totalWeeks} weeks and at most ${maxWeeks} in four gated phases, after about ${PROC} weeks of procurement.</p>
   ${timeline}
   ${tbl("Key figures", ["Question", "Answer", "What it means"], [
-    ["What was tested?", `3 pre-registered approaches, ${int(d.held_out_n)} real invoices`, "None proved the 99% bar"],
+    ["What was tested?", `3 pre-registered approaches: the simple rule and the rulebook on ${int(d.held_out_n)} real test invoices, Claude checking each invoice on ${b2 ? int(b2.b_alone.n) + " (a follow-up sample)" : int(d.sample_n)}`, "None proved the 99% bar"],
     ["What did the best one do?", `Rulebook paid ${pct(b.paid / d.held_out_n, 1)}; ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} right; worst likely case ${pct(c.held_out.precision_lower, 2)}`, "Below the bar: not proved"],
     ["The saving", `Not known yet. It rests on the share of order lines a person reviews today, which the records can't show. ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step`, "A footprint, not proof of review. Phase 0 measures it"],
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
