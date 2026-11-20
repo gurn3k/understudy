@@ -253,7 +253,7 @@ function build(d) {
   const risks = [
     ["R1", "A line that needs a correction is paid", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7, M9, M12", "Pilot Owner"],
     ["R2", "A late fix costs more than the break-even", "Medium", "High", `Cautious break-even: ${int(L.gated_cautious)} lines per mistake × share reviewed × cost of a review (section 11)`, "Measure it in Phase 0; stop rule", "Finance Controller"],
-    ["R3", "Mistakes concentrate in one kind of invoice", "Medium", "Medium", `The replay's ${int(t.wrong)} mistakes were mostly from one kind`, "Promote kind by kind; M3", "Pilot Owner"],
+    ["R3", "Mistakes concentrate in one kind of invoice", "Medium", "Medium", `The replay's ${int(t.wrong)} mistakes were ${er.kinds === 1 ? "all in one kind" : `in ${int(er.kinds)} kinds`}, ${int(er.top_order)} of them on one order`, "Promote kind by kind; M3; M12", "Pilot Owner"],
     ["R4", "The rulebook goes stale", "High", "Medium", "Suppliers, prices and buying habits change", "M5; scheduled retest and rewrite", "Rulebook Owner"],
     ["R5", "Mistakes found after payment go unnoticed", "Medium", "High", "Not in the study's records", "M6", "Finance Controller"],
     ["R6", "Reviewers copy the AI's suggestion", "Medium", "High", "The agreement simulation", "M2, M9, D3", "Internal Audit"],
@@ -394,7 +394,7 @@ function build(d) {
     ["Blind check", "A person decides on a line the AI paid on its own without seeing the AI's call, so the result measures the AI, not the reviewer (M9)."],
   ])}
   <h3>B. Where each figure comes from</h3>
-  ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
+  ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "The controls in sections 3, 6, 7 and 8 (promotion, switch-off, blind checks, intervals, data protection, roles, Gate 4): 0025.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
   <h3>C. Benchmarks to collect</h3>
   <p>See the table at the end of section 11.</p>
   <h3>D. Change log</h3>
