@@ -236,6 +236,8 @@ REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payabl
   ["deskilling risk", "Staff lose practice on the kinds the AI pays (deskilling)"], ["saving as capacity", "Capacity, not jobs"]);
 // Each approach's own test set (Should 23): B was judged on its follow-up sample, not on all the test invoices.
 REQUIRED.rfp.push(["B's test set in section 1", `Claude checking each invoice on ${n0(D.b2.b_alone.n)} (a follow-up sample)`]);
+// The licence's "modified" statement (Should 22), on the pilot request's footer as on the main page's.
+REQUIRED.rfp.push(["CC BY: data modified", "Filtered and aggregated for this analysis"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);
