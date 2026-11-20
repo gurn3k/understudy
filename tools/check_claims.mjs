@@ -66,6 +66,7 @@ const FORBIDDEN = [
   [/never seen|had (not|never) seen|none of them (had )?seen|saw their outcomes/i, "the test months were held out, but inputs drew on later outcomes (look-ahead)", "ADR 0022"],
   [/wrong payments?/i, "say lines paid that needed a correction: the label is a correction, not a wrong payment", "ADR 0022"],
   [/corrections after payment aren't seen/i, "post-clearing corrections are in the records and move the result: give the figure", "ADR 0022"],
+  [/\bFTEs?\b|staff resist/i, "count the saving as review hours freed (capacity, not jobs); staff are consulted, not a resistance risk", "review round, Should 4"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -204,6 +205,10 @@ REQUIRED.q9.push(["largest tenth: share of mistakes by count", `held ${pc(T10.wr
   ["value rate of lines needing a correction", pc(B.value.wrong / B.value.paid, 1)]);
 REQUIRED.rfp.push(["largest tenth: share of mistakes by count", `held ${pc(T10.wrong / B.wrong, 0)} of its mistakes`],
   ["largest tenth: share of value paid", `${pc(T10.paid_value / B.value.paid, 0)} of all the value paid`]);
+// People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.
+REQUIRED.q9.push(["saving as capacity", "capacity, not jobs"]);
+REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payable staff"], ["consultation in Phase 0", "a works council where there is one"],
+  ["deskilling risk", "Staff lose practice on the kinds the AI pays (deskilling)"], ["saving as capacity", "Capacity, not jobs"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);

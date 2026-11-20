@@ -203,7 +203,7 @@ function build(d) {
   <p class="jump"><a href="#s14">The findings behind D1, D3, D4 and M9 are in section 14 &rarr;</a></p>`));
 
   const ph = [
-    ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget, and Phase 0's measured share reviewed, minutes per review and late-fix cost give a positive net after running costs (section 11); otherwise stop"],
+    ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; consult the accounts-payable staff and their representatives (a works council where there is one) on how roles and workload change, and plan redeployment of freed hours; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget, and Phase 0's measured share reviewed, minutes per review and late-fix cost give a positive net after running costs (section 11); otherwise stop"],
     ["1 Practice mode", `At least ${firstWk} (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}, under its own single-crossing rule, and was switched off again later; ${m2Line}); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
     ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind checks run window by window (one month to one quarter) on each kind paid on its own (M9).", "G3: results review; the correction budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
@@ -261,14 +261,15 @@ function build(d) {
     ["R7", "A few large invoices carry most of the value at risk", "Medium", "High", `${pct(v.wrong / v.paid, 1)} of paid value from ${pct(b.wrong / b.paid, 2)} of invoices`, "D1", "Risk and Compliance"],
     ["R8", "Fraud or duplicate payments", "Low", "High", "Not tested", "Out of scope; existing controls stay", "Risk and Compliance"],
     ["R9", "Privacy or supplier-data terms are breached", "Medium", "High", "A live pilot sends supplier and invoice data to an outside service and, for some designs, an outside model; the study sent none", "M13 and the data-protection table (section 6)", "Risk and Compliance"],
-    ["R10", "Staff resist or roles are unclear", "Medium", "Medium", "Not tested", "Explain the change in Phase 0", "Executive Sponsor"],
+    ["R10", "Roles and workload change for accounts-payable staff", "Medium", "Medium", "Not tested", "Consult the staff affected and their representatives (a works council where there is one) in Phase 0, before any kind is paid on its own; plan where the freed hours go, including redeployment", "Executive Sponsor"],
     ["R11", "The AI model or a supplier changes", "Medium", "Medium", "Models can change behaviour", "Retest on every change; D4", "IT and Data"],
     ["R12", "Seasonal volume hides a weakness", "Medium", "Medium", `The test covered ${b.months} months`, "Track by month through Phase 2", "Pilot Owner"],
+    ["R13", "Staff lose practice on the kinds the AI pays (deskilling)", "Medium", "Medium", "Not tested; a switch-off hands a kind straight back to people", "Blind checks (M9) run by the accounts-payable team; rotate reviewers across kinds; keep written procedures for every kind", "Accounts-payable team lead"],
   ];
   out.push(sec("s9", "9", "Risk register", `
   <p>The ratings are my judgment, not measurements. Replace them with the company's own scale in Phase 0.</p>
   ${tbl("Risks", ["Ref", "Risk", "Likelihood", "Impact", "Evidence", "Mitigation", "Owner"], risks)}
-  <p class="small">Risks beyond lines paid that need a correction (R4 to R12) are not measured by the study. They are what I would expect a risk committee to ask about.</p>`));
+  <p class="small">Risks beyond lines paid that need a correction (R4 to R13) are not measured by the study. They are what I would expect a risk committee to ask about.</p>`));
 
   out.push(sec("s10", "10", "Controls and compliance", `
   ${list([
@@ -298,7 +299,7 @@ function build(d) {
     [`Hosting and logging<span class="small">${req("Proposer to price")}</span>`, "For the pilot and the retention period", fill("US$ amount")],
     [`Outcome scoring<span class="small">${req("Proposer to price")}</span>`, "Matching each call to its outcome as it arrives", fill("US$ amount")],
     [`Audit<span class="small">${req("Yours to estimate")}</span>`, "Internal Audit's review before Gate 3 (section 10)", fill("US$ amount")],
-    [`Training and change management<span class="small">${req("Yours to estimate")}</span>`, "", fill("US$ amount")],
+    [`Training, staff consultation and change management<span class="small">${req("Yours to estimate")}</span>`, "", fill("US$ amount")],
     ["Total so far", "Phase 0, oversight, the rulebook, blind checks (M9: monthly windows during Phase 2, on the kinds you enter above), and integration if entered. Not the required lines still blank", `<span data-out="total"></span>`],
   ])}
   <p><strong>No saving for at least ${f.dryWeeks} weeks.</strong> Nothing is paid without a person in Phase 0 (${PH.p0} weeks) or in practice mode (at least ${firstWk} weeks), so the pilot costs money for that long before it can save any. The costs here take Phase 1 at that minimum.</p>
@@ -327,7 +328,7 @@ function build(d) {
   ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Lines paid alone a year", "Needing a correction a year", "Gross saving", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
     scenRows(g).map(([x, why], k) => [`${pct(x, x && x < 0.1 ? 1 : 0)}${why ? `<span class="small">${why}</span>` : ""}`, `<span data-out="sc-checks-${k}"></span>`, `<span data-out="sc-wrong-${k}"></span>`, `<span data-out="sc-gross-${k}"></span>`, `<span data-out="sc-net-${k}"></span>`, `<span data-out="sc-roi-${k}"></span>`, `<span data-out="sc-pay-${k}"></span>`]), "scen")}
   ${tbl("How each figure is worked out", ["Figure", "Formula"], [
-    ["Gross saving", "Lines paid alone × share reviewed today × minutes per review ÷ 60 × hourly cost"],
+    ["Gross saving", "Lines paid alone × share reviewed today × minutes per review ÷ 60 × hourly cost: review hours freed, priced. Capacity, not jobs"],
     ["Late-fix cost", "Lines paid alone × the cautious error rate × (work per fix + share never recovered × average value of a wrongly paid line)"],
     ["Net yearly benefit", "Gross saving − late-fix cost − oversight (hours a week × 52) − blind checks (kinds × 12 monthly windows × one window's cost, but never more checks than lines paid alone). At 0% earned nothing is paid on its own, so there are no blind checks and it is the oversight cost alone"],
     ["First-year ROI", "(Net yearly benefit − total pilot cost) ÷ total pilot cost"],
