@@ -76,6 +76,7 @@ const FORBIDDEN = [
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
   [/pre-registered approaches, [\d,]+ real invoices/i, "the three approaches were not all judged on the same invoices: give each its own set", "review round, Should 23"],
   [/30 to 90 days|supplier-written guides/i, "an outside claim with no checked source: the study's own replay sets the shortest pilot", "review round, Should 24"],
+  [/Out of scope; existing controls stay/i, "the existing duplicate and fraud checks must run on lines paid on their own (M14)", "review round, Should 18"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
@@ -243,6 +244,8 @@ REQUIRED.rfp.push(["CC BY: data modified", "Filtered and aggregated for this ana
 REQUIRED.rfpHead = [["og:url", "https://understudy.gurn3k.com/rfp.html"], ["og:title", "Understudy: request for a pilot proposal"], ["og:image", "https://understudy.gurn3k.com/og.png"], ["twitter card", "summary_large_image"]];
 // Shorter pilots (Should 24): the reason is the replay's own first promotion, not an outside guide.
 REQUIRED.rfp.push(["why not a shorter pilot", `the first kind qualified only in week ${firstWkC} of the replay`]);
+// Duplicates and fraud (Should 18): rated Medium, and the existing checks run on every line paid on its own.
+REQUIRED.rfp.push(["R8 rated Medium", "Fraud or duplicate paymentsMediumHigh"], ["duplicate check on autonomous payments", "Run the company's existing duplicate-payment and fraud checks on every line paid on its own"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"] }[where];

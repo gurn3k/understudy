@@ -107,7 +107,7 @@ function build(d) {
   <h3>In scope</h3>
   ${list(["Purchase invoices matched against orders and goods receipts (the kind the study covered).", "Practice mode (shadow mode) on every kind of invoice, then limited autonomy on kinds that qualify.", "Measurement of the share of order lines a person reviews today, minutes per review, the cost of a late fix (the work plus the share of value never recovered) and the rate of corrections after payment."])}
   <h3>Out of scope</h3>
-  ${list(["Payment runs, supplier onboarding and supplier bank-detail changes.", "Fraud and duplicate-payment detection. I did not test either; existing controls stay as they are.", "Any invoice type the study did not cover."])}
+  ${list(["Payment runs, supplier onboarding and supplier bank-detail changes.", "Building new fraud or duplicate-payment detection. I did not test either; the existing checks stay, and they must run on every line paid on its own (M14).", "Any invoice type the study did not cover."])}
   <h3>Objectives</h3>
   ${list([
     "<strong>O1.</strong> Prove or disprove the 99% bar on the company's own invoices.",
@@ -184,6 +184,7 @@ function build(d) {
     ["M11", `Beat a supplier whitelist that the issuer, not the proposer, builds on its earlier months: every cell of ${esc(d.evidence.vendor.picked)} whose worst likely case on those months is at least 99%. On the same held-out months, the proposal must reach a worst likely case of 99% allowing for orders and pay more lines than the whitelist; if the whitelist itself misses 99% there, the proposal must still reach 99% and pay more lines than the whitelist cells that do.`, "Both are scored by the issuer on the same held-out months before Gate 2; a proposal that does not beat the whitelist is disqualified."],
     ["M12", `Pay at most ${word(ORDER_CAP).toLowerCase()} lines of one purchase order on their own (my default; the issuer sets the number at Gate 1); the order's later lines go to a person, as they do today. This is a lesson from the replay, where ${int(er.top_order)} of the ${int(er.wrong)} mistakes were on one order, not a tested control. On the replay, a cap of ${int(ORDER_CAP)} would have cut lines paid on their own from ${int(t.passed)} to ${int(ctl.order_cap.passed)} and mistakes from ${int(t.wrong)} to ${int(ctl.order_cap.wrong)}; the money in section 11 does not include it.`, "A seeded order with more lines than the cap stops at the cap."],
     ["M13", "Meet every data-protection requirement in the table below before any invoice, supplier or call data leaves the company, and keep to them for as long as any of it is held.", "Each item has the evidence named in the table, checked by Risk and Compliance before Phase 0 uses real data."],
+      ["M14", "Run the company's existing duplicate-payment and fraud checks on every line paid on its own, before it is paid, exactly as on lines a person pays. The pilot does not replace, skip or reorder them.", "In Phase 0, a seeded duplicate of a line already paid, sent down the path for lines paid on its own, is stopped before payment."],
   ], "fit")}
   ${tbl("Data protection (all mandatory, under M13)", ["Ref", "The proposer shall", "Evidence"], [
     ["DP1 Retention and training use", `Keep invoice, supplier and call data only as long as the pilot and the retention period in section 10 need it, delete it on request, and never use it to train or improve any model without the company's written consent.`, "Contract terms, and the model provider's written data-use terms for the plan used"],
@@ -264,7 +265,7 @@ function build(d) {
     ["R5", "Mistakes found after payment go unnoticed", "Medium", "High", "Not in the study's records", "M6", "Finance Controller"],
     ["R6", "Reviewers copy the AI's suggestion", "Medium", "High", "The agreement simulation", "M2, M9, D3", "Internal Audit"],
     ["R7", "A few large invoices carry most of the value at risk", "Medium", "High", `${pct(v.wrong / v.paid, 1)} of paid value from ${pct(b.wrong / b.paid, 2)} of invoices`, "D1", "Risk and Compliance"],
-    ["R8", "Fraud or duplicate payments", "Low", "High", "Not tested", "Out of scope; existing controls stay", "Risk and Compliance"],
+    ["R8", "Fraud or duplicate payments", "Medium", "High", "Not tested: the records have no duplicate or fraud label. Paying a line on its own takes away the person who might have spotted one", "M14: the existing duplicate and fraud checks run on every line paid on its own", "Risk and Compliance"],
     ["R9", "Privacy or supplier-data terms are breached", "Medium", "High", "A live pilot sends supplier and invoice data to an outside service and, for some designs, an outside model; the study sent none", "M13 and the data-protection table (section 6)", "Risk and Compliance"],
     ["R10", "Roles and workload change for accounts-payable staff", "Medium", "Medium", "Not tested", "Consult the staff affected and their representatives (a works council where there is one) in Phase 0, before any kind is paid on its own; plan where the freed hours go, including redeployment", "Executive Sponsor"],
     ["R11", "The AI model or a supplier changes", "Medium", "Medium", "Models can change behaviour", "Retest on every change; D4", "IT and Data"],
@@ -283,7 +284,7 @@ function build(d) {
     "<strong>Audit trail.</strong> Every call, input and outcome is logged and kept for the retention period the company's policy sets: " + fill("e.g. 7 years, per records policy") + ".",
     "<strong>Independent review.</strong> Internal Audit reviews a sample of paid invoices before Gate 3.",
     "<strong>Data protection.</strong> Nothing leaves the company until every item under M13 is met; Risk and Compliance checks them before Phase 0 uses real data and at each gate.",
-    "<strong>Existing controls.</strong> Payment-approval limits, fraud checks and period-end controls stay in force.",
+    "<strong>Existing controls.</strong> Payment-approval limits, fraud and duplicate checks and period-end controls stay in force, on lines paid on their own as on every other line (M14).",
     "<strong>Regulation.</strong> The company's compliance function decides which rules apply. This document does not state any.",
   ])}`));
 
