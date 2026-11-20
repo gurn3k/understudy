@@ -805,7 +805,7 @@ function q8(d) {
   <p>To compare them fairly, all three were judged on the same things:</p>
   <ol class="plainlist">
   <li><strong>Proof of 99%.</strong> Of the invoices it paid, the worst likely case had to be at least 99% fine (Q4).</li>
-  <li><strong>How many it paid.</strong> The share of invoices it took off people's desks. This is where the saving is.</li>
+  <li><strong>How many it paid.</strong> The share of invoices it paid without a person. The saving depends on how many of those a person would really have reviewed (Q9).</li>
   <li><strong>Beating the simple rule.</strong> An AI had to pay at least 10 percentage points more invoices while still proving 99%. Between the two Claude approaches, one won only if it paid at least as many invoices as the other and made clearly fewer mistakes. Otherwise they counted as not separated, and the cheaper one was preferred (Q3).</li>
   <li><strong>Cost and time</strong> per 1,000 invoices, measured, not estimated (Q7).</li>
   <li><strong>Earning trust over time.</strong> In the week-by-week replay: how soon it earned the right to pay alone, how much work it removed, and how many wrong payments got through (Q5).</li>
@@ -836,7 +836,7 @@ function q8(d) {
   <h4 class="kpis-all">For any of them</h4>
   <ul>
   <li><strong>Keep the guardrail on.</strong> Track how many recently paid invoices turned out fine, and switch the AI off automatically when that slips, as the replay does (Q5).</li>
-  <li><strong>Count the saving in hours and money,</strong> not just the share of invoices paid.</li>
+  <li><strong>Count the saving in review time actually freed,</strong> on lines a person really reviewed before, not just the share of invoices paid.</li>
   <li><strong>Time to spot a problem,</strong> and how often the AI has to be switched off.</li>
   <li><strong>How often people overrule it:</strong> a warning sign worth looking into, never a measure of accuracy. Q6 shows why agreement misleads.</li>
   </ul>
