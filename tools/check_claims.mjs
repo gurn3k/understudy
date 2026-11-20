@@ -238,13 +238,16 @@ REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payabl
 REQUIRED.rfp.push(["B's test set in section 1", `Claude checking each invoice on ${n0(D.b2.b_alone.n)} (a follow-up sample)`]);
 // The licence's "modified" statement (Should 22), on the pilot request's footer as on the main page's.
 REQUIRED.rfp.push(["CC BY: data modified", "Filtered and aggregated for this analysis"]);
+// The pilot request's link preview (Should 21): its own address and title, with the shared image.
+REQUIRED.rfpHead = [["og:url", "https://understudy.gurn3k.com/rfp.html"], ["og:title", "Understudy: request for a pilot proposal"], ["og:image", "https://understudy.gurn3k.com/og.png"], ["twitter card", "summary_large_image"]];
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
-  const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);
+  const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"] }[where];
+  const text = norm(src[0] || "");
   for (const [label, fig] of list) {
     nreq++;
-    if (!text.includes(fig)) { absent++; console.log(`REQUIRED FIGURE MISSING on ${where === "q9" ? "Q9" : "rfp.html"}: ${label} (${fig})`); }
+    if (!text.includes(fig)) { absent++; console.log(`REQUIRED FIGURE MISSING on ${src[1]}: ${label} (${fig})`); }
   }
 }
-console.log(`${nreq - absent}/${nreq} required figures found in Q9 and rfp.html`);
+console.log(`${nreq - absent}/${nreq} required figures found on the page, in Q9, in rfp.html and its head`);
 process.exit(missing || banned || absent ? 1 : 0);
