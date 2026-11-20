@@ -38,6 +38,8 @@ class Footprint(unittest.TestCase):
         self.assertEqual(fp["paid_lines"], 4)
         self.assertEqual(fp["held_lines"], 12)  # the never-cleared line has no window
         self.assertEqual(fp["isolated_paid"], 2)  # the lone price change and the lone release; bulk steps don't count
+        self.assertEqual(fp["isolated_paid_lt5"], 2)
+        self.assertEqual(fp["any_manual_paid"], 4)  # every paid line has some manual step besides the clearing
         self.assertEqual(fp["rpb_manual_paid"], 3)
         self.assertEqual(fp["rpb_manual_held"], 11)
         self.assertEqual(fp["groups_paid"], 3)  # P1 shares one receipt minute across its two lines
@@ -76,6 +78,12 @@ class Rates(unittest.TestCase):
         self.assertEqual(n % 50, 0)
         self.assertGreaterEqual(money.switch_off_power(n, 0.02), 0.8)
         self.assertTrue(all(money.switch_off_power(m, 0.02) < 0.8 for m in range(50, n, 50)))
+
+    def test_first_powered(self):
+        n = money.first_powered(0.02, 0.8)
+        self.assertGreaterEqual(money.switch_off_power(n, 0.02), 0.8)
+        self.assertTrue(all(money.switch_off_power(m, 0.02) < 0.8 for m in range(n - 20, n)))
+        self.assertLessEqual(n, money.blind_sample(q=0.02, power=0.8))
 
     def test_value_anchors(self):
         paid = list(range(1, 11))  # tenth line is 10

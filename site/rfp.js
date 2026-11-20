@@ -16,6 +16,8 @@ const PH = { p0: 4, p2: 12, p3: 2 }; // weeks
 const OVERSIGHT_H = 8; // hours a week of oversight during the pilot
 const DEF_MIN = 5, DEF_RATE = 40; // input defaults: my assumptions
 const AGREE = "0.9", SIM_RUNS = 20; // the simulation shown: reviewers copy this share; runs per ADR 0017
+const DEF_KINDS = 1; // kinds of invoice paid on their own, for the blind-check cost: my assumption
+const WINDOWS_YR = 12; // blind-check windows a year: monthly, my assumption (the phase table's monthly spot-checks)
 const DEF_FIX = 100, DEF_LOST = 0; // a late fix: US$ of work, and % of the line's value never recovered. My assumptions.
 const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
 /* Rows of the return table: none earned, the replay's observed share (a truncated window), then the scenarios. */
@@ -74,7 +76,7 @@ function build(d) {
     ["Trust earned safely (replay)", `First kind in week ${firstWk}; ${int(t.passed)} lines paid, ${int(t.wrong)} wrong (${pct(t.wrong / t.passed, 1)})`, "Expect errors in the first months"],
     ["When it pays off", `Only if a person today reviews at least <span data-out="need-low"></span> of these lines`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate (section 11)`],
     ["Pilot cost", `<span data-out="pilot"></span>, internal oversight only`, "Supplier fees, model use, hosting, outcome scoring, audit, blind checks and integration are required lines still to price (section 11)"],
-    ["Return", `Repays itself in its first year after the pilot if it earns <span data-out="need"></span> of the on-paper volume`, `At your inputs<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
+    ["Return", `Repays itself in its first year after the pilot if it earns <span data-out="need"></span> of the on-paper volume`, `At your inputs, including monthly blind checks on <span data-out="kinds-lab"></span> (my assumption)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
   ], "keys")}
   <p class="ask"><strong>The decision I ask for:</strong> approve Phase 0 (set-up and baseline) now. Every later phase waits for a gate.</p>
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, safely, whether its own invoices would.</p>`));
@@ -239,6 +241,7 @@ function build(d) {
   <label>Work to fix one line after payment (US$) <input id="in-fix" type="number" min="0" max="100000" step="10" value="${DEF_FIX}" inputmode="numeric"></label>
   <label>Share of a wrongly paid line's value never recovered (%) <input id="in-lost" type="number" min="0" max="100" step="0.5" value="${DEF_LOST}" inputmode="decimal"></label>
   <label>Oversight hours a week during the pilot <input id="in-oh" type="number" min="0" max="80" step="1" value="${OVERSIGHT_H}" inputmode="numeric"></label>
+  <label>Kinds of invoice paid on their own (for blind checks) <input id="in-kinds" type="number" min="0" max="50" step="1" value="${DEF_KINDS}" inputmode="numeric"></label>
   <label>Your one-off integration cost (US$) <input id="in-int" type="number" min="0" step="1000" value="" placeholder="not entered" inputmode="numeric"></label>
   <p class="small">The share reviewed is the figure the saving rests on, and the records can't show it: ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step, a footprint, not proof of review. Until you enter it, the figures use every line (100%), an upper limit, not a plan.</p>
   </div>
@@ -251,7 +254,7 @@ function build(d) {
   ${tbl("Cost lines", ["Line", "Basis", "Amount"], [
     [`Phase 0: set-up and baseline<span class="small">My assumption</span>`, `<span data-out="p0-basis"></span>`, `<span data-out="p0-cost"></span>`],
     [`Oversight, phases 1 to 3<span class="small">My assumption</span>`, `<span data-out="oh-basis"></span>`, `<span data-out="oh-cost"></span>`],
-    [`Blind checks<span class="small">${req("Sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. The switch-off test on ${int(bl.n)} lines catches a true ${pct(bl.q, 0)} error rate ${pct(bl.power, 0)} of the time.`, `<span data-out="blind-cost"></span> a kind a window`],
+    [`Blind checks<span class="small">${req("Sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. The switch-off test on ${int(bl.n)} lines catches a true ${pct(bl.q, 0)} error rate ${pct(bl.power, 0)} of the time. Power does not rise smoothly with the window: ${int(bl.first_n)} lines already reach 80%, but ${int(1000)} fall back to ${pct(bl.power_1000, 0)}, so I size in steps of 50 to the first that holds.`, `<span data-out="blind-cost"></span> a kind a window; <span data-out="blind-pilot"></span> in the pilot`],
     [`Weekly reconciliation of calls against outcomes<span class="small">${req("Yours to estimate")}</span>`, "Hours a week × the weeks of the pilot", fill("US$ amount")],
     [`Writing the rulebook<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line", `$${cOnce.toFixed(2)}`],
     [`Integration and data access<span class="small">${req("Yours to enter above")}</span>`, "One-off", `<span data-out="int-cost"></span>`],
@@ -261,7 +264,7 @@ function build(d) {
     [`Outcome scoring<span class="small">${req("Proposer to price")}</span>`, "Matching each call to its outcome as it arrives", fill("US$ amount")],
     [`Audit<span class="small">${req("Yours to estimate")}</span>`, "Internal Audit's review before Gate 3 (section 10)", fill("US$ amount")],
     [`Training and change management<span class="small">${req("Yours to estimate")}</span>`, "", fill("US$ amount")],
-    ["Total so far", "Phase 0, oversight, the rulebook, and integration if entered. Not the required lines still blank, nor blind checks", `<span data-out="total"></span>`],
+    ["Total so far", "Phase 0, oversight, the rulebook, blind checks (my assumption: monthly windows during Phase 2, on the kinds you enter above), and integration if entered. Not the required lines still blank", `<span data-out="total"></span>`],
   ])}
   <p><strong>No saving for about ${f.dryWeeks} weeks.</strong> Nothing is paid without a person in Phase 0 (${PH.p0} weeks) or in practice mode (about ${firstWk} weeks), so the pilot costs money for that long before it can save any.</p>
   ${tbl("Where the on-paper saving comes from", ["Step", "Figure"], [
@@ -291,11 +294,12 @@ function build(d) {
   ${tbl("How each figure is worked out", ["Figure", "Formula"], [
     ["Gross saving", "Lines paid alone × share reviewed today × minutes per review ÷ 60 × hourly cost"],
     ["Late-fix cost", "Lines paid alone × the cautious error rate × (work per fix + share never recovered × average value of a wrongly paid line)"],
-    ["Net yearly benefit", "Gross saving − late-fix cost − oversight (hours a week × 52). At 0% earned it is the oversight cost alone"],
+    ["Net yearly benefit", "Gross saving − late-fix cost − oversight (hours a week × 52) − blind checks (kinds × 12 monthly windows × one window's cost). At 0% earned nothing is paid on its own, so there are no blind checks and it is the oversight cost alone"],
     ["First-year ROI", "(Net yearly benefit − total pilot cost) ÷ total pilot cost"],
     ["Payback", "Total pilot cost ÷ monthly net benefit, from the end of the pilot"],
-    ["Total pilot cost", "The cost lines above with a figure; integration only if entered"],
-    ["Not included", "The required lines still blank, blind checks, discounting, tax, seasonality, benefit during the pilot"],
+    ["Total pilot cost", "The cost lines above with a figure, blind checks included; integration only if entered"],
+    ["Blind checks (my assumption)", `${WINDOWS_YR} windows a year (monthly), about ${(PH.p2 * 12 / 52).toFixed(1)} during Phase 2, each ${int(b.blind.n)} lines a kind × minutes per review, on the kinds you enter. The check window is still to be fixed in the requirements; these figures change with it`],
+    ["Not included", "The required lines still blank, discounting, tax, seasonality, benefit during the pilot"],
   ])}
   <p class="small">The ${pct(g.earned_share, 1)} row is what the replay earned on the same test lines; its window was too short to show the steady state, so it is a floor seen once, not an estimate. ${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling. None of these rows changes the verdict: no approach proved the 99% bar.</p>
   <h3>Benchmarks to collect from your own records</h3>
@@ -361,62 +365,71 @@ function build(d) {
   return out;
 }
 
+/* Reads a number input: blank or unreadable gives the default; out of range is held to the field's limits. */
+function readNum(el, lo, hi, dflt) {
+  const v = el.value.trim(), n = Number(v);
+  if (v === "" || !Number.isFinite(n)) return dflt;
+  return Math.min(hi, Math.max(lo, n));
+}
 function wire(d) {
   const f = figures(d), b = f.b, L = f.L, el = (id) => $("#" + id);
-  const share = el("in-share"), min = el("in-min"), rate = el("in-rate"), fix = el("in-fix"), lost = el("in-lost"), oh = el("in-oh"), integ = el("in-int");
-  const bad = 1 / L.gated_cautious;
+  const share = el("in-share"), min = el("in-min"), rate = el("in-rate"), fix = el("in-fix"), lost = el("in-lost"), oh = el("in-oh"), kinds = el("in-kinds"), integ = el("in-int");
+  const bad = 1 / L.gated_cautious, p2Windows = (PH.p2 * 12) / 52;
   const set = (k, s) => document.querySelectorAll(`[data-out="${k}"]`).forEach((x) => (x.textContent = s));
-  const clamp = (x, lo, hi, dflt) => (Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : dflt);
   const draw = () => {
-    const s = share.value.trim() === "" ? null : clamp(Number(share.value), 0, 100, null), sh = s === null ? 1 : s / 100;
-    const m = Number(min.value), r = clamp(Number(rate.value) || NaN, 1, 500, DEF_RATE), h = clamp(Number(oh.value), 0, 80, 0);
-    const i = Math.max(0, Number(integ.value) || 0), c = (m / 60) * r;
-    const M = clamp(Number(fix.value), 0, 100000, DEF_FIX) + (clamp(Number(lost.value), 0, 100, DEF_LOST) / 100) * f.meanWrong;
+    const s = readNum(share, 0, 100, null), sh = s === null ? 1 : s / 100;
+    const m = Number(min.value), r = readNum(rate, 1, 500, DEF_RATE), h = readNum(oh, 0, 80, OVERSIGHT_H), k = Math.round(readNum(kinds, 0, 50, DEF_KINDS));
+    const hasInt = integ.value.trim() !== "" && Number.isFinite(Number(integ.value)), i = hasInt ? Math.max(0, Number(integ.value)) : 0, c = (m / 60) * r;
+    const M = readNum(fix, 0, 100000, DEF_FIX) + (readNum(lost, 0, 100, DEF_LOST) / 100) * f.meanWrong;
     const hrs = (f.linesYr * sh * m) / 60, saving = hrs * r;
-    const p0 = h * PH.p0 * r, ohRest = h * (f.totalWeeks - PH.p0) * r, pilot = p0 + ohRest + f.cOnce, total = pilot + i;
-    const need = (lpm) => { const n = M / (lpm * c); return n > 1 ? "more than every line" : pct(n, 1); };
+    const bh = (b.blind.n * m) / 60, win = bh * r, blindPilot = k * p2Windows * win, blindYr = k * WINDOWS_YR * win;
+    const p0 = h * PH.p0 * r, ohRest = h * (f.totalWeeks - PH.p0) * r, pilot = p0 + ohRest + f.cOnce, total = pilot + blindPilot + i;
+    const need = (lpm) => { const n = M / (lpm * c); return n > 1 ? "more than every line" : n <= 0 ? "any share" : pct(n, 1); };
+    const kTxt = `${k} kind${k === 1 ? "" : "s"}`;
     const shareLab = s === null ? "every line (100%), an upper limit: not entered" : `${pct(sh, 1)} (yours)`;
-    set("money", usd(saving));
-    set("money2", usd(saving));
+    set("money", s === null ? "Enter share reviewed" : usd(saving));
+    set("money2", s === null ? `up to ${usd(saving)} (every line reviewed: an upper limit, not a plan)` : `${usd(saving)} gross a year`);
     set("share-used", shareLab);
-    set("hours-note", `${int(hrs)} hours of review a year, at a share reviewed of ${shareLab}. Gross: before late fixes and the pilot's cost.`);
+    set("hours-note", s === null ? `Up to ${usd(saving)} (${int(hrs)} hours of review a year) if a person reviewed every line today: an upper limit, not a plan. Gross: before late fixes and the pilot's cost.` : `${int(hrs)} hours of review a year, at your share reviewed of ${pct(sh, 1)}. Gross: before late fixes and the pilot's cost.`);
     set("pilot", usd(pilot));
     set("pilot-note", `${h} hours a week for ${f.totalWeeks} weeks, plus $${f.cOnce.toFixed(2)} to write the rulebook. Not supplier fees, model use, hosting, scoring, audit, blind checks or integration.`);
     set("p0-basis", `${h} hours a week × ${PH.p0} weeks × $${int(r)}, plus integration below`);
     set("p0-cost", usd(p0));
     set("oh-basis", `${h} hours a week × ${f.totalWeeks - PH.p0} weeks × $${int(r)}`);
     set("oh-cost", usd(ohRest));
-    const bh = (b.blind.n * m) / 60;
     set("blind-h", `${int(bh)} hours`);
-    set("blind-cost", usd(bh * r));
-    set("int-cost", i ? usd(i) : "not entered");
+    set("blind-cost", usd(win));
+    set("blind-pilot", `${usd(blindPilot)} for ${kTxt} over about ${p2Windows.toFixed(1)} monthly windows`);
+    set("kinds-lab", kTxt);
+    set("int-cost", hasInt ? usd(i) : "not entered");
     set("total", usd(total));
     set("be-low", `$${int(L.gated_cautious * sh * c)}`);
     set("be-paper", `$${int(L.paper * sh * c)}`);
     set("need-low", need(L.gated_cautious));
     set("need-paper", need(L.paper));
     set("late", `$${int(M)}`);
-    const run = h * 52 * r, wrongFull = f.linesYr * bad;
-    const margin = saving - wrongFull * M; // net yearly benefit per unit of share earned, before oversight
+    const run = h * 52 * r + blindYr, wrongFull = f.linesYr * bad;
+    const margin = saving - wrongFull * M; // net yearly benefit per unit of share earned, before oversight and blind checks
     const ask = margin > 0 ? (total + run) / margin : Infinity;
     set("wrong-yr", int(wrongFull));
-    set("need-int", (i ? "" : ", before integration cost") + (s === null ? ", with every line counted as reviewed today (an upper limit)" : ""));
+    set("need-int", (hasInt ? "" : ", before integration cost") + (s === null ? ", with every line counted as reviewed today (an upper limit)" : ""));
     set("need", ask <= 1 ? pct(ask, 1) : "not reachable");
     const upper = s === null ? " Share reviewed not entered, so every line counts as reviewed today: an upper limit." : "";
-    set("need-note", (ask <= 1 ? `of the on-paper volume, with a late fix at $${int(M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(M)}, even the full on-paper volume does not repay the pilot in a year.`) + upper);
-    set("roi-warn", i ? "" : "Integration cost not entered: the pilot cost below is internal oversight only, so return and payback are hidden until you enter your integration cost above.");
-    scenRows(f.g).forEach(([x], k) => {
-      const net = x * margin - run, roi = total ? (net - total) / total : NaN;
-      set(`sc-checks-${k}`, int(x * f.linesYr));
-      set(`sc-wrong-${k}`, int(x * wrongFull));
-      set(`sc-gross-${k}`, usd(x * saving));
-      set(`sc-net-${k}`, (net < 0 ? "−" : "") + usd(Math.abs(net)));
-      set(`sc-roi-${k}`, !i ? "enter integration cost" : Number.isFinite(roi) ? `${roi < 0 ? "−" : ""}${int(Math.abs(roi) * 100)}%` : "n/a");
-      set(`sc-pay-${k}`, !i ? "enter integration cost" : net > 0 ? `${(total / (net / 12)).toFixed(1)} months` : "does not pay back");
+    const blindTxt = ` It counts blind checks on ${kTxt} each month (${usd(blindYr)} a year), my assumption.`;
+    set("need-note", (ask <= 1 ? `of the on-paper volume, with a late fix at $${int(M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(M)}, even the full on-paper volume does not repay the pilot in a year.`) + blindTxt + upper);
+    set("roi-warn", hasInt ? "" : "Integration cost not entered: the pilot cost below leaves it out, so return and payback are hidden until you enter your integration cost above (0 is allowed).");
+    scenRows(f.g).forEach(([x], j) => {
+      const net = x * margin - h * 52 * r - (x > 0 ? blindYr : 0), roi = total ? (net - total) / total : NaN;
+      set(`sc-checks-${j}`, int(x * f.linesYr));
+      set(`sc-wrong-${j}`, int(x * wrongFull));
+      set(`sc-gross-${j}`, usd(x * saving));
+      set(`sc-net-${j}`, (net < 0 ? "−" : "") + usd(Math.abs(net)));
+      set(`sc-roi-${j}`, !hasInt ? "enter integration cost" : Number.isFinite(roi) ? `${roi < 0 ? "−" : ""}${int(Math.abs(roi) * 100)}%` : "n/a");
+      set(`sc-pay-${j}`, !hasInt ? "enter integration cost" : net > 0 ? `${(total / (net / 12)).toFixed(1)} months` : "does not pay back");
     });
   };
   min.addEventListener("change", draw);
-  [share, rate, fix, lost, oh, integ].forEach((x) => x.addEventListener("input", draw));
+  [share, rate, fix, lost, oh, kinds, integ].forEach((x) => x.addEventListener("input", draw));
   draw();
 }
 

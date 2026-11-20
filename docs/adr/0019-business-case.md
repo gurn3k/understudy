@@ -3,7 +3,7 @@
 ## Status
 Accepted 2026-11-17 by an independent reviewer, with changes, all applied here. Every result was already known when this was written: the verdict (ADR 0016), the replay (ADR 0017) and the B follow-up (ADR 0018). Nothing here changes a verdict, a bar or a fixed sentence. Everything it adds is labelled on the page as added after the results, for a business reader.
 
-**Superseded in part by ADR 0021 (2026-11-20).** The parts marked [superseded] below counted bulk clearing postings as human checks. ADR 0021 re-bases the money on order lines a person reviews, with one break-even. The text below is kept as written.
+**Superseded in part by ADR 0021 (2026-11-20).** The parts marked [superseded] below counted bulk clearing postings as human checks. ADR 0021 re-bases the money on order lines a person reviews, with one break-even. The text below is kept as written, with [superseded] markers added.
 
 ## Why
 The page answers "did any approach earn trust at the 99% bar?" A business leader also asks what it would save, what a mistake costs, and what to do next. These additions answer those questions from the same records. They don't move the bar. The owner placed the business case first on the page; the technical sections follow unchanged.

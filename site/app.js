@@ -64,7 +64,7 @@ function moneyBasis(d) {
   const b = d.business, R = b.eur_usd;
   return { b, R, L: b.lines_per_mistake, linesYr: b.paid * (12 / b.months), fp: b.footprint, g: b.gated,
     meanWrong: b.anchors.mean_wrong * R, meanBelow: b.anchors.mean_wrong_below_top10 * R,
-    anchorShares: [[b.footprint.isolated_paid / b.paid, "lines with a person's own step"], [b.footprint.rpb_manual_paid / b.paid, "lines with a block released under a person's login"]] };
+    anchorShares: [[b.footprint.isolated_paid / b.paid, "lines with a person's own step: a footprint, used here only as an example share"], [b.footprint.rpb_manual_paid / b.paid, "lines with a block released under a person's login: also a footprint, an example share"]] };
 }
 /* m: minutes per review; r: hourly cost; fix: work per late fix; lost: share of value never recovered (0-1). */
 function moneyAt(mb, m, r, fix, lost) {
@@ -144,7 +144,7 @@ function biz(d) {
   <p>${esc(eventSentence(d))}</p>
   <p>While trusted it paid ${int(t.passed)} lines on its own, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar). On the same test lines, that is ${pct(g.earned_share, 1)} of the ${int(b.paid)} it would have paid on paper. Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion. The test window was too short to show the steady state, so ${pct(g.earned_share, 1)} understates it, and I do not estimate it here.</p>
   <div class="tablewrap"><table class="score num money"><caption>Gross and net a year, at your inputs, by share of lines the rulebook earns the right to pay</caption><thead><tr><th scope="col">Share earned</th><th scope="col">Lines paid on its own</th><th scope="col">Gross saving</th><th scope="col">Late fixes</th><th scope="col">Net</th></tr></thead><tbody>
-  ${[["0%", "none earned yet", 0], [pct(g.earned_share, 1), "observed in the replay; window too short", g.earned_share], ["100%", "on paper, trusted from day one", 1]].map(([lab, why, x], i) => `<tr><th scope="row">${lab} <span class="small">(${why})</span></th><td>${int(x * mb.linesYr)}</td><td data-out="gn-g-${i}"></td><td data-out="gn-f-${i}"></td><td data-out="gn-n-${i}"></td></tr>`).join("")}
+  ${[["0%", "none earned yet", 0], [pct(g.earned_share, 1), "observed in the replay; window too short", g.earned_share], ["100%", "every line it would pay on paper", 1]].map(([lab, why, x], i) => `<tr><th scope="row">${lab} <span class="small">(${why})</span></th><td>${int(x * mb.linesYr)}</td><td data-out="gn-g-${i}"></td><td data-out="gn-f-${i}"></td><td data-out="gn-n-${i}"></td></tr>`).join("")}
   </tbody></table></div>
   <p class="small" data-out="gn-note"></p>
   <h3>5. Why agreement is not proof</h3>
@@ -181,7 +181,7 @@ function biz(d) {
   const detail = `<p>I added this section after every result was known (decision record 0019), and re-based it on order lines after an outside review (decision record 0021). It changes no result: no approach met the 99% bar (Q1).</p>
   <ul>
   <li><strong>Unit</strong>: one order line. The records have no invoice-document field. The ${int(b.paid)} paid lines fall into ${int(b.groups_paid)} groups sharing a purchase order and a first-receipt minute, and the ${int(d.held_out_n)} test lines into ${int(b.groups_held)}.</li>
-  <li><strong>Footprint</strong>: a paid line counts when, between its first invoice receipt and its clearing, it has a step under a person's login, other than the clearing, whose login, minute and activity are shared by fewer than 10 steps across the whole log: ${int(fp.isolated_paid)} of ${int(b.paid)} (${pct(iso, 1)}). A block released under a person's login: ${int(fp.rpb_manual_paid)} of the paid lines (${pct(rpb, 1)}), and ${int(fp.rpb_manual_held)} of all ${int(d.held_out_n)} test lines (${pct(fp.rpb_manual_held / d.held_out_n, 1)}). An earlier version of this section counted every clearing and block-release step under a person's login as a check. Most were bulk postings, so that count, and the hours and full-time people built on it, are withdrawn.</li>
+  <li><strong>Footprint</strong>: a paid line counts when, between its first invoice receipt and its clearing, it has a step under a person's login, other than the clearing, whose login, minute and activity are shared by fewer than 10 steps across the whole log: ${int(fp.isolated_paid)} of ${int(b.paid)} (${pct(iso, 1)}). The count depends on that threshold: fewer than 5 gives ${int(fp.isolated_paid_lt5)} (${pct(fp.isolated_paid_lt5 / b.paid, 1)}), and counting any step under a person's login besides the clearing gives ${int(fp.any_manual_paid)} (${pct(fp.any_manual_paid / b.paid, 1)}). A block released under a person's login: ${int(fp.rpb_manual_paid)} of the paid lines (${pct(rpb, 1)}), and ${int(fp.rpb_manual_held)} of all ${int(d.held_out_n)} test lines (${pct(fp.rpb_manual_held / d.held_out_n, 1)}). An earlier version of this section counted every clearing and block-release step under a person's login as a check. Most were bulk postings, so that count, and the hours and full-time people built on it, are withdrawn.</li>
   <li><strong>Saving</strong> = ${int(mb.linesYr)} lines a year × share reviewed × minutes ÷ 60 × hourly cost. Yearly = the ${word(b.months)} test months × ${yr}, assuming no seasonality.</li>
   <li><strong>Break-even</strong>: the rulebook pays off while a late fix costs less than lines per mistake × share reviewed × cost of a review. On paper, ${int(b.paid)} ÷ ${int(b.wrong)} = ${L.paper.toFixed(1)} lines per mistake (worst likely case ${L.paper_cautious.toFixed(1)}). Gated, in the replay, ${int(g.passed)} ÷ ${int(g.wrong)} = ${L.gated.toFixed(1)}; the 95% interval on its error rate gives ${L.gated_cautious.toFixed(1)} to ${L.gated_generous.toFixed(1)}. The decision uses the cautious end, ${L.gated_cautious.toFixed(1)}.</li>
   <li><strong>Late fix</strong> = work to fix a line after payment + the share never recovered × the line's value. The mean value of a line paid wrongly is ${usd(mb.meanWrong)} (all ${int(b.wrong)}), or ${usd(mb.meanBelow)} for the ${int(b.anchors.wrong_below_top10)} below the largest tenth's line.</li>
@@ -195,17 +195,22 @@ function biz(d) {
     `No figure in this section changes the verdict, which stands as in Q1`,
   ]);
 }
+/* Reads a number input: blank or unreadable gives the default; out of range is held to the field's limits. */
+function readNum(el, lo, hi, dflt) {
+  const v = el.value.trim(), n = Number(v);
+  if (v === "" || !Number.isFinite(n)) return dflt;
+  return Math.min(hi, Math.max(lo, n));
+}
 function wireBiz(d) {
   const mb = moneyBasis(d), L = mb.L, el = (id) => $("#" + id);
   const share = el("biz-share"), min = el("biz-min"), rate = el("biz-rate"), fix = el("biz-fix"), lost = el("biz-lost");
   if (!share || !min || !rate || !fix || !lost) return;
   const set = (k, s) => document.querySelectorAll(`[data-out="${k}"]`).forEach((x) => (x.textContent = s));
-  const clamp = (x, lo, hi, dflt) => (Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : dflt);
   const draw = () => {
-    const s = share.value.trim() === "" ? null : clamp(Number(share.value), 0, 100, null);
+    const s = readNum(share, 0, 100, null);
     const sh = s === null ? null : s / 100, sUse = sh === null ? 1 : sh;
-    const m = Number(min.value), r = clamp(Number(rate.value) || NaN, 1, 500, 40);
-    const x = moneyAt(mb, m, r, clamp(Number(fix.value), 0, 100000, 100), clamp(Number(lost.value), 0, 100, 0) / 100);
+    const m = Number(min.value), r = readNum(rate, 1, 500, 40);
+    const x = moneyAt(mb, m, r, readNum(fix, 0, 100000, 100), readNum(lost, 0, 100, 0) / 100);
     [...mb.anchorShares.map(([a]) => a), sh, 1].forEach((q, i) => {
       set(`rv-${i}`, q === null ? "enter it above" : int(mb.linesYr * q));
       set(`hr-${i}`, q === null ? "–" : int(x.hours(q)));
@@ -214,7 +219,7 @@ function wireBiz(d) {
     set("share-lab", sh === null ? "" : `(${pct(sh, 1)})`);
     set("c", `$${x.c.toFixed(2)}`);
     set("M", `about $${int(x.M)} a line`);
-    const need = (lpm) => { const n = x.need(lpm); return n > 1 ? "more than every line" : pct(n, 1); };
+    const need = (lpm) => { const n = x.need(lpm); return n > 1 ? "more than every line" : n <= 0 ? "any share" : pct(n, 1); };
     set("be-paper", `$${int(x.be(L.paper, sUse))}`);
     set("need-paper", need(L.paper));
     set("be-gated", `$${int(x.be(L.gated_cautious, sUse))} to $${int(x.be(L.gated_generous, sUse))}`);
@@ -224,18 +229,20 @@ function wireBiz(d) {
     const nLow = x.need(L.gated_cautious);
     let verdict = nLow > 1
       ? `At a late fix of about $${int(x.M)}, the rulebook does not pay off on time saved even if a person reviews every line today (cautious end).`
-      : `At a late fix of about $${int(x.M)}, the rulebook is worth piloting only if a person today reviews at least ${pct(nLow, 1)} of these lines (cautious end; ${need(L.paper)} on paper). The records show a person's own step on ${pct(mb.anchorShares[0][0], 1)}.`;
+      : nLow <= 0
+      ? `At a late fix of $0, the rulebook pays off at any share reviewed: the time saved has no late fixes to cover.`
+      : `At a late fix of about $${int(x.M)}, the rulebook is worth piloting only if a person today reviews at least ${pct(nLow, 1)} of these lines (cautious end; ${need(L.paper)} on paper). How many they review today is not in the records: the ${pct(mb.anchorShares[0][0], 1)} with a person's own step is a footprint, not a measure of how many are reviewed.`;
     if (sh !== null) verdict += sh >= nLow ? ` At your ${pct(sh, 1)}, it clears the cautious end.` : ` At your ${pct(sh, 1)}, it does not clear the cautious end.`;
     set("verdict", verdict);
-    const cover = (lpm, V) => pct((lpm * x.c) / V, 0);
-    set("anchor", `For scale: even if a person reviewed every line today, the time saved would cover losing only about ${cover(L.paper, mb.meanWrong)} of an average wrongly paid line's value on paper, or ${cover(L.gated_cautious, mb.meanWrong)} at the cautious end, before any work to fix it. If the largest tenth of lines always went to a person, about ${cover(L.paper, mb.meanBelow)} and ${cover(L.gated_cautious, mb.meanBelow)}.`);
+    const cover = (lpm, V) => { const q = (lpm * x.c) / V; return q >= 1 ? "all of it (100% or more)" : `about ${pct(q, 0)}`; };
+    set("anchor", `For scale: even if a person reviewed every line today, the time saved would cover losing ${cover(L.paper, mb.meanWrong)} of an average wrongly paid line's value on paper, or ${cover(L.gated_cautious, mb.meanWrong)} at the cautious end, before any work to fix it. If the largest tenth of lines always went to a person: ${cover(L.paper, mb.meanBelow)} on paper, and ${cover(L.gated_cautious, mb.meanBelow)} at the cautious end.`);
     [0, mb.g.earned_share, 1].forEach((e, i) => {
       const gross = x.saving(sUse) * e, fixes = ((mb.linesYr * e) / L.gated_cautious) * x.M;
       set(`gn-g-${i}`, usd(gross));
       set(`gn-f-${i}`, signed(-fixes));
       set(`gn-n-${i}`, signed(gross - fixes));
     });
-    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the cautious end, one in ${int(L.gated_cautious)} lines, at about $${int(x.M)} each. Net is before the pilot's own costs (see the pilot request). The rows are scenarios, not forecasts.`);
+    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. Net is before the pilot's own costs (see the pilot request). The rows are scenarios, not forecasts.`);
   };
   min.addEventListener("change", draw);
   [share, rate, fix, lost].forEach((x) => x.addEventListener("input", draw));
@@ -808,7 +815,7 @@ function q8(d) {
   <li><strong>How many it paid.</strong> The share of invoices it paid without a person. The saving depends on how many of those a person would really have reviewed (Q9).</li>
   <li><strong>Beating the simple rule.</strong> An AI had to pay at least 10 percentage points more invoices while still proving 99%. Between the two Claude approaches, one won only if it paid at least as many invoices as the other and made clearly fewer mistakes. Otherwise they counted as not separated, and the cheaper one was preferred (Q3).</li>
   <li><strong>Cost and time</strong> per 1,000 invoices, measured, not estimated (Q7).</li>
-  <li><strong>Earning trust over time.</strong> In the week-by-week replay: how soon it earned the right to pay alone, how much work it removed, and how many wrong payments got through (Q5).</li>
+  <li><strong>Earning trust over time.</strong> In the week-by-week replay: how soon it earned the right to pay alone, how many lines it paid on its own, and how many wrong payments got through (Q5).</li>
   </ol>
   <p>On this yardstick, none of the three earned trust at the 99% bar (Q3).</p>
   <p>One yardstick answers "which approach does this job best?" It does not answer "how do you keep it safe once it is running?" Each approach goes wrong in a different way, so each needs its own extra checks.</p>

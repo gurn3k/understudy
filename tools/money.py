@@ -60,6 +60,9 @@ def footprint(cases, paid_ids, held_ids):
     return {
         "paid_lines": len(paid), "held_lines": len(held),
         "isolated_paid": sum(1 for i in paid if any(groups[k] < ISOLATED for k in keep[i][0])),
+        # How much the footprint depends on the threshold: a stricter one (groups under 5), and none at all.
+        "isolated_paid_lt5": sum(1 for i in paid if any(groups[k] < 5 for k in keep[i][0])),
+        "any_manual_paid": sum(1 for i in paid if keep[i][0]),
         "rpb_manual_paid": sum(1 for i in paid if keep[i][1]),
         "rpb_manual_held": sum(1 for i in held if keep[i][1]),
         "groups_paid": len({keep[i][2] for i in paid}),
@@ -94,6 +97,15 @@ def switch_off_power(n, q, bar=0.99):
 def blind_sample(q=0.02, power=0.8, step=50, bar=0.99, limit=5000):
     """Smallest window, in steps of `step`, whose switch-off catches a true error rate q with at least `power`."""
     for n in range(step, limit + 1, step):
+        if switch_off_power(n, q, bar) >= power:
+            return n
+    return None
+
+
+def first_powered(q=0.02, power=0.8, bar=0.99, limit=5000):
+    """Smallest window, in steps of one, that reaches `power`. Power is not monotone in n (the switch-off
+    threshold moves in whole mistakes), so some larger windows fall back below it."""
+    for n in range(1, limit + 1):
         if switch_off_power(n, q, bar) >= power:
             return n
     return None

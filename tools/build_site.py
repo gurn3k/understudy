@@ -168,7 +168,7 @@ def main():
         # The log has no invoice-document field: (purchase order, first-receipt minute) groups stand in for documents.
         "groups_paid": fp["groups_paid"], "groups_held": fp["groups_held"],
         # What the log shows of people's hands on these lines: a footprint, not proof of review.
-        "footprint": {k: fp[k] for k in ("isolated_paid", "rpb_manual_paid", "rpb_manual_held")},
+        "footprint": {k: fp[k] for k in ("isolated_paid", "isolated_paid_lt5", "any_manual_paid", "rpb_manual_paid", "rpb_manual_held")},
         # Paid lines per mistake: on paper (the test, trusted from day one) and gated (the replay, trust earned).
         "lines_per_mistake": {"paper": paper, "paper_cautious": paper_cautious,
                               "gated": gated, "gated_cautious": gated_cautious, "gated_generous": gated_generous},
@@ -176,7 +176,8 @@ def main():
                   "orders_wrong": len(auto_wrong_po), "earned_share": tot["passed"] / len(paid)},
         # Blind checks per kind per window to catch a true 2% error rate 80% of the time with the switch-off test.
         "blind": {"n": blind_n, "q": 0.02, "power": money.switch_off_power(blind_n, 0.02),
-                  "fires_at": money.switch_off_threshold(blind_n)},
+                  "fires_at": money.switch_off_threshold(blind_n),
+                  "first_n": money.first_powered(0.02, 0.8), "power_1000": money.switch_off_power(1000, 0.02)},
         # Invoice values are recorded in EUR (order-line net value); the page shows USD at the ECB's 2018 average.
         "eur_usd": 1.1810,
         "value": {"held": sum(val(held)), "paid": sum(pv), "wrong": sum(val(wrong)),
