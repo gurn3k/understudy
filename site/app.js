@@ -86,7 +86,7 @@ function biz(d) {
   <p><strong>What it costs now:</strong> only Phase 0, ${Calc.PH.p0} weeks to measure the share of lines a person reviews today, the minutes per review and the cost of a late fix: <span data-out="rec-p0"></span> of oversight time at your inputs below, plus any integration.</p>
   <p><strong>What would stop it:</strong> those measurements show no positive net after running costs; lines needing a correction go over the budget fixed before the pilot; or no kind proves the bar by week ${(d.replay.weeks.indexOf(d.replay.first) + 1) * 2} of practice mode.</p>
   </div>
-  <p>This section stands on its own: if you read nothing else, read this. It turns my findings into money, risk and a next step. The rest of the report (Q1 to Q8) holds the evidence. All money is in US dollars.<sup><a href="#usd-note" id="usd-ref">*</a></sup></p>
+  <p>This section stands on its own: if you read nothing else, read this. It turns my findings into money, risk and a next step. The rest of the report (Q1 to Q8) holds the evidence. All money is in US dollars.<sup><a href="#usd-note" id="usd-ref" aria-label="Note on the money values">*</a></sup></p>
   <h3>The study in brief</h3>
   <p><strong>The question.</strong> Every invoice line is cleared for payment, but the records can't show how many of them a person actually looks at first: most clearing steps are bulk postings, one login clearing many lines in the same minute. I wanted to know whether AI could take the routine decisions off people's desks and still reach a strict accuracy bar, and how a company would prove it before trusting it.</p>
   <p><strong>The data.</strong> A real multinational company's purchasing records from 2018: ${int(d.log.raw.cases)} order lines and ${int(d.log.raw.events)} recorded steps, published for research. Every line has a known outcome: it either went through cleanly or someone had to correct it before payment.</p>
@@ -176,7 +176,7 @@ function biz(d) {
   <li><a href="#q7">Q7 Cost</a> and <a href="#q8">Q8 Running it</a>: what each approach costs and what to watch once it is live.</li>
   <li><a href="rfp.html">A model request for a pilot proposal</a>: scope, requirements, gates, owners, risks, costs and sign-off, for a company that wants to run the pilot I recommend.</li>
   </ul>
-  <p class="small footnote" id="usd-note"><a href="#usd-ref">*</a> All money values are in US dollars. Invoice values were recorded in euros and are converted at ${R.toFixed(3)} US dollars per euro, the European Central Bank's average reference rate for 2018. AI costs are at the provider's published US-dollar list prices on the run date.</p>`;
+  <p class="small footnote" id="usd-note"><a href="#usd-ref" aria-label="Back to the text">*</a> All money values are in US dollars. Invoice values were recorded in euros and are converted at ${R.toFixed(3)} US dollars per euro, the European Central Bank's average reference rate for 2018. AI costs are at the provider's published US-dollar list prices on the run date.</p>`;
   const detail = `<p>I added this section after every result was known (decision record 0019), and re-based it on order lines after an outside review (decision record 0021). It changes no result: no approach met the 99% bar (Q1).</p>
   <ul>
   <li><strong>Unit</strong>: one order line. The records have no invoice-document field. The ${int(b.paid)} paid lines fall into ${int(b.groups_paid)} groups sharing a purchase order and a first-receipt minute, and the ${int(d.held_out_n)} test lines into ${int(b.groups_held)}.</li>
@@ -297,7 +297,7 @@ function q1(d) {
   <p>Each one made its calls on invoices from June to August 2018, held out from the learning months (a look-ahead is listed in the Method section): ${int(d.held_out_n)} in all, or a smaller sample for the costly one-by-one approach. I then compared its calls with what really happened.</p>
   <p><strong>The bar:</strong> of the invoices an AI pays without a check, no more than 1 in 100 may later need fixing. A short test can be lucky, so I judge each AI by its <em>worst likely case</em>: the lowest its true accuracy is likely to be, given how many invoices it handled. To pass, that worst likely case must be at least 99%.</p>
   ${wordsBox()}
-  <div class="tablewrap"><table class="score"><caption>What each AI did</caption><thead><tr><th>Approach</th><th>Paid without a check</th><th>Later needed fixing</th><th>Proved 99%?</th></tr></thead><tbody>
+  <div class="tablewrap"><table class="score"><caption>What each AI did</caption><thead><tr><th scope="col">Approach</th><th scope="col">Paid without a check</th><th scope="col">Later needed fixing</th><th scope="col">Proved 99%?</th></tr></thead><tbody>
   <tr><td>Pay every invoice (for comparison)</td><td>${int(pe[1])}</td><td>${int(peWrong)} (${oneIn(pe[1], peWrong)})</td><td>${no("No")}</td></tr>
   <tr><td>1. Simple rule</td><td>${int(aPasses)}</td><td>&ndash;</td><td>${no("Paid nothing")}</td></tr>
   <tr><td>2. Claude checking each invoice*</td><td>${int(bp)} of ${int(d.sample_n)}</td><td>${int(be)}</td><td>${no("Not proven")}</td></tr>
@@ -519,12 +519,12 @@ function q2(d) {
   <p class="small">Dark: done by a person. Blue: done automatically. Number: steps done by hand.</p>
   <h3>Why this decision, and what else could be tested</h3>
   <p>I compared three decisions that staff make over and over. Each one has a clear outcome in the records, so an AI's call can be checked against what really happened.</p>
-  <div class="tablewrap"><table class="score"><caption>Decisions I sized</caption><thead><tr><th>Decision</th><th>Steps logged by hand</th><th>Tested here?</th></tr></thead><tbody>${cand.map((c, i) => `<tr class="${i === 0 ? "chosen" : ""}"><td>${esc(PLAIN_DECISION[c.name] || c.name.replace(/_/g, " "))}</td><td>${int(c.manual_events)}</td><td>${i === 0 ? "Yes" : "Not yet"}</td></tr>`).join("")}</tbody></table></div>
+  <div class="tablewrap"><table class="score"><caption>Decisions I sized</caption><thead><tr><th scope="col">Decision</th><th scope="col">Steps logged by hand</th><th scope="col">Tested here?</th></tr></thead><tbody>${cand.map((c, i) => `<tr class="${i === 0 ? "chosen" : ""}"><td>${esc(PLAIN_DECISION[c.name] || c.name.replace(/_/g, " "))}</td><td>${int(c.manual_events)}</td><td>${i === 0 ? "Yes" : "Not yet"}</td></tr>`).join("")}</tbody></table></div>
   <p>The invoice decision came first on steps logged by hand: about ${int(Math.floor(cand[0].manual_events / cand[1].manual_events))} times as many as the next one, and past records predict it about as well. Those are logged steps, not decisions: many are bulk postings (Q9), and each decision is logged on different events. Counted in order lines created January to August 2018, the decisions come up about as often: ${int(cand[0].records.fit + cand[0].records.heldout)} lines had an invoice to clear, against ${int(cand[1].records.fit + cand[1].records.heldout)} new order lines for the other two. The other two were sized but not tested. The same test would work for them: the same bar, and the same proof before any trust.</p>
   <p>The biggest jobs in the chart, such as creating orders and recording deliveries, are data entry, not decisions. These records hold no document text, so they cannot show whether an AI could do that work.</p>`;
   const detail = `<p>Of ${int(k.events)} recorded steps, ${int(k.manual)} (${pct(k.manual / k.events, 0)}) were done by people under their own logins, ${int(k.batch)} by automatic jobs, and ${int(k.unclassified)} by accounts that are neither. ${int(d.log.users.manual)} people did the work by hand.</p>
   <p>For each decision I asked two things: how often people make it, and how predictable it already is. <strong>How predictable</strong> means: if you guessed the outcome from the single best clue in the earlier months' records, how often would you be right in the later months? It is scored so that 50 is a coin toss and 100 is never wrong. A middling score is a good place to test an AI: there is a pattern to learn, but no simple rule already does the job.</p>
-  <div class="tablewrap"><table><caption>The decisions, side by side</caption><thead><tr><th>Decision</th><th>Steps logged by hand</th><th>How predictable</th><th>Best single clue</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  <div class="tablewrap"><table><caption>The decisions, side by side</caption><thead><tr><th scope="col">Decision</th><th scope="col">Steps logged by hand</th><th scope="col">How predictable</th><th scope="col">Best single clue</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   return section("q2", "Q2", "Where people spend their time", plain, detail, [
     `Source: ${esc(d.source.name)} (${esc(d.source.licence)}), ${int(d.log.raw.events)} recorded steps`,
     `${int(d.log.excluded.duplicate_events)} same-minute duplicates and ${int(d.log.excluded.bad_date_events)} steps with impossible dates removed`,
@@ -615,7 +615,7 @@ function q3(d) {
   <li><strong>Claude checking each invoice.</strong> A request to the AI for every invoice is too costly to run on all ${int(d.held_out_n)}, so it judged a ${int(d.sample_n)}-invoice sample, in ${int(d.cost.b.calls)} requests of 25 invoices each. Answers that failed my code checks count as "hold for a person".</li>
   <li><strong>Claude writing a rulebook.</strong> Claude saw only January to May summaries and wrote rules in a small, fixed format that software checks and then runs. It wrote three rulebooks separately. The one picked is the one that paid the most invoices in the learning months while still clearing the bar there.</li>
   </ul>
-  <div class="tablewrap"><table><caption>All ${int(d.held_out_n)} test invoices</caption><thead><tr><th>Approach</th><th>About it</th><th>Paid on its own</th><th>Fine when paid</th><th>Worst likely case</th><th>Proved 99%?</th></tr></thead><tbody>
+  <div class="tablewrap"><table><caption>All ${int(d.held_out_n)} test invoices</caption><thead><tr><th scope="col">Approach</th><th scope="col">About it</th><th scope="col">Paid on its own</th><th scope="col">Fine when paid</th><th scope="col">Worst likely case</th><th scope="col">Proved 99%?</th></tr></thead><tbody>
   ${row("Simple rule", `${int(d.a.cells)} kinds of invoice qualified`, "none", ratio(a.coverage, 1), "none", false)}${pols}</tbody></table></div>
   <p class="small">One of the three policies (policy ${esc(p1.policy)}) does clear the bar on held-out invoices (lower bound ${pct(p1.held_out.precision_lower, 2)}), but its result had been seen before the rule was rewritten and the earlier-month selection did not choose it, so it does not count towards the verdict; all three are shown. Its pass is not robust to clustering either: allowing for invoices on the same order, its lower bound is ${pct(d.evidence.policy_clustering[p1.policy].clustered_lower, 2)}.</p>
   <p class="small">In plain words: rulebook ${esc(p1.policy)} passed, but I had already seen its score before the final comparison rule was set, and it was not the one picked in advance. Counting it would be choosing the winner after the race, so it is shown but does not count.</p>
@@ -848,7 +848,7 @@ function q7(d) {
   </div>
   <h3>At scale</h3>
   <p>Checking each invoice costs more with every invoice. A rulebook costs the same however many invoices it handles. The table prices a rewrite every month, 12 rulebooks a year, as a ceiling on cost, not a pace a pilot could keep. Trust belongs to the rulebook version that earned it: a new version keeps a kind of invoice's trust only if it leaves that kind's rules unchanged, and otherwise that kind starts practice mode again (decision record 0026). A kind needs months of settled outcomes to earn trust (Q5), so the rules for a kind in use would change far less often than monthly.</p>
-  <div class="tablewrap"><table class="score scale"><caption>Cost per year, by invoice volume</caption><thead><tr><th>Invoice lines a year</th><th>Checking each invoice</th><th>Rulebook, rewritten monthly (a cost ceiling)</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="tablewrap"><table class="score scale"><caption>Cost per year, by invoice volume</caption><thead><tr><th scope="col">Invoice lines a year</th><th scope="col">Checking each invoice</th><th scope="col">Rulebook, rewritten monthly (a cost ceiling)</th></tr></thead><tbody>${rows}</tbody></table></div>
   <p>At this volume, either AI bill is small; at 10 million invoices a year, checking each one costs tens of thousands of dollars, while the rulebook stays under $5. The bigger difference is control: a rulebook can be read, tested and approved like any other company policy before it touches a payment. Decisions made one by one can't be approved in advance, only sampled and checked as they are made.</p>
   <p class="small">AI time assumes requests are made one after another; running several at once would shorten it but not cost less. Prices are list prices at the time of the test and change over time.</p>`;
   const detail = `<p>Costs are what the same amount of text sent to and from the AI would cost at list prices. Time is measured from start to finish, with requests made one after another. Checking each invoice took ${int(b.calls)} requests for the first ${int(d.sample_n)} invoices${d.b2 && d.b2.cost && d.b2.b_alone ? ` and ${int(d.b2.cost.calls)} for the ${int(d.b2.b_alone.n)}-invoice follow-up` : ""}. ${int(c.calls)} rulebooks were written; software ran all ${int(d.held_out_n)} test invoices in ${d.cost.c_run_s_all_held_out.toFixed(2)} seconds.</p>`;
@@ -976,14 +976,16 @@ function openDrawer(set, all = false) {
   const hasWeek = rows.length && "week" in rows[0];
   $("#drawer-title").textContent = `${title} (${int(rows.length)})`;
   $("#drawer-note").textContent = `${note} Values are in US dollars, converted from euros (see the footnote in Q9).`;
-  $("#drawer-body").innerHTML = `<table><thead><tr><th>Invoice line</th><th>Kind of invoice</th>${hasWeek ? "<th>Week</th>" : ""}<th>Value (US$)</th><th>Outcome</th></tr></thead><tbody>${shown.map((r) =>
+  $("#drawer-body").innerHTML = `<table><thead><tr><th scope="col">Invoice line</th><th scope="col">Kind of invoice</th>${hasWeek ? '<th scope="col">Week</th>' : ""}<th scope="col">Value (US$)</th><th scope="col">Outcome</th></tr></thead><tbody>${shown.map((r) =>
     `<tr><td>${esc(r.id)}</td><td style="text-align:left" title="${esc(r.type)}">${esc(kindLabel(r.type))}</td>${hasWeek ? `<td>${esc(r.week.split("-W")[1])}</td>` : ""}<td>${r.value == null ? "" : int(r.value * DATA.business.eur_usd)}</td><td><span class="state ${r.straight_through ? "go" : "standby"}">${r.straight_through ? "PAID CLEAN" : "CORRECTED"}</span></td></tr>`).join("")}</tbody></table>
     ${shown.length < rows.length ? `<button type="button" class="open more" data-all="${set}">Show all ${int(rows.length)}</button>` : ""}`;
   if (dr.hidden) lastFocus = document.activeElement;
   dr.hidden = false;
+  // A modal: everything behind the drawer is inert, so focus and screen readers stay inside it.
+  for (const el of document.body.children) if (el !== dr && el.tagName !== "SCRIPT") el.inert = true;
   dr.focus();
 }
-function closeDrawer() { $("#drawer").hidden = true; if (lastFocus) lastFocus.focus(); }
+function closeDrawer() { for (const el of document.body.children) el.inert = false; $("#drawer").hidden = true; if (lastFocus) lastFocus.focus(); }
 
 /* ---------- Boot ---------- */
 async function boot() {
@@ -1026,7 +1028,7 @@ async function boot() {
     if (!st) return;
     const lamp = a.querySelector(".lamp");
     lamp.classList.add(st);
-    lamp.insertAdjacentHTML("afterend", `<span class="sr">(${PLAIN_STATE[st]})</span>`);
+    a.insertAdjacentHTML("beforeend", `<span class="sr"> (${PLAIN_STATE[st]})</span>`);
   });
   const links = [...document.querySelectorAll(".cues a, .tabs a")];
   const obs = new IntersectionObserver((entries) => {

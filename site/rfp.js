@@ -465,7 +465,7 @@ async function boot() {
   const parts = build(d);
   main.innerHTML = parts.join("");
   const names = { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost", s12: "Proposers", s13: "Approvals", s14: "Findings", ap: "Appendices" };
-  $("#toc").innerHTML = Object.entries(names).map(([id, n]) => `<li><a href="#${id}"><i class="lamp"></i><span>${id === "ap" ? "A" : id.slice(1)}</span> ${n}</a></li>`).join("");
+  $("#toc").innerHTML = Object.entries(names).map(([id, n]) => `<li><a href="#${id}"><i class="lamp"></i>${id === "ap" ? '<span aria-hidden="true">A</span>' : `<span><span class="sr">Section </span>${id.slice(1)}</span>`} ${n}</a></li>`).join("");
   wire(d);
   const links = [...document.querySelectorAll(".cues a, .tabs a[href^='#']")];
   const obs = new IntersectionObserver((entries) => entries.forEach((en) => {
