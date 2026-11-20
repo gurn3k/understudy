@@ -251,9 +251,11 @@ REQUIRED.rfp.push(["R8 rated Medium", "Fraud or duplicate paymentsMediumHigh"], 
 REQUIRED.rfp.push(["no goods receipt means hold", "No goods receipt yet means hold"], ["variance as a data input", "price and quantity differences between invoice, order and goods receipt"]);
 // Practice calls hidden, override rate dropped (Should 8, ADR 0027).
 REQUIRED.rfp.push(["practice calls hidden", "The rulebook's calls are hidden from the people who handle invoices"], ["override rate dropped", "D3, the override rate, is dropped"]);
+// The README names the business case and the pilot request (Should 20).
+REQUIRED.readme = [["README: business case", "a business case (Q9)"], ["README: pilot request", "`site/rfp.html`"]];
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
-  const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"] }[where];
+  const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"], readme: [read("README.md"), "README.md"] }[where];
   const text = norm(src[0] || "");
   for (const [label, fig] of list) {
     nreq++;

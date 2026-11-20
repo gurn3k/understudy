@@ -5,6 +5,14 @@ Drafted 2026-11-18. Ruled ACCEPT WITH CHANGES by an independent reviewer after t
 
 **Superseded in part by ADR 0021 (2026-11-20).** The on-paper saving, the pilot cost as a share of it, the second break-even and the $100 late fix are replaced; see the parts marked [superseded] below and ADR 0021's list. The text below is kept as written, with [superseded] markers added.
 
+**Status now (2026-11-20): accepted, and the page has been live since 2026-11-18.** Later records change parts of it. Where the text below differs from them, they hold:
+- ADR 0021: the saving re-based on order lines, as above.
+- ADRs 0022 to 0024: the wording of the limits, the sensitivity checks and the supplier baseline checked after the fact.
+- ADR 0025: the controls. M1 to M13 replace the first issue's requirements; promotion, switch-off and blind checks are rewritten, blind checks are mandatory (M9, so D2 is retired), and data protection, roles and the Gate 4 box are added.
+- ADR 0026: evidence belongs to the rulebook version that earned it (M5).
+- ADR 0027: the rulebook's calls are hidden in practice mode (M1), and the override rate (D3) is dropped.
+- Review fixes without a record of their own, since no decision changed: M14 (the existing duplicate and fraud checks run on every line paid on its own, and R8 is rated Medium) and M15 (no goods receipt yet means hold), the shorter-pilot row now resting on the replay instead of an outside guide, and link-preview tags.
+
 ## Why
 The owner asked for the business case to be revisited as a formal request for proposals in a corporation with a lot of process: structure and a one-screen summary, a firmer set of numbers, a leader's framing, a concrete pilot plan, and the missing pieces (pilot cost, benchmarks, wider risks). The page already answers "what could it save?" (Q9). A leader deciding on a pilot also needs the controls, owners, gates, costs and approvals a company would ask for before saying yes.
 
