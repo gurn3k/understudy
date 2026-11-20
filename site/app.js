@@ -802,10 +802,11 @@ function sweepFacts(d) {
 function sweepTable(d) {
   const { sw, ffLo } = sweepFacts(d), t = d.replay.totals;
   const rows = sw.filter((x) => x.false_flag === ffLo);
-  return `<div class="tablewrap"><table class="score num"><caption>In this simulation: the agreement gate by how reviewers behave (${int(rows[0] ? rows[0].runs : 0)} runs a row; 1 clean invoice in ${int(1 / ffLo)} wrongly flagged. Copy: how many suggestions in 10 reviewers copy; catch: of the rest, the share of the AI's mistakes they catch. Opened: runs in which it was switched on. Paid and needed a fix: the median run. Rate: pooled over all runs, every line needing a fix over every line paid)</caption><thead><tr><th scope="col">Copy</th><th scope="col">Catch</th><th scope="col">Opened</th><th scope="col">Paid</th><th scope="col">Needed a fix</th><th scope="col">Rate</th></tr></thead><tbody>
-  <tr class="chosen"><th scope="row" colspan="2">By real results (Q5)</th><td>Yes, one run</td><td>${int(t.passed)}</td><td>${int(t.wrong)}</td><td>${pct(t.wrong / t.passed, 1)}</td></tr>
-  ${rows.map((x) => `<tr><th scope="row">${int(x.alpha * 10)} in 10</th><td>${pct(x.catch, 0)}</td><td>${int(x.opened)} of ${int(x.runs)}</td><td>${half(x.passed_median)}</td><td>${half(x.wrong_median)}</td><td>${x.pooled_rate === null || x.pooled_rate === undefined ? "never on" : pct(x.pooled_rate, 2)}</td></tr>`).join("")}
-  </tbody></table></div>`;
+  return `<div class="tablewrap"><table class="score num fit"><caption>In this simulation: the agreement gate by how reviewers behave (${int(rows[0] ? rows[0].runs : 0)} runs a row; 1 clean invoice in ${int(1 / ffLo)} wrongly flagged)</caption><thead><tr><th scope="col">Copy, in 10</th><th scope="col">Catch</th><th scope="col">Opened</th><th scope="col">Paid</th><th scope="col">Fixes</th><th scope="col">Rate</th></tr></thead><tbody>
+  <tr class="chosen"><th scope="row" colspan="2">By real results (Q5)</th><td>Yes</td><td>${int(t.passed)}</td><td>${int(t.wrong)}</td><td>${pct(t.wrong / t.passed, 1)}</td></tr>
+  ${rows.map((x) => `<tr><th scope="row">${int(x.alpha * 10)}</th><td>${pct(x.catch, 0)}</td><td>${int(x.opened)}/${int(x.runs)}</td><td>${half(x.passed_median)}</td><td>${half(x.wrong_median)}</td><td>${x.pooled_rate === null || x.pooled_rate === undefined ? "never on" : pct(x.pooled_rate, 2)}</td></tr>`).join("")}
+  </tbody></table></div>
+  <p class="small">Copy: how many suggestions in 10 reviewers copy. Catch: of the rest, the share of the AI's mistakes they catch. Opened: runs, out of ${int(rows[0] ? rows[0].runs : 0)}, in which the gate switched the AI on. Paid and fixes (lines that needed a correction): the median run, so a row can show 0 even when the gate opened in a run or two. Rate: pooled over all runs, every line needing a correction over every line paid.</p>`;
 }
 
 /* ---------- Q7: cost at volume ---------- */
