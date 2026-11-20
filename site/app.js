@@ -844,8 +844,8 @@ function q7(d) {
   <div><span class="small">Claude writing a rulebook</span><span class="big">$${cOnce.toFixed(2)}</span><span class="small">once per rulebook. Ordinary software then handled all ${int(d.held_out_n)} test invoices in ${secs(d.cost.c_run_s_all_held_out)}.</span></div>
   </div>
   <h3>At scale</h3>
-  <p>Checking each invoice costs more with every invoice. A rulebook costs the same however many invoices it handles. The table assumes the rulebook is rewritten every month, which is 12 rulebooks a year.</p>
-  <div class="tablewrap"><table class="score scale"><caption>Cost per year, by invoice volume</caption><thead><tr><th>Invoice lines a year</th><th>Checking each invoice</th><th>Rulebook, rewritten monthly</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p>Checking each invoice costs more with every invoice. A rulebook costs the same however many invoices it handles. The table prices a rewrite every month, 12 rulebooks a year, as a ceiling on cost, not a pace a pilot could keep. Trust belongs to the rulebook version that earned it: a new version keeps a kind of invoice's trust only if it leaves that kind's rules unchanged, and otherwise that kind starts practice mode again (decision record 0026). A kind needs months of settled outcomes to earn trust (Q5), so the rules for a kind in use would change far less often than monthly.</p>
+  <div class="tablewrap"><table class="score scale"><caption>Cost per year, by invoice volume</caption><thead><tr><th>Invoice lines a year</th><th>Checking each invoice</th><th>Rulebook, rewritten monthly (a cost ceiling)</th></tr></thead><tbody>${rows}</tbody></table></div>
   <p>At this volume, either AI bill is small; at 10 million invoices a year, checking each one costs tens of thousands of dollars, while the rulebook stays under $5. The bigger difference is control: a rulebook can be read, tested and approved like any other company policy before it touches a payment. Decisions made one by one can't be approved in advance, only sampled and checked as they are made.</p>
   <p class="small">AI time assumes requests are made one after another; running several at once would shorten it but not cost less. Prices are list prices at the time of the test and change over time.</p>`;
   const detail = `<p>Costs are what the same amount of text sent to and from the AI would cost at list prices. Time is measured from start to finish, with requests made one after another. Checking each invoice took ${int(b.calls)} requests for the first ${int(d.sample_n)} invoices${d.b2 && d.b2.cost && d.b2.b_alone ? ` and ${int(d.b2.cost.calls)} for the ${int(d.b2.b_alone.n)}-invoice follow-up` : ""}. ${int(c.calls)} rulebooks were written; software ran all ${int(d.held_out_n)} test invoices in ${d.cost.c_run_s_all_held_out.toFixed(2)} seconds.</p>`;
@@ -905,7 +905,7 @@ function q8(d) {
     "A fresh test every time the AI model changes",
   ])}
   ${card("Claude's rulebook", "the rules go stale as suppliers, prices and buying habits change.", `about $${cOnce.toFixed(2)} per rulebook: a tiny fraction of a cent for each invoice it paid.`, [
-    "How often the rulebook is rewritten and tested again",
+    "How often the rulebook is rewritten and tested again. A rewrite that changes a kind's rules sends that kind back to practice mode",
     `Whether rewrites agree. Here, three drafts from the same inputs landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine: consistent, but not independent checks`,
     "That a person reads and signs off each version before it is used",
   ])}

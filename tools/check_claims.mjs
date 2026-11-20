@@ -72,6 +72,7 @@ const FORBIDDEN = [
   [/Code: MIT\.|independent program|recounted the records independently/i, "the code is private, and the recount is a second program written separately", "review round, Should 13"],
   [/written separately all landed|written separately landed|independently written|rulebooks agree/i, "the three rulebooks are drafts by the same model from the same inputs: consistent, not independent", "review round, Should 15"],
   [/Decision and Gate 1 package|\d+ weeks expected/i, "the plan is a range (at least, at most under the stop rule) and procurement ends in the award decision", "review round, Should 26"],
+  [/rewritten every month, which is 12 rulebooks a year/i, "a monthly rewrite is a cost ceiling; trust belongs to the version that earned it", "ADR 0026"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -222,6 +223,8 @@ REQUIRED.q9.push(["in brief: recommendation", "What I recommend:"], ["in brief: 
 const PHc = { p0: 4, p2: 12, p3: 2 }, minWk = PHc.p0 + firstWkC + PHc.p2 + PHc.p3, maxWk = PHc.p0 + 2 * firstWkC + PHc.p2 + PHc.p3;
 REQUIRED.rfp.push(["plan length range", `at least ${minWk} weeks and at most ${maxWk}`], ["procurement pre-phase", "weeks of procurement"],
   ["award decision", "Award decision"]);
+// Evidence per rulebook version (Should 14, ADR 0026).
+REQUIRED.rfp.push(["evidence per version", "Trust belongs to the version that earned it"]);
 // The three rulebooks (Should 15): consistent, not independent.
 REQUIRED.rfp.push(["three drafts are not independent", "consistent, but not independent checks"]);
 // People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.
