@@ -246,6 +246,8 @@ REQUIRED.rfpHead = [["og:url", "https://understudy.gurn3k.com/rfp.html"], ["og:t
 REQUIRED.rfp.push(["why not a shorter pilot", `the first kind qualified only in week ${firstWkC} of the replay`]);
 // Duplicates and fraud (Should 18): rated Medium, and the existing checks run on every line paid on its own.
 REQUIRED.rfp.push(["R8 rated Medium", "Fraud or duplicate paymentsMediumHigh"], ["duplicate check on autonomous payments", "Run the company's existing duplicate-payment and fraud checks on every line paid on its own"]);
+// Goods receipt and variance (Should 17): no goods receipt yet means hold; price and quantity differences are a data input.
+REQUIRED.rfp.push(["no goods receipt means hold", "No goods receipt yet means hold"], ["variance as a data input", "price and quantity differences between invoice, order and goods receipt"]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"] }[where];
