@@ -66,7 +66,7 @@ function build(d) {
   <p class="headline">I ask for approval of a controlled pilot, not a roll-out: ${totalWeeks} weeks in four gated phases.</p>
   ${timeline}
   ${tbl("Key figures", ["Question", "Answer", "What it means"], [
-    ["What was tested?", `3 approaches, ${int(d.held_out_n)} real invoices`, "None proved the 99% bar"],
+    ["What was tested?", `3 pre-registered approaches, ${int(d.held_out_n)} real invoices`, "None proved the 99% bar"],
     ["How close did the best get?", `Rulebook paid ${pct(b.paid / d.held_out_n, 1)}; ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} right; worst likely case ${pct(c.held_out.precision_lower, 2)}`, "Below the bar: not proved"],
     ["The saving", `Not known yet. It rests on the share of order lines a person reviews today, which the records can't show. ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step`, "A footprint, not proof of review. Phase 0 measures it"],
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
@@ -115,6 +115,7 @@ function build(d) {
   out.push(sec("s4", "4", "Evidence base", `
   <p>All figures come from the main report. Each approach could only pay an invoice without a check or hold it for a person, and each was scored against what really happened.</p>
   ${tbl("The three approaches on the test invoices (the bar: worst likely case of at least 99%)", ["Approach", "What it is", "Invoices judged", "Paid without a check", "Of those, wrong", "Worst likely case", "Cost to run"], ev)}
+  <p><strong>The baseline to beat.</strong> The study's simple rule could not use the supplier. After the fact, a non-AI rule grouped by ${esc(d.evidence.vendor.picked)} paid ${pct(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).coverage, 1)} of the test invoices with a worst likely case of ${pct(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).lower, 2)}, resting on ${int(d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked).vendors)} suppliers (post hoc, to be confirmed). Any proposal must beat a supplier whitelist like this, built on the issuer's own data.</p>
   <h3>Three ways to grant trust, on the same test invoices</h3>
   ${tbl("How trust was granted, and what it let through", ["Way", "Invoices paid", "Wrong", "Wrong rate", "Note"], [
     ["Trusted from day one (on paper)", int(b.paid), int(b.wrong), pct(b.wrong / b.paid, 2), "The ceiling; never tested live"],

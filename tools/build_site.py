@@ -38,7 +38,7 @@ POST_RESULT = [
     ["fix", "The replay's touch count", "ADR 0013, amendment 3; ADR 0017, erratum 2", "Code corrected after the replay ran: 788 became 785.", "One figure."],
     ["fix", "Agreement-gate sentences", "ADR 0017, erratum 1", "A misread list corrected after the ruling.", "Wording and two figures."],
     ["added", "The business case and the pilot request", "ADRs 0019, 0020, 0021", "Written after the verdict, and re-based after an outside review.", "None: no verdict, bar or fixed sentence."],
-    ["added", "How the page words its limits", "ADRs 0022, 0023", "Rewritten after an outside review: this table, the sensitivity checks and the plain wording.", "None."],
+    ["added", "How the page words its limits", "ADRs 0022 to 0024", "Rewritten after an outside review: this table, the sensitivity checks, a supplier baseline checked after the fact, and the plain wording.", "None."],
 ]
 
 

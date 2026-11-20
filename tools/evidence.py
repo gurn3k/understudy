@@ -117,10 +117,10 @@ def sensitivity(paid_ids, wrong_ids, scan):
 
 
 VENDOR_KEYS = {
-    "vendor, corrections, goods receipt": lambda r: (r["vendor"], r["corrections_before_invoice"] > 0, bool(r["gr_before_invoice"])),
-    "kind, corrections, goods receipt, vendor": lambda r: (case_type(r), r["corrections_before_invoice"] > 0, bool(r["gr_before_invoice"]), r["vendor"]),
-    "vendor, corrections": lambda r: (r["vendor"], r["corrections_before_invoice"] > 0),
-    "vendor": lambda r: r["vendor"],
+    "supplier, earlier corrections, goods received first": lambda r: (r["vendor"], r["corrections_before_invoice"] > 0, bool(r["gr_before_invoice"])),
+    "kind of invoice, earlier corrections, goods received first, supplier": lambda r: (case_type(r), r["corrections_before_invoice"] > 0, bool(r["gr_before_invoice"]), r["vendor"]),
+    "supplier, earlier corrections": lambda r: (r["vendor"], r["corrections_before_invoice"] > 0),
+    "supplier alone": lambda r: r["vendor"],
 }
 
 
