@@ -102,6 +102,24 @@ def clustering(ids, wrong_ids):
             "clustered_lower": clustered_lower(cl), "boot": list(po_bootstrap(cl))}
 
 
+def by_key(rows, wrong_ids, key):
+    """[(lines, wrong)] per cluster, for any cluster key (a supplier, say)."""
+    g = defaultdict(lambda: [0, 0])
+    for r in rows:
+        x = g[key(r)]
+        x[0] += 1
+        x[1] += r["id"] in wrong_ids
+    return [tuple(x) for x in g.values()]
+
+
+def vendor_clustering(rows, wrong_ids):
+    """The bound when whole suppliers, not single lines, are the independent units: for policies that rest on
+    a list of suppliers, the reliance on those suppliers is what the interval has to carry."""
+    cl = by_key(rows, wrong_ids, lambda r: r["vendor"])
+    n, w = sum(a for a, _ in cl), sum(b for _, b in cl)
+    return {"n": n, "wrong": w, "vendors": len(cl), "deff": design_effect(cl), "clustered_lower": clustered_lower(cl) if n else None}
+
+
 def sensitivity(paid_ids, wrong_ids, scan):
     """The label moved one way at a time: drop CDI-only corrections; count post-clearing corrections."""
     paid_ids = list(paid_ids)
@@ -143,7 +161,8 @@ def vendor_panel(fit, held, bar=0.99):
         rows.append({"key": name, "fit_coverage": sum(1 for r in fit if kf(r) in ok) / len(fit),
                      "passed": n, "coverage": n / len(held), "wrong": len(wrong),
                      "lower": wilson(n - len(wrong), n)[0] if n else None,
-                     "boot": list(po_bootstrap(cl)) if n else None, "vendors": len({r["vendor"] for r in calls})})
+                     "boot": list(po_bootstrap(cl)) if n else None, "vendors": len({r["vendor"] for r in calls}),
+                     "by_vendor": vendor_clustering(calls, wrong) if n else None})
     best = max(rows, key=lambda x: x["fit_coverage"])
     return {"rows": rows, "picked": best["key"]}
 

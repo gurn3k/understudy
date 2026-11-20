@@ -23,6 +23,16 @@ class Clustering(unittest.TestCase):
         self.assertGreater(E.design_effect(cl), 5)
         self.assertLess(E.clustered_lower(cl), E.clustering(ids, wrong)["lower"])
 
+    def test_supplier_clusters_widen_the_bound(self):
+        # 1,000 lines on 20 suppliers; all 10 mistakes on one supplier: the supplier-level bound is lower.
+        rows = [{"id": f"{i}_00001", "vendor": f"v{i % 20}"} for i in range(1000)]
+        wrong = {r["id"] for r in rows if r["vendor"] == "v3"}
+        wrong = set(sorted(wrong)[:10])
+        out = E.vendor_clustering(rows, wrong)
+        self.assertEqual((out["n"], out["wrong"], out["vendors"]), (1000, 10, 20))
+        self.assertGreater(out["deff"], 1.5)
+        self.assertLess(out["clustered_lower"], E.clustering([r["id"] for r in rows], wrong)["lower"])
+
     def test_bootstrap_is_repeatable(self):
         cl = E.clusters([f"{i % 50}_{i:05d}" for i in range(500)], {"3_00003", "7_00007"})
         self.assertEqual(E.po_bootstrap(cl, draws=200), E.po_bootstrap(cl, draws=200))

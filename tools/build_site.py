@@ -225,12 +225,33 @@ def main():
         "b_in_c": {"b_passed": len(b_pass), "also_c": sum(1 for r in b_pass if decide(r)),
                    "c_on_b": sum(1 for r in b_pass if decide(r) and not r["straight_through"])},
         "sweep": sweep["cells"] if sweep else None,
+        # The rulebook's paid lines with whole suppliers as the units (ADR 0025).
+        "rulebook_by_vendor": evidence.vendor_clustering(paid, wrong_ids),
+    }
+
+    # The pilot request's controls (ADR 0025): the switch-off test in numbers, blind-check power, and how the
+    # replay's promotions fired. All from the same functions the replay and the cost model use.
+    from understudy.evaluate import wilson as _wilson
+    from understudy.replay import DEMOTE_WINDOW
+    fires = money.switch_off_threshold(DEMOTE_WINDOW)
+    controls = {
+        "window": DEMOTE_WINDOW, "fires_at": fires,
+        "tolerated_upper": _wilson(DEMOTE_WINDOW - (fires - 1), DEMOTE_WINDOW)[1],
+        "tolerated_lower": _wilson(DEMOTE_WINDOW - (fires - 1), DEMOTE_WINDOW)[0],
+        "fires_upper": _wilson(DEMOTE_WINDOW - fires, DEMOTE_WINDOW)[1],
+        "power_window": money.switch_off_power(DEMOTE_WINDOW, 0.02),
+        "small_n": 400, "power_400": money.switch_off_power(400, 0.02),
+        "promotions": [{**e, "lower": _wilson(*e["evidence"])[0]} for e in again["events"] if e["event"] == "promoted"],
+        "demotions": [{**e, "upper": _wilson(*e["recent"])[1]} for e in again["events"] if e["event"] == "demoted"],
+        "looks": sum(len(v) for v in states(again["events"]).values()), "kinds": len(states(again["events"])),
+        "clustered_calls": [{"errors": e, "calls": min_calls(e), "clustered": min_calls(e) * ev["clustering"]["deff"]} for e in range(4)],
     }
 
     pe_rate = sum(1 for r in held if r["straight_through"]) / len(held)
     data = {
         "built": time.strftime("%Y-%m-%d"),
         "evidence": ev,
+        "controls": controls,
         "post_result": [[k, w, r, h.format(base=f"{pe_rate:.1%}"), e] for k, w, r, h, e in POST_RESULT],
         "business": business,
         "source": {"name": "BPI Challenge 2019", "licence": "CC BY 4.0",
