@@ -66,6 +66,7 @@ const FORBIDDEN = [
   [/never seen|had (not|never) seen|none of them (had )?seen|saw their outcomes/i, "the test months were held out, but inputs drew on later outcomes (look-ahead)", "ADR 0022"],
   [/wrong payments?/i, "say lines paid that needed a correction: the label is a correction, not a wrong payment", "ADR 0022"],
   [/corrections after payment aren't seen/i, "post-clearing corrections are in the records and move the result: give the figure", "ADR 0022"],
+  [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
@@ -196,6 +197,13 @@ REQUIRED.rfp.push(
 REQUIRED.q9.push(["quarterly sensitivity in the readout", `With quarterly blind-check windows instead of monthly: ${qTxt}`],
   ["Q9: a rule that holds under weekly looks", "by a rule that holds when checked every week"], ["Q9: blind checks", "Check a sample of what it pays on its own, blind"],
   ["Q9: per-order cap", "Cap how many lines of one order it pays on its own"]);
+// Value-weighted error (Should 3): the largest tenth's share of mistakes by count, and the base it sits on.
+const T10 = B.top10;
+REQUIRED.q9.push(["largest tenth: share of mistakes by count", `held ${pc(T10.wrong / B.wrong, 0)} of its mistakes`],
+  ["largest tenth: share of value paid", `${pc(T10.paid_value / B.value.paid, 0)} of all the value it paid`],
+  ["value rate of lines needing a correction", pc(B.value.wrong / B.value.paid, 1)]);
+REQUIRED.rfp.push(["largest tenth: share of mistakes by count", `held ${pc(T10.wrong / B.wrong, 0)} of its mistakes`],
+  ["largest tenth: share of value paid", `${pc(T10.paid_value / B.value.paid, 0)} of all the value paid`]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);
