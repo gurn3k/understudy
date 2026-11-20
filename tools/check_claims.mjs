@@ -75,6 +75,7 @@ const FORBIDDEN = [
   [/rewritten every month, which is 12 rulebooks a year/i, "a monthly rewrite is a cost ceiling; trust belongs to the version that earned it", "ADR 0026"],
   [/points the same way/i, "the value limit was not tested; give the share of mistakes and of value paid in the largest tenth", "review round, Should 3"],
   [/pre-registered approaches, [\d,]+ real invoices/i, "the three approaches were not all judged on the same invoices: give each its own set", "review round, Should 23"],
+  [/30 to 90 days|supplier-written guides/i, "an outside claim with no checked source: the study's own replay sets the shortest pilot", "review round, Should 24"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
@@ -240,6 +241,8 @@ REQUIRED.rfp.push(["B's test set in section 1", `Claude checking each invoice on
 REQUIRED.rfp.push(["CC BY: data modified", "Filtered and aggregated for this analysis"]);
 // The pilot request's link preview (Should 21): its own address and title, with the shared image.
 REQUIRED.rfpHead = [["og:url", "https://understudy.gurn3k.com/rfp.html"], ["og:title", "Understudy: request for a pilot proposal"], ["og:image", "https://understudy.gurn3k.com/og.png"], ["twitter card", "summary_large_image"]];
+// Shorter pilots (Should 24): the reason is the replay's own first promotion, not an outside guide.
+REQUIRED.rfp.push(["why not a shorter pilot", `the first kind qualified only in week ${firstWkC} of the replay`]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"] }[where];

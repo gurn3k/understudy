@@ -160,7 +160,7 @@ function build(d) {
     ["Phases 0, 2 and 3", `${PH.p0}, ${PH.p2} and ${PH.p3} weeks`, "My judgment"],
     ["Phase 1 (practice mode)", `At least ${firstWk} weeks, at most ${stopWk}`, `The earliest a kind qualified in the replay, under its single-crossing rule; ${m2Line}. Outcomes arrive weeks after invoices. The stop rule ends the pilot at week ${stopWk} (section 7)`],
     ["Procurement, before Phase 0", `About ${PROC} weeks`, "The timetable in section 12, from issue to the award decision"],
-    ["Shorter pilots", "Not used", "Some supplier-written guides online suggest 30 to 90 days. I have not checked them, and that is unlikely to collect enough outcomes for this bar"],
+    ["Shorter pilots", "Not used", `Too few outcomes for this bar: in the replay the first kind qualified only in week ${firstWk} of the replay, because outcomes arrive weeks after invoices`],
     ["Volume", "No seasonality", "A simplification"],
   ])}
   <h3>Constraints</h3>
