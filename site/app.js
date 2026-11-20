@@ -757,7 +757,7 @@ function q6(d) {
   };
   const plain = `<p class="headline">People tend to go along with a computer's suggestion, even when it is wrong. This is called <em>automation bias</em>, and it can make a weak AI look trustworthy.</p>
   <p>A popular shortcut for switching an AI on goes like this: show its suggestions to staff, and once staff agree with it often enough (a threshold the company picks), let it act alone. The trouble is that agreement can come from people copying the AI rather than checking it. Then a high agreement score carries almost no information about the AI: it tells you about the people.</p>
-  <p>${(() => { const f = sweepFacts(d); return f.lo && f.hi ? `In this simulation, when reviewers copied ${int(f.aHi * 10)} suggestions in 10, how well they checked the rest barely mattered: catching ${pct(f.lo.catch, 0)} of the AI's mistakes or ${pct(f.hi.catch, 0)}, it was switched on for about as many lines (${half(f.lo.passed_median)} against ${half(f.hi.passed_median)}). What moved the result was the reviewers' own habits: ${f.ffNone ? `when they wrongly flagged 1 clean invoice in ${int(1 / f.ffHi)}, it was never switched on at any copy rate` : "their false flags"}. The gate was reading the reviewers, not the AI.` : ""; })()}</p>
+  <p>${(() => { const f = sweepFacts(d); return f.lo && f.hi ? `In this simulation, when reviewers copied ${int(f.aHi * 10)} suggestions in 10, how well they checked the rest barely mattered: catching ${pct(f.lo.catch, 0)} of the AI's mistakes or ${pct(f.hi.catch, 0)}, it was switched on for about as many lines (${half(f.lo.passed_median)} against ${half(f.hi.passed_median)}). What moved the result was the reviewers' own habits: ${f.ffNone ? `when they wrongly flagged 1 clean invoice in ${int(1 / f.ffHi)}, in the median run it never switched on at any copy rate (it opened in at most ${word(f.ffMaxOpened)} of ${int(f.runs)} runs)` : "their false flags"}. The gate was reading the reviewers, not the AI.` : ""; })()}</p>
   <h3>What I tested</h3>
   <p>I ran the same week-by-week replay as in Q5, but this time the AI was switched on when staff agreed with it, not when real results proved it right. The staff were simulated: they copy the AI's suggestion 9 times in 10. The other time they check properly and catch most of its mistakes. I ran this 20 times; the figures are the middle result of the 20 runs.</p>
   <h3>What happened</h3>
@@ -793,16 +793,18 @@ function sweepFacts(d) {
   const sw = d.evidence.sweep || [], t = d.replay.totals, a9 = d.agreement.alphas["0.9"];
   const ffs = sw.map((x) => x.false_flag), ffLo = Math.min(...ffs), ffHi = Math.max(...ffs), aHi = Math.max(...sw.map((x) => x.alpha));
   const at = sw.filter((x) => x.alpha === aHi && x.false_flag === ffLo).sort((p, q) => p.catch - q.catch), lo = at[0], hi = at[at.length - 1];
-  const ffNone = sw.length > 0 && sw.filter((x) => x.false_flag === ffHi).every((x) => x.passed_median === 0);
+  const ffCells = sw.filter((x) => x.false_flag === ffHi);
+  const ffNone = sw.length > 0 && ffCells.every((x) => x.passed_median === 0); // in the median run, never opened
+  const ffMaxOpened = Math.max(0, ...ffCells.map((x) => x.opened || 0)), runs = sw.length ? sw[0].runs : 0;
   const perExtra = (a9.passed_median - t.passed) / (a9.wrong_median - t.wrong); // extra lines paid per extra mistake
-  return { sw, lo, hi, ffNone, perExtra, ffLo, ffHi, aHi };
+  return { sw, lo, hi, ffNone, ffMaxOpened, runs, perExtra, ffLo, ffHi, aHi };
 }
 function sweepTable(d) {
   const { sw, ffLo } = sweepFacts(d), t = d.replay.totals;
   const rows = sw.filter((x) => x.false_flag === ffLo);
-  return `<div class="tablewrap"><table class="score num"><caption>In this simulation: the agreement gate by how reviewers behave (medians of ${int(rows[0] ? rows[0].runs : 0)} runs; 1 clean invoice in ${int(1 / ffLo)} wrongly flagged. Copy: how many suggestions in 10 reviewers copy; catch: of the rest, the share of the AI's mistakes they catch)</caption><thead><tr><th scope="col">Copy</th><th scope="col">Catch</th><th scope="col">Paid</th><th scope="col">Needed a fix</th><th scope="col">Rate</th></tr></thead><tbody>
-  <tr class="chosen"><th scope="row" colspan="2">By real results (Q5)</th><td>${int(t.passed)}</td><td>${int(t.wrong)}</td><td>${pct(t.wrong / t.passed, 1)}</td></tr>
-  ${rows.map((x) => `<tr><th scope="row">${int(x.alpha * 10)} in 10</th><td>${pct(x.catch, 0)}</td><td>${half(x.passed_median)}</td><td>${half(x.wrong_median)}</td><td>${x.passed_median ? pct(x.wrong_median / x.passed_median, 2) : "never on"}</td></tr>`).join("")}
+  return `<div class="tablewrap"><table class="score num"><caption>In this simulation: the agreement gate by how reviewers behave (${int(rows[0] ? rows[0].runs : 0)} runs a row; 1 clean invoice in ${int(1 / ffLo)} wrongly flagged. Copy: how many suggestions in 10 reviewers copy; catch: of the rest, the share of the AI's mistakes they catch. Opened: runs in which it was switched on. Paid and needed a fix: the median run. Rate: pooled over all runs, every line needing a fix over every line paid)</caption><thead><tr><th scope="col">Copy</th><th scope="col">Catch</th><th scope="col">Opened</th><th scope="col">Paid</th><th scope="col">Needed a fix</th><th scope="col">Rate</th></tr></thead><tbody>
+  <tr class="chosen"><th scope="row" colspan="2">By real results (Q5)</th><td>Yes, one run</td><td>${int(t.passed)}</td><td>${int(t.wrong)}</td><td>${pct(t.wrong / t.passed, 1)}</td></tr>
+  ${rows.map((x) => `<tr><th scope="row">${int(x.alpha * 10)} in 10</th><td>${pct(x.catch, 0)}</td><td>${int(x.opened)} of ${int(x.runs)}</td><td>${half(x.passed_median)}</td><td>${half(x.wrong_median)}</td><td>${x.pooled_rate === null || x.pooled_rate === undefined ? "never on" : pct(x.pooled_rate, 2)}</td></tr>`).join("")}
   </tbody></table></div>`;
 }
 

@@ -36,7 +36,11 @@ def main(data, runs):
                 cells.append({"alpha": a, "catch": c, "false_flag": f, "runs": runs,
                               "passed_median": statistics.median(r["passed"] for r in reps),
                               "wrong_median": statistics.median(r["wrong"] for r in reps),
-                              "rate_median": statistics.median(r["wrong"] / r["passed"] if r["passed"] else 0 for r in reps)})
+                              "rate_median": statistics.median(r["wrong"] / r["passed"] if r["passed"] else 0 for r in reps),
+                              # Runs where the gate opened, and the rate pooled over all runs (total wrong / total paid):
+                              # a ratio of two medians from different runs is not a rate.
+                              "opened": sum(1 for r in reps if r["passed"]),
+                              "pooled_rate": (sum(r["wrong"] for r in reps) / sum(r["passed"] for r in reps)) if any(r["passed"] for r in reps) else None})
                 print(cells[-1], flush=True)
     save_json({"cells": cells, "alphas": ALPHAS, "catch": CATCH, "false_flag": FALSE_FLAG}, data / "agreement_sweep.json")
 
