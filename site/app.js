@@ -96,7 +96,7 @@ function biz(d) {
   <p><strong>Keeping it honest.</strong> I locked the test invoices before any approach ran and wrote each rule down before the run it governed. I then made ${word(d.post_result.length)} changes after a test result was known, all listed in the Method section: ${word(postCount(d, "bar"))} raised the bar to 99% once the test months' base rate showed a do-nothing rule would pass (before any approach ran), ${word(postCount(d, "rule"))} changed how the approaches are compared (I show the verdict under both rules; they agree), ${word(postCount(d, "run"))} added a run on new invoices, ${word(postCount(d, "lookahead"))} disclosed that information from the test months reached the setup (a look-ahead), and the rest corrected figures or added these pages. I published the results that went against me. A second program recounted the records independently.</p>
   <h3>The result</h3>
   ${summaryStrip(d)}
-  <p>None of the three pre-registered approaches proved the 99% bar. The simple rule, a per-category rule, paid nothing. Claude checking each invoice paid only ${b2 ? `${int(b2.b_alone.passed)} of ${int(b2.b_alone.n)} invoices in the follow-up (${int(b2.b_alone.wrong)} wrong)` : `${int(d.b.sample.passed)} of ${int(d.sample_n)}`}, too few to prove the bar, and costs about $${bPer1k.toFixed(2)} for every 1,000 invoices, for as long as it runs. Claude's rulebook paid ${pct(c.held_out.coverage[0] / d.held_out_n, 1)} of invoices and got ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} of those right. That is not proven: its worst likely case is ${pct(c.held_out.precision_lower, 2)}, about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order, against ${pct(d.bar.pass_everything.full.precision[0] / d.bar.pass_everything.full.precision[1], 2)} for paying every invoice. The rest of this section is about the rulebook, the best of the three tested and the only one paying enough to be worth a pilot.</p>
+  <p>None of the three pre-registered approaches proved the 99% bar. The simple rule, a per-category rule, paid nothing. Claude checking each invoice paid only ${b2 ? `${int(b2.b_alone.passed)} of ${int(b2.b_alone.n)} invoices in the follow-up (${int(b2.b_alone.wrong)} wrong)` : `${int(d.b.sample.passed)} of ${int(d.sample_n)}`}, too few to prove the bar, and costs about $${bPer1k.toFixed(2)} for every 1,000 invoices, for as long as it runs. Claude's rulebook paid ${pct(c.held_out.coverage[0] / d.held_out_n, 1)} of invoices and got ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} of those right. That is not proven: its worst likely case is ${pct(c.held_out.precision_lower, 2)}, about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order, against ${pct(d.bar.pass_everything.full.precision[0] / d.bar.pass_everything.full.precision[1], 2)} for paying every invoice. The rest of this section is about the rulebook, the best of the three tested and the only one of the three paying enough to be worth a pilot.</p>
   <div class="cost biz-tiles">
   ${tile("Order lines it would have paid", `>${int(b.paid)}`, `of ${int(d.held_out_n)} in the ${word(b.months)} test months (${pct(b.paid / d.held_out_n, 1)}), in about ${int(b.groups_paid)} invoice groups`)}
   ${tile("Lines where the records show a person's own step", `>${pct(iso, 1)}`, `${int(fp.isolated_paid)} of ${int(b.paid)}: a step besides the clearing, not part of a bulk posting. A footprint, not proof of review.`)}
@@ -202,7 +202,7 @@ function wireBiz(d) {
     set("be-paper", `$${int(x.be(L.paper))}`);
     set("need-paper", need(L.paper));
     set("be-gated", `$${int(x.be(L.gated_cautious))} to $${int(x.be(L.gated_generous))}`);
-    set("need-gated", `${need(L.gated_generous)} to ${need(L.gated_cautious)}`);
+    { const lo = need(L.gated_generous), hi = need(L.gated_cautious); set("need-gated", lo === hi ? lo : `${lo} to ${hi}`); }
     set("be-low", `$${int(x.be(L.gated_cautious))}`);
     set("need-low", need(L.gated_cautious));
     // The decision rests on the net after running costs (oversight and blind checks); the per-line share is secondary.
@@ -319,7 +319,7 @@ function q1(d) {
 /* ---------- Not proven: the rulebook's result in plain words, with the figures that qualify it ---------- */
 function notProven(d) {
   const c = d.policies.find((p) => p.chosen), [ck, cn] = c.held_out.precision, pe = d.bar.pass_everything.full.precision;
-  return `It was about 99% right on what it paid (${pct(ck / cn, 2)}), but not proven: the worst likely case is ${pct(c.held_out.precision_lower, 2)}, and about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order. Paying every invoice with no checks at all would have been ${pct(pe[0] / pe[1], 2)} right. ${fitDrop(d)}`;
+  return `It was about 99% right on what it paid (${pct(ck / cn, 2)}), but not proven: the worst likely case is ${pct(c.held_out.precision_lower, 2)}, and about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for invoices on the same order. Paying every invoice with no checks at all would have been ${pct(pe[0] / pe[1], 2)} right.`;
 }
 function fitDrop(d) {
   const c = d.policies.find((p) => p.chosen);
@@ -364,7 +364,7 @@ function summaryStrip(d) {
   const b2 = d.b2 && d.b2.b_alone ? d.b2.b_alone : null;
   const items = [
     ["A simple rule", "Paid nothing", "No kind of invoice had a clean enough record."],
-    ["Claude checking each invoice", b2 ? `About ${pct(b2.wrong / b2.passed, 0)} wrong` : "Not proven", b2 ? `On what it paid, about the same as the rulebook (${pct((cn - ck) / cn, 2)}), paying far fewer: ${pct(b2.coverage, 1)} of ${int(b2.n)} new invoices. Not proven.` : "Paid too few to prove anything."],
+    ["Claude checking each invoice", "Not proven", b2 ? `About ${pct(b2.wrong / b2.passed, 0)} wrong on what it paid, about the same as the rulebook (${pct((cn - ck) / cn, 2)}), paying far fewer: ${pct(b2.coverage, 1)} of ${int(b2.n)} new invoices.` : "Paid too few to prove anything."],
     ["Claude's rulebook", "Not proven", `About 99% right on the ${pct(cn / d.held_out_n, 0)} it paid (worst likely case ${pct(c.held_out.precision_lower, 2)}; about ${pct(d.evidence.clustering.clustered_lower, 1)} allowing for orders). Paying everything: ${pct(pe, 2)}.`],
   ];
   const r = d.evidence.replay, t = d.replay.totals;
@@ -606,6 +606,7 @@ function q3(d) {
   ${row("Simple rule", `${int(d.a.cells)} kinds of invoice qualified`, "none", ratio(a.coverage, 1), "none", false)}${pols}</tbody></table></div>
   <p class="small">One of the three policies (policy ${esc(p1.policy)}) does clear the bar on held-out invoices (lower bound ${pct(p1.held_out.precision_lower, 2)}), but its result had been seen before the rule was rewritten and the earlier-month selection did not choose it, so it does not count towards the verdict; all three are shown. Its pass is not robust to clustering either: allowing for invoices on the same order, its lower bound is ${pct(d.evidence.policy_clustering[p1.policy].clustered_lower, 2)}.</p>
   <p class="small">In plain words: rulebook ${esc(p1.policy)} passed, but I had already seen its score before the final comparison rule was set, and it was not the one picked in advance. Counting it would be choosing the winner after the race, so it is shown but does not count.</p>
+  <p class="small">For the picked rulebook, ${fitDrop(d).replace(/^In/, "in")}</p>
   ${vendorPanel(d)}
   <h3>Checking each invoice against the rulebook, on the same ${int(d.sample_n)} invoices</h3>
   <p>Checking each invoice paid ${int(bvc.B_passed)} and was wrong ${bvc.B_errors === 1 ? "once" : int(bvc.B_errors) + " times"} (worst likely case ${pct(bLow, 1)}). The rulebook paid ${int(bvc.C_passed)} and was wrong ${int(bvc.C_errors)} times. Looking only at mistakes one made and the other avoided: ${int(bvc.C_only_errors)} were the rulebook's and ${int(bvc.B_only_errors)} were the other's. The rule I wrote down in advance tests that gap (p = ${bvc.p_B_better.toFixed(3)}), but the test is ill-posed here: checking each invoice paid only invoices the rulebook also paid${bic.also_c === bic.b_passed ? "" : ` (${int(bic.also_c)} of its ${int(bic.b_passed)})`}, so every mistake "only the rulebook made" is on an invoice the other simply held. On the ${int(bic.b_passed)} invoices both paid, ${int(bvc.B_errors)} needed fixing for checking each invoice and ${int(bic.c_on_b)} for the rulebook. The gap measures how much less it paid, not how much more accurate it was: it added cost, not accuracy. Under the rule, that is not enough to win, so cost decides: the rulebook.</p>
