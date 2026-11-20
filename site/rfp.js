@@ -363,6 +363,15 @@ function build(d) {
   out.push(sec("s12", "12", "Instructions to proposers, timetable and evaluation", `
   <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer every M and D requirement in section 6 one by one, and state every assumption it changes.</p>
   ${tbl("Timetable (proposed offsets from the issue date)", ["Event", "Offset", "Date"], TT.map(([e, w]) => [e, w ? `T + ${w} weeks` : "T", fill("DD Month YYYY")]))}
+  <h3>How to submit</h3>
+  ${tbl("Submission", ["Item", "Entry"], [
+    ["Where to submit", fill("Portal or address, set at issue")],
+    ["Deadline", `Responses due at T + ${TT[3][1]} weeks: ${fill("date and time zone set at issue")}. ${fill("Late-response rule, set at issue")}`],
+    ["Format", `One document, searchable PDF, plus the cost lines of section 11 as a spreadsheet; ${fill("language set at issue")}`],
+    ["Length", `${fill("Page limit set at issue, e.g. 20 pages")}, not counting CVs, references and certificates`],
+    ["Questions", `In writing only, to ${fill("contact role and address set at issue")}, by Questions close (T + ${TT[1][1]} weeks). Answers go to every proposer at once (T + ${TT[2][1]}), without saying who asked. No other contact with the issuer's staff about this request before the award.`],
+    ["Signature", "Signed by a person with authority to commit the proposer, naming the legal entity that would contract"],
+  ])}
   <h3>What a response contains</h3>
   ${list(["Approach, mapped to the requirements.", "How it groups invoices into kinds, and why: each kind needs enough volume to prove the bar (section 3), and lines alike enough to be trusted together.","Plan against the phases and gates in section 7, with named people.", "Cost, in the format of section 11, with every assumption stated.", "Evidence of relevant past work and references.", "Declarations: conflicts of interest, confidentiality, data handling.", "Validity of the offer: " + fill("e.g. 90") + " days.", "An exit plan.", "Answers to the commercial terms below, row by row."])}
   <h3>Evaluation criteria</h3>
