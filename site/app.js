@@ -135,7 +135,7 @@ function biz(d) {
   </tbody></table></div>
   <p class="small" data-out="gn-note"></p>
   <h3>5. Why agreement is not proof</h3>
-  <p>A tempting shortcut is to trust the AI once the people checking its work usually agree with it. I simulated that. When reviewers copied the AI's suggestion 9 times in 10, trusting it on agreement paid a median of ${half(ag.passed_median)} invoices, ${half(ag.wrong_median)} of them wrong, against ${int(t.passed)} and ${int(t.wrong)} when trust had to be earned on real outcomes: ten times the wrong payments, though at a lower rate per invoice paid, because it paid far more. The agreement mostly measured the reviewers, not the AI. This is a simulation with assumed reviewer behaviour, not a study of real people (Q6).</p>
+  <p>A tempting shortcut is to trust the AI once the people checking its work usually agree with it. I simulated that. When reviewers copied the AI's suggestion 9 times in 10, trusting it on agreement paid a median of ${half(ag.passed_median)} invoices, ${half(ag.wrong_median)} of them wrong, against ${int(t.passed)} and ${int(t.wrong)} when trust had to be earned on real outcomes: a lower rate per line paid (${pct(ag.wrong_median / ag.passed_median, 2)} against ${pct(t.wrong / t.passed, 1)}) on far more lines. The count is not the problem: on these figures it would come out ahead whenever a late fix costs less than about ${int((ag.passed_median - t.passed) / (ag.wrong_median - t.wrong))} × share reviewed × the cost of a review. The problem is that the agreement mostly measured the reviewers, so it says nothing about whether the AI is right. This is a simulation with assumed reviewer behaviour, not a study of real people (Q6).</p>
   <h3>6. A value limit to try in the pilot (proposed, not tested)</h3>
   <p>A common control in accounts payable is a value limit: lines above a set amount always go to a person, whatever the rules say. The test points the same way. The typical line the rulebook paid wrongly was worth ${usd(v.median_wrong)}, against ${usd(v.median_paid)} for a typical line it paid. The largest tenth of the lines it paid (${usd(top.line)} and up) held ${int(b.top10.wrong)} of its ${int(b.wrong)} mistakes, but ${pct(b.top10.wrong_value / b.value.wrong, 0)} of their value (${usd(top.wrong_value)} of ${usd(v.wrong)}).</p>
   <p>In these test lines, then, the money at stake in the mistakes sat mostly in the largest tenth. That is a description of what already happened, not a test: the line was drawn from the same lines, after the results were known, and it does not change the verdict in Q1. I did not test a value limit, because choosing one after seeing these results would flatter it. A business would set its limit from its own policy or earlier months, before the pilot, and test it there.</p>
@@ -753,14 +753,17 @@ function q6(d) {
     <li class="hit"><span class="name">Switched on by agreement</span><span class="track" aria-hidden="true"><span class="fill" style="width:${(b / top) * 100}%"></span></span><span class="val">${fmtB}</span></li></ul>`;
   };
   const plain = `<p class="headline">People tend to go along with a computer's suggestion, even when it is wrong. This is called <em>automation bias</em>, and it can make a weak AI look trustworthy.</p>
-  <p>A popular shortcut for switching an AI on goes like this: show its suggestions to staff, and once staff agree with it, say, 95% of the time, let it act alone. The trouble is that agreement can come from people copying the AI rather than checking it. Then a high agreement score tells you about the people, not the AI.</p>
+  <p>A popular shortcut for switching an AI on goes like this: show its suggestions to staff, and once staff agree with it often enough (a threshold the company picks), let it act alone. The trouble is that agreement can come from people copying the AI rather than checking it. Then a high agreement score carries almost no information about the AI: it tells you about the people.</p>
+  <p>${(() => { const f = sweepFacts(d); return f.lo && f.hi ? `In this simulation, when reviewers copied ${int(f.aHi * 10)} suggestions in 10, how well they checked the rest barely mattered: catching ${pct(f.lo.catch, 0)} of the AI's mistakes or ${pct(f.hi.catch, 0)}, it was switched on for about as many lines (${half(f.lo.passed_median)} against ${half(f.hi.passed_median)}). What moved the result was the reviewers' own habits: ${f.ffNone ? `when they wrongly flagged 1 clean invoice in ${int(1 / f.ffHi)}, it was never switched on at any copy rate` : "their false flags"}. The gate was reading the reviewers, not the AI.` : ""; })()}</p>
   <h3>What I tested</h3>
   <p>I ran the same week-by-week replay as in Q5, but this time the AI was switched on when staff agreed with it, not when real results proved it right. The staff were simulated: they copy the AI's suggestion 9 times in 10. The other time they check properly and catch most of its mistakes. I ran this 20 times; the figures are the middle result of the 20 runs.</p>
   <h3>What happened</h3>
   ${race(d) || pair("Wrong payments while the AI was switched on", t.wrong, a9.wrong_median, int(t.wrong), `about ${int(down10(a9.wrong_median))}`)}
   ${pair("Invoices it paid by itself", t.passed, a9.passed_median, int(t.passed), `about ${round100(a9.passed_median)}`)}
-  <p>Judged on agreement, the AI was switched on about ${word(Math.round(med(gaps9)))} weeks sooner, paid far more invoices by itself, and made ${word(times)} times as many wrong payments. Each payment was less likely to be wrong (about ${pct(a9.wrong_median / a9.passed_median, 1)} against ${pct(t.wrong / t.passed, 1)}), but only because the rulebook happens to be about 99% right. A much worse AI would have been agreed with nearly as often.</p>
-  <p class="callout"><strong>The agreement it was switched on for was mostly copied. It measured the reviewers, not the AI.</strong></p>
+  <p>Judged on agreement, the AI was switched on about ${word(Math.round(med(gaps9)))} weeks sooner and paid ${half(a9.passed_median)} lines by itself, ${half(a9.wrong_median)} of which needed a correction (${pct(a9.wrong_median / a9.passed_median, 2)}). Judged on real results it paid ${int(t.passed)}, ${int(t.wrong)} needing a correction (${pct(t.wrong / t.passed, 1)}). The rate was lower on agreement only because this rulebook happens to be about 99% right; a much worse AI would have been agreed with nearly as often.</p>
+  <p class="callout"><strong>In this simulation, the agreement it was switched on for was mostly copied. It measured the reviewers, not the AI.</strong></p>
+  ${sweepTable(d)}
+  <p class="small">The count of mistakes is not the reason to avoid the shortcut. On this page's own money, the agreement gate paid about ${int(sweepFacts(d).perExtra)} more lines for each extra mistake, so it would come out ahead whenever a late fix costs less than ${int(sweepFacts(d).perExtra)} × the share of lines a person reviews today × the cost of one review. The reason is that agreement carries no information about whether the AI is right.</p>
   <h3>What to do instead</h3>
   <ul>
   <li>Judge the AI on real outcomes, such as whether the payment later needed fixing, not on whether people agreed with it.</li>
@@ -779,6 +782,24 @@ function q6(d) {
     `The low mistake rate per payment comes from a rulebook that is about 99% right. With these settings, an AI wrong 5% of the time would still see about 99.4% agreement when reviewers copy 9 in 10 (arithmetic, not a run)`,
     `In the simulation, real results can still switch the AI off`,
   ], true);
+}
+
+/* ---------- The agreement gate: what the sweep shows (ADR 0022). All figures from data.json (evidence.sweep, agreement). ---------- */
+function sweepFacts(d) {
+  const sw = d.evidence.sweep || [], t = d.replay.totals, a9 = d.agreement.alphas["0.9"];
+  const ffs = sw.map((x) => x.false_flag), ffLo = Math.min(...ffs), ffHi = Math.max(...ffs), aHi = Math.max(...sw.map((x) => x.alpha));
+  const at = sw.filter((x) => x.alpha === aHi && x.false_flag === ffLo).sort((p, q) => p.catch - q.catch), lo = at[0], hi = at[at.length - 1];
+  const ffNone = sw.length > 0 && sw.filter((x) => x.false_flag === ffHi).every((x) => x.passed_median === 0);
+  const perExtra = (a9.passed_median - t.passed) / (a9.wrong_median - t.wrong); // extra lines paid per extra mistake
+  return { sw, lo, hi, ffNone, perExtra, ffLo, ffHi, aHi };
+}
+function sweepTable(d) {
+  const { sw, ffLo } = sweepFacts(d), t = d.replay.totals;
+  const rows = sw.filter((x) => x.false_flag === ffLo);
+  return `<div class="tablewrap"><table class="score num"><caption>In this simulation: the agreement gate by how reviewers behave (medians of ${int(rows[0] ? rows[0].runs : 0)} runs; 1 clean invoice in ${int(1 / ffLo)} wrongly flagged)</caption><thead><tr><th scope="col">Reviewers copy</th><th scope="col">Of the rest, they catch</th><th scope="col">Lines paid on its own</th><th scope="col">Needed a correction</th><th scope="col">Rate</th></tr></thead><tbody>
+  <tr class="chosen"><th scope="row" colspan="2">Switched on by real results (Q5)</th><td>${int(t.passed)}</td><td>${int(t.wrong)}</td><td>${pct(t.wrong / t.passed, 1)}</td></tr>
+  ${rows.map((x) => `<tr><th scope="row">${int(x.alpha * 10)} in 10</th><td>${pct(x.catch, 0)}</td><td>${half(x.passed_median)}</td><td>${half(x.wrong_median)}</td><td>${x.passed_median ? pct(x.wrong_median / x.passed_median, 2) : "never switched on"}</td></tr>`).join("")}
+  </tbody></table></div>`;
 }
 
 /* ---------- Q7: cost at volume ---------- */

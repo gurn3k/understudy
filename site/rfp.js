@@ -123,7 +123,7 @@ function build(d) {
     ["Trusted on agreement (simulation)", half(ag.passed_median), half(ag.wrong_median), `about ${pct(ag.wrong_median / ag.passed_median, 2)}`, `Reviewers copy ${Math.round(+AGREE * 10)} in 10; medians of ${SIM_RUNS} runs; assumed behaviour, not a study of people`],
   ])}
   ${bars("Wrong payments let through", [["Earned on outcomes", t.wrong, int(t.wrong)], ["Trusted on agreement (simulation, assumed behaviour)", ag.wrong_median, half(ag.wrong_median), true]])}
-  <p>Trusting on agreement let through about ten times the wrong payments, though at a lower rate per invoice, because it paid far more. That is why requirement M2 forbids it.</p>
+  <p>In the simulation, trusting on agreement let through about ten times as many lines that needed a correction, at a lower rate per line, because it paid far more. The count is not why requirement M2 forbids it: when reviewers copy, agreement carries no information about whether the AI is right.</p>
   <h3>Limits of the evidence</h3>
   ${tbl("What the evidence can and cannot carry", ["Limit", "What it means for a proposal"], [
     ["Look-ahead", `The learning months' rates include outcomes that landed after the test began, and test outcomes helped choose invoices as the subject. A live system would not have either. Direction of the effect: not established.`],
