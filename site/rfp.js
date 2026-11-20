@@ -72,7 +72,7 @@ function build(d) {
   const phases = [["0 Set-up", PH.p0], ["1 Practice mode", firstWk], ["2 Limited autonomy", PH.p2], ["3 Review", PH.p3]];
   const timeline = `<figure class="tline"><div class="tline-bar" role="img" aria-label="Pilot plan: ${phases.map(([n, w], i) => `${n}, ${i === 1 ? "at least " : ""}${w} weeks`).join("; ")}">${phases.map(([n, w], i) => `<span class="seg s${i}" style="flex:${w}"><b>${n}</b><i>${i === 1 ? "≥" : ""}${w} wk</i></span>`).join("")}</div><figcaption class="small">At least ${totalWeeks} weeks. Each phase ends at a gate (section 7). Phase 1 ends when a kind of invoice proves the bar under M2. ${firstWk} weeks is the earliest that happened in the replay, under its own single-crossing rule; ${m2Line}, so Phase 1 is at least ${firstWk} weeks, and the stop rule may end the pilot first.</figcaption></figure>`;
   out.push(sec("s1", "1", "Executive summary", `
-  <p class="headline">I ask for approval of a controlled pilot, not a roll-out: ${totalWeeks} weeks in four gated phases.</p>
+  <p class="headline">I ask for approval of a controlled pilot, not a roll-out: at least ${totalWeeks} weeks in four gated phases.</p>
   ${timeline}
   ${tbl("Key figures", ["Question", "Answer", "What it means"], [
     ["What was tested?", `3 pre-registered approaches, ${int(d.held_out_n)} real invoices`, "None proved the 99% bar"],
@@ -81,8 +81,8 @@ function build(d) {
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
     ["Trust earned on outcomes (replay)", `${int(t.passed)} paid, ${int(t.wrong)} needed correction (${pct(t.wrong / t.passed, 1)}), ${d.evidence.replay.kinds === 1 ? "all in one kind" : `in ${int(d.evidence.replay.kinds)} kinds`}, ${int(d.evidence.replay.top_order)} on one order; first kind in week ${firstWk} of the replay (ISO week ${firstIso}) under the replay's own rule; ${m2d.promotions === 0 ? "none under M2's default" : `under M2's default, ${wkL(m2d.first)}`}`, "Not proven either; expect errors in the first months"],
     ["When it pays off", `<span data-out="pays-off"></span>.<span data-out="pays-off-q"></span>`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate, after oversight and blind checks (section 11)`],
-    ["Pilot cost", `<span data-out="total"></span>: internal oversight and the rulebook (my assumptions), blind checks on <span data-out="kinds-lab"></span> each month (M9), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
-    ["Return", `<span data-out="return-line"></span>`, `At your inputs, including blind checks on <span data-out="kinds-lab"></span> each month (M9)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
+    ["Pilot cost", `<span data-out="total"></span>: internal oversight and the rulebook (my assumptions), blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
+    ["Return", `<span data-out="return-line"></span>`, `At your inputs, including blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
   ], "keys")}
   <p class="ask"><strong>The decision I ask for:</strong> approve Phase 0 to measure the inputs that decide it: the share of lines a person reviews today, minutes per review and the cost of a late fix. <span data-out="ask-note"></span> Gate 1 goes ahead only if those measurements give a positive net after running costs. Every later phase waits for a gate.</p>
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, under controls, whether its own invoices would.</p>`));
@@ -205,11 +205,11 @@ function build(d) {
   const ph = [
     ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget, and Phase 0's measured share reviewed, minutes per review and late-fix cost give a positive net after running costs (section 11); otherwise stop"],
     ["1 Practice mode", `At least ${firstWk} (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}, under its own single-crossing rule, and was switched off again later; ${m2Line}); it ends when G2 holds, and depends on your volume per kind`, "The rulebook makes calls on every kind; people handle every invoice; every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
-    ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind checks run every month on each kind paid on its own (M9).", "G3: results review; the correction budget was respected"],
+    ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind checks run window by window (one month to one quarter) on each kind paid on its own (M9).", "G3: results review; the correction budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
   ];
   out.push(sec("s7", "7", "Pilot plan, gates and decision points", `
-  <p>The plan runs about ${totalWeeks} weeks (${(totalWeeks * 12 / 52).toFixed(1)} months) if Phase 1 takes about ${firstWk} weeks. It may take longer or shorter, depending on volume; no gate may be skipped.</p>
+  <p>The plan runs at least ${totalWeeks} weeks (${(totalWeeks * 12 / 52).toFixed(1)} months), with Phase 1 at its minimum of ${firstWk} weeks. It can only take longer, depending on volume; no gate may be skipped.</p>
   ${tbl("Phases and gates", ["Phase", "Weeks", "What happens", "Gate to leave"], ph)}
   <h3>Stop criteria</h3>
   <p>The Pilot Owner shall recommend stopping, and the sponsor shall decide, if any of these holds:</p>
@@ -367,7 +367,7 @@ function build(d) {
     bars("Largest tenth of paid invoices: share of each total", [["Share of invoices paid", b.top10.count / b.paid, pct(b.top10.count / b.paid, 0)], ["Share of mistakes, by count", b.top10.wrong / b.wrong, pct(b.top10.wrong / b.wrong, 0)], ["Share of value paid", topSharePaid, pct(topSharePaid, 0)], ["Share of mistakes' value", topShareWrong, pct(topShareWrong, 0), true]], 1),
     "a value limit is a common accounts-payable control, and on these invoices that tenth held most of the mistakes' value. The line here was drawn from the same invoices after the results, so it describes what happened; it does not show a limit would help.",
     "set the limit from the company's own policy or earlier months, before the pilot, and test it there.")}
-  ${dcard("M9", "Check a sample of paid invoices blind, every month", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} lines that needed a correction, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
+  ${dcard("M9", "Check a sample of paid invoices blind, window by window", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} lines that needed a correction, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
     "", "reviewers who can see the AI's answer tend to agree with it. A blind check, where the reviewer does not see the AI's call, measures the AI, not the reviewer.",
     "describe the sample size, who checks, and how the AI's answer is hidden from them.", "Mandatory since this issue (it was D2), not tested")}
   ${dcard("D3", "Watch how often people overrule it, as a warning sign only", "agreement mostly measured the reviewers in the simulation, not the AI.",
@@ -431,7 +431,7 @@ function wire(d) {
     set("pays-off-q", qTxt);
     set("pays-off", x.needNet > 1 ? `Not at these inputs: even with every line reviewed today, late fixes, oversight and blind checks cost more than the time saved (late fixes alone would need ${Calc.needTxt(x.need(B.L.gated_cautious))} reviewed)` : `Only if a person today reviews at least ${pct(x.needNet, 1)} of these lines (late fixes alone: ${Calc.needTxt(x.need(B.L.gated_cautious))})`);
     const upper = v.sh === null ? " Share reviewed not entered, so every line counts as reviewed today: an upper limit." : "";
-    const blindTxt = ` It counts blind checks on ${kTxt} each month (${usd(x.blindYr)} a year), as M9 requires.`;
+    const blindTxt = ` It counts blind checks on ${kTxt}, costed at M9's shortest (monthly) window (${usd(x.blindYr)} a year).`;
     set("need-note", (x.ask <= 1 ? `of the on-paper volume, with a late fix at $${int(x.M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(x.M)}, even the full on-paper volume does not repay the pilot in a year.`) + blindTxt + upper);
     set("roi-warn", v.hasInt ? "" : "Integration cost not entered: return and payback are hidden until you enter your integration cost above (0 is allowed).");
     scenRows(B.g).forEach(([e], j) => {
