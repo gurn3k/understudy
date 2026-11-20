@@ -261,6 +261,7 @@ details.words summary { font-size: 17px; }
 .bars.pair li.hit .fill { background: var(--standby); }
 .bars.proof .fill { background: var(--pencil); }
 .callout { font-size: 19px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 14px 0; margin: 22px 0; }
+.callout.rec { font-size: 17px; padding: 10px 0; } .callout.rec p { margin: 6px 0; }
 table.scale .sub { display: block; font-size: 13px; color: var(--ink-2); }
 dd, li { text-wrap: pretty; }
 h2.sub { font: 700 21px/1.2 var(--display); margin: 36px 0 10px; letter-spacing: .01em; }

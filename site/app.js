@@ -81,6 +81,11 @@ function biz(d) {
   const tile = (label, out, sub) => `<div><span class="small">${label}</span><span class="big" ${out}</span><span class="small">${sub}</span></div>`;
   const shareRows = [...mb.anchorShares.map(([s, why]) => [pct(s, 1), why]), ["Your share", ""], ["100%", "every line: an upper limit, not a plan"]];
   const plain = `<p class="headline">On paper, an AI-written rulebook could have paid about half of invoices without a person checking them, for almost nothing to run. It has not proven the 99% bar, and proof takes months.</p>
+  <div class="callout rec" role="note" aria-label="In brief">
+  <p><strong>What I recommend:</strong> a gated pilot, not a roll-out. The rulebook runs in practice mode first, and pays a kind of invoice on its own only once real outcomes prove the bar (<a href="rfp.html">the pilot request</a>).</p>
+  <p><strong>What it costs now:</strong> only Phase 0, ${Calc.PH.p0} weeks to measure the share of lines a person reviews today, the minutes per review and the cost of a late fix: <span data-out="rec-p0"></span> of oversight time at your inputs below, plus any integration.</p>
+  <p><strong>What would stop it:</strong> those measurements show no positive net after running costs; lines needing a correction go over the budget fixed before the pilot; or no kind proves the bar by week ${(d.replay.weeks.indexOf(d.replay.first) + 1) * 2} of practice mode.</p>
+  </div>
   <p>This section stands on its own: if you read nothing else, read this. It turns my findings into money, risk and a next step. The rest of the report (Q1 to Q8) holds the evidence. All money is in US dollars.<sup><a href="#usd-note" id="usd-ref">*</a></sup></p>
   <h3>The study in brief</h3>
   <p><strong>The question.</strong> Every invoice line is cleared for payment, but the records can't show how many of them a person actually looks at first: most clearing steps are bulk postings, one login clearing many lines in the same minute. I wanted to know whether AI could take the routine decisions off people's desks and still reach a strict accuracy bar, and how a company would prove it before trusting it.</p>
@@ -131,8 +136,9 @@ function biz(d) {
   <p data-out="anchor"></p>
   <h3>4. What the first months really look like</h3>
   <p>The figures above assume the rulebook is trusted from day one. That is not how I would run it, so I also tested trust earned on outcomes. In a week-by-week replay of the test months, it started in practice mode: it made its calls while people still checked everything. It earned the right to pay one kind of invoice on its own only once that kind's real outcomes proved the bar, and lost it when results slipped. ${esc(plainEvents(d))}</p>
-  <p class="small">In the decision record's words ("the written policy" is the rulebook; its weeks are ISO weeks, so week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay):</p>
-  <p>${esc(eventSentence(d))}</p>
+  <details class="detail"><summary>The same, in the decision record's words</summary>
+  <p class="small">"The written policy" is the rulebook; its weeks are ISO weeks, so week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
+  <p>${esc(eventSentence(d))}</p></details>
   <p>While trusted it paid ${int(t.passed)} lines on its own, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar). On the same test lines, that is ${pct(g.earned_share, 1)} of the ${int(b.paid)} it would have paid on paper. Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion. The test window was too short to show the steady state, so ${pct(g.earned_share, 1)} understates it, and I do not estimate it here.</p>
   <div class="tablewrap"><table class="score num money"><caption>Gross and net a year, at your inputs, by share of lines the rulebook earns the right to pay</caption><thead><tr><th scope="col">Share earned</th><th scope="col">Lines paid on its own</th><th scope="col">Gross saving</th><th scope="col">Late fixes</th><th scope="col">Net</th></tr></thead><tbody>
   ${[["0%", "none earned yet", 0], [pct(g.earned_share, 1), "observed in the replay; window too short", g.earned_share], ["100%", "every line it would pay on paper", 1]].map(([lab, why, x], i) => `<tr><th scope="row">${lab} <span class="small">(${why})</span></th><td>${int(x * mb.linesYr)}</td><td data-out="gn-g-${i}"></td><td data-out="gn-f-${i}"></td><td data-out="gn-n-${i}"></td></tr>`).join("")}
@@ -200,6 +206,7 @@ function wireBiz(d) {
     });
     set("share-lab", sh === null ? "" : `(${pct(sh, 1)})`);
     set("c", `$${x.c.toFixed(2)}`);
+    set("rec-p0", usd(x.p0));
     set("M", `about $${int(x.M)} a line`);
     const need = (lpm) => Calc.needTxt(x.need(lpm));
     set("be-paper", `$${int(x.be(L.paper))}`);

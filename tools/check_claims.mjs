@@ -211,6 +211,10 @@ REQUIRED.rfp.push(["largest tenth: share of mistakes by count", `held ${pc(T10.w
 const KS = E.kind_setting;
 REQUIRED.rfp.push(["kind is a setting", `${pc(KS.before_gr_gr_first / KS.before_gr_lines, 1)} of the test lines had the goods received first`],
   ["proposers justify the grouping", "How it groups invoices into kinds, and why"]);
+// Q9 in brief (Should 11): the three lines after the lede, with Phase 0's oversight cost at the defaults.
+const firstWkC = D.replay.weeks.indexOf(D.replay.first) + 1;
+REQUIRED.q9.push(["in brief: recommendation", "What I recommend:"], ["in brief: cost now", `${"$" + n0(8 * 4 * 40)} of oversight time`],
+  ["in brief: stop rule", `no kind proves the bar by week ${firstWkC * 2} of practice mode`]);
 // People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.
 REQUIRED.q9.push(["saving as capacity", "capacity, not jobs"]);
 REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payable staff"], ["consultation in Phase 0", "a works council where there is one"],
