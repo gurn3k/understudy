@@ -23,7 +23,7 @@ No contender earned trust at the 99% bar. The fixed rule passes nothing. The pol
 - **Held-out data.** Order lines created June to August 2018 were locked with a checksum before any contender ran. No contender was given their outcomes, but some inputs, such as earlier-month rates, drew on outcomes that landed later (see Limits). The builder used held-out outcomes three times before the last rule was written: to rank the candidate decisions, to set the 99% bar, and to score the first policy. Each use is recorded in `docs/adr/`.
 - **Rules written first, changes listed.** Rules were written down in `docs/adr/` before the runs they govern. Some were changed after results were in, starting with the bar itself; the page lists every such change with its record, and replaced rules stay on the record with the reason and timing.
 - **Checks that fail.** Every check was shown to fail on purpose before it was trusted. Fixtures with hand-worked answers are in `tests/fixtures/`.
-- **Independent recount.** A second program with no shared code recounts the raw log, and its totals match.
+- **Separate recount.** A second program, written separately with no shared code, recounts the raw log, and its totals match.
 - **Claude's output is gated in code.** Invalid or missing answers count as "leave to a person". Policies are validated before they run.
 - **Fixed wording.** `tools/check_claims.mjs` confirms that every sentence fixed in the decision records appears verbatim on the page.
 
