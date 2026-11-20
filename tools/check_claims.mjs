@@ -166,7 +166,9 @@ REQUIRED.rfp.push(["weekly looks the replay's gate took", `looked ${n0(K.looks)}
   ["data protection, mandatory", "Data protection (all mandatory, under M13)"], ["retention and training use", "DP1 Retention and training use"], ["residency", "DP2 Residency"],
   ["sub-processors", "DP3 Sub-processors"], ["breach notice", "DP4 Breach notice"], ["attestations", "DP5 Attestations"], ["data-processing agreement", "DP6 Data-processing agreement"],
   ["RACI: switch-off row renamed", "Confirm or override an automatic switch-off"], ["RACI: writing row", "Write or regenerate a rulebook version"],
-  ["RACI: AP team lead", "Accounts-payable team lead"], ["RACI: control owner", "Finance Controller or Internal Control"]);
+  ["RACI: AP team lead", "Accounts-payable team lead"], ["RACI: control owner", "Finance Controller or Internal Control"],
+  ["Gate 4 success box", "Success at Gate 4"], ["budget in count and value", "two parts, count and value"],
+  ["default count budget breached in the replay", `${n0(D.replay.totals.wrong)} of ${n0(D.replay.totals.passed)} (${pc(D.replay.totals.wrong / D.replay.totals.passed, 1)})`]);
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const text = norm(where === "q9" ? pageAll.biz : rfpAll.main);

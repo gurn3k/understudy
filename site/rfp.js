@@ -218,7 +218,17 @@ function build(d) {
     `No kind of invoice has qualified by week ${stopWk} of practice mode (my judgment: twice the replay's ${firstWk}; the issuer sets its own).`,
     "Outcome data, including corrections after payment, cannot be obtained.",
     "A control in section 10 cannot be met.",
-  ])}`));
+  ])}
+  <h3>The correction budget</h3>
+  <p>Gate 1 sets the budget in two parts, count and value (M7). Unless the issuer sets its own, my default is: lines paid on their own that need a correction stay at or below ${pct(1 - d.bar.bar, 0)} of the lines paid on their own since Phase 2 began (the bar itself), and their total value stays under ${fill("US$ cap set by Finance at Gate 1")}. Going over either part switches every kind off at once. In the replay, the count part would have been exceeded by its end: ${int(t.wrong)} of ${int(t.passed)} (${pct(t.wrong / t.passed, 1)}).</p>
+  <div class="callout gate4"><p><strong>Success at Gate 4.</strong> The pilot succeeds only if all four hold:</p>
+  ${list([
+    "At least one kind of invoice is still paid on its own at the end of Phase 2.",
+    "Lines that needed a correction stayed within the budget, in count and in value.",
+    "The pilot's measured cost of a late fix is below the break-even in section 11, recalculated at the pilot's own measured error rate.",
+    `The share of the on-paper volume it earned is above the share needed to repay the pilot in its first year after (section 11; <span data-out="need"></span> at your inputs).`,
+  ], "ol")}
+  <p class="small">Anything less is a stop or an extension, decided at Gate 4; it is not a roll-out.</p></div>`));
 
   /* Columns: Sponsor, Pilot Owner, Finance Controller or Internal Control, Internal Audit, Risk and Compliance, IT and Data,
      Rulebook Owner, accounts-payable team lead. One A per row. Whoever writes a rulebook does not sign it; whoever signs it
