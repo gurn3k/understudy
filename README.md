@@ -4,7 +4,7 @@
 
 Live report: https://understudy.gurn3k.com
 
-![The report's invoice journey, the 1,000-invoice explorer, and the week-by-week race of wrong payments](docs/media/understudy-demo.gif)
+![The report's invoice journey, the 1,000-invoice explorer, and the week-by-week race of lines paid that needed a correction](docs/media/understudy-demo.gif)
 
 Understudy is a findings report built on a real enterprise purchase-to-pay event log: 251,734 purchase-order lines and 1.6 million events. It finds where people spend their time, picks the most repetitive decision (whether an invoice can be paid with no one checking it), and tests three AI "understudies" for that job against what actually happened:
 
@@ -16,12 +16,12 @@ Each understudy is held to a trust bar: the 95% lower bound on how often its str
 
 ## The result
 
-No contender earned trust at the 99% bar. The fixed rule passes nothing. The policy Claude wrote passes 48.7% of held-out invoices at 99.07% correct, just short of the bar (lower bound 98.95%). Three independently written policies all landed between 99.07% and 99.20%. A follow-up run of B on 10,000 new invoices, pre-registered in `docs/adr/0018-b-follow-up-run.md`, did not prove 99% either: it passed 577 (5.8%) with 6 wrong, a lower bound of 97.8%, and was not separated from the written policy, which is far cheaper. The page shows the full result, including the verdict under the rule set before any run, and the cost of each approach per 1,000 invoices.
+No contender earned trust at the 99% bar. The fixed rule passes nothing. The policy Claude wrote passes 48.7% of held-out invoices at 99.07% correct. That does not prove the bar: the worst likely case is 98.95%, or 98.82% allowing for lines on the same order. Three independently written policies all landed between 99.07% and 99.20%. A follow-up run of B on 10,000 new invoices, pre-registered in `docs/adr/0018-b-follow-up-run.md`, did not prove 99% either: it passed 577 (5.8%) with 6 wrong, a lower bound of 97.8%, and was not separated from the written policy, which is far cheaper. The page shows the full result, including the verdict under the rule set before any run, and the cost of each approach per 1,000 invoices.
 
 ## How it was kept honest
 
-- **Held-out data.** Order lines created June to August 2018 were locked with a checksum before any contender ran. No contender saw their outcomes. The builder used held-out outcomes three times before the last rule was written: to rank the candidate decisions, to set the 99% bar, and to score the first policy. Each use is recorded in `docs/adr/`.
-- **Rules written first.** Every rule was written down before the run it governs, in `docs/adr/`. Rules that were later replaced stay on the record, with the reason and timing.
+- **Held-out data.** Order lines created June to August 2018 were locked with a checksum before any contender ran. No contender was given their outcomes, but some inputs, such as earlier-month rates, drew on outcomes that landed later (see Limits). The builder used held-out outcomes three times before the last rule was written: to rank the candidate decisions, to set the 99% bar, and to score the first policy. Each use is recorded in `docs/adr/`.
+- **Rules written first, changes listed.** Rules were written down in `docs/adr/` before the runs they govern. Some were changed after results were in, starting with the bar itself; the page lists every such change with its record, and replaced rules stay on the record with the reason and timing.
 - **Checks that fail.** Every check was shown to fail on purpose before it was trusted. Fixtures with hand-worked answers are in `tests/fixtures/`.
 - **Independent recount.** A second program with no shared code recounts the raw log, and its totals match.
 - **Claude's output is gated in code.** Invalid or missing answers count as "leave to a person". Policies are validated before they run.
@@ -58,4 +58,4 @@ The log is the **BPI Challenge 2019** dataset by van Dongen, B.F., published by 
 
 ## Limits
 
-The data is from 2018 and contains no free text. "Straight through" means no correction between the first invoice receipt and payment, so corrections after payment aren't seen. B was scored on a 1,500-invoice sample, which can't show a 99% lower bound at a 1% error rate. The agreement-gate section is a simulation with assumed reviewer behaviour. Earlier-month rates are split by order-line creation month, so 53% of them rest on outcomes that landed after the first held-out invoice arrived. Results were not recomputed with only the rates known at the time.
+The data is from 2018 and contains no free text. "Straight through" means no correction between the first invoice receipt and payment, so a correction made after payment does not count as a mistake. Counting every such correction as a mistake lowers the worst likely case from 98.95% to 98.52%; the page shows this. B was scored on a 1,500-invoice sample, which can't show a 99% lower bound at a 1% error rate. The agreement-gate section is a simulation with assumed reviewer behaviour. Earlier-month rates are split by order-line creation month, so 53% of them rest on outcomes that landed after the first held-out invoice arrived. Results were not recomputed with only the rates known at the time.

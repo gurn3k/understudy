@@ -1,5 +1,7 @@
 // Checks that every sentence fixed in the decision records appears verbatim on the rendered page, and that
-// wording the records rule out appears on neither the page nor the pilot request (rfp.html).
+// wording the records rule out appears on neither the page nor the pilot request (rfp.html), including their meta
+// tags, chart descriptions and labels, nor in README.md. The fixed sentences are removed before that scan, since
+// some of them quote wording that is otherwise ruled out.
 // Usage: node tools/check_claims.mjs <url>   (exit 1 on any missing sentence or forbidden phrase)
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -54,6 +56,10 @@ const FORBIDDEN = [
   [/too few to tell/i, "it was about as accurate as the rulebook on what it paid, paying far fewer", "ADR 0022"],
   [/say, 95%/i, "an unexplained example threshold", "ADR 0022"],
   [/the safer way|trust earned safely/i, "the replay is not shown to be safer", "ADR 0017, Don't claim"],
+  [/just short|edge of the bar|how close/i, "near-miss framing; say not proven, with the worst likely case", "ADR 0022"],
+  [/never seen|had (not|never) seen|none of them (had )?seen|saw their outcomes/i, "the test months were held out, but inputs drew on later outcomes (look-ahead)", "ADR 0022"],
+  [/wrong payments?/i, "say lines paid that needed a correction: the label is a correction, not a wrong payment", "ADR 0022"],
+  [/corrections after payment aren't seen/i, "post-clearing corrections are in the records and move the result: give the figure", "ADR 0022"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const port = 9334;
@@ -83,11 +89,11 @@ async function pageText(u) {
   }
   if (!loaded) return null;
   await sleep(300);
-  const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '' })", returnByValue: true });
+  const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '', extra: [...document.querySelectorAll('meta[content]')].map((m) => m.content).concat([...document.querySelectorAll('svg desc, svg title')].map((e) => e.textContent), [...document.querySelectorAll('[aria-label]')].map((e) => e.getAttribute('aria-label')), [...document.querySelectorAll('img[alt]')].map((e) => e.alt)).join(' | ') })", returnByValue: true });
   return JSON.parse(res.result.result.value || "{}");
 }
 const pageAll = await pageText(url), rfpAll = await pageText(new URL("rfp.html", url).href);
-const texts = { page: pageAll && pageAll.main, rfp: rfpAll && rfpAll.main };
+const texts = { page: pageAll && pageAll.main, "page head and labels": pageAll && pageAll.extra, rfp: rfpAll && rfpAll.main, "rfp head and labels": rfpAll && rfpAll.extra, "README.md": read("README.md") };
 if (!pageAll || !rfpAll) {
   console.log("PAGE DID NOT LOAD within 30 s: no sentences checked");
   ws.close();
@@ -105,8 +111,10 @@ for (const w of want) {
 }
 console.log(`${want.length - missing}/${want.length} fixed sentences found on the page`);
 let banned = 0;
+const fixed = want.map((w) => norm(w.text));
 for (const [name, t] of Object.entries(texts)) {
-  const text = norm(t);
+  let text = norm(t || "");
+  for (const f of fixed) text = text.split(f).join(" [fixed sentence] ");
   for (const [re, why, src] of FORBIDDEN) {
     const g = new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g");
     for (const m of text.matchAll(g)) {
@@ -115,21 +123,27 @@ for (const [name, t] of Object.entries(texts)) {
     }
   }
 }
-console.log(`${FORBIDDEN.length} forbidden patterns checked on the page and rfp.html: ${banned} found`);
+console.log(`${FORBIDDEN.length} forbidden patterns checked on the page, rfp.html (with meta tags, chart descriptions and labels) and README.md: ${banned} found`);
 
 // Required figures: the business case (Q9) and the pilot request must each carry the key figures, computed here
 // from site/data.json the same way the pages format them, so the two parts can't drift apart or drop a qualifier.
 const D = JSON.parse(read("site/data.json")), B = D.business, E = D.evidence, chosen = D.policies.find((p) => p.chosen);
 const pc = (x, dp) => (x * 100).toFixed(dp) + "%", n0 = (x) => Math.round(x).toLocaleString("en-US");
 const cReview = (5 / 60) * 40, needLow = 100 / (B.lines_per_mistake.gated_cautious * cReview); // the calculators' defaults
+// The decision figure at the defaults: the share reviewed at which the yearly net, everything earned, reaches zero after
+// late fixes (cautious end), 8 oversight hours a week and monthly blind checks on one kind.
+const linesYr = (B.paid * 12) / B.months, runYr = 8 * 52 * 40 + 12 * ((B.blind.n * 5) / 60) * 40;
+const needNet = (linesYr / B.lines_per_mistake.gated_cautious * 100 + runYr) / (linesYr * cReview);
+const netWord = needNet > 1 ? ["decision at the defaults", "Doesn't pay at these inputs"] : ["decision at the defaults", pc(needNet, 1)];
 const REQUIRED = {
   q9: [["lines it would have paid", n0(B.paid)], ["lines that needed a correction", n0(B.wrong)], ["worst likely case", pc(chosen.held_out.precision_lower, 2)],
     ["worst likely case allowing for orders", pc(E.clustering.clustered_lower, 1)], ["paying every invoice", pc(D.bar.pass_everything.full.precision[0] / D.bar.pass_everything.full.precision[1], 2)],
-    ["replay lines paid", n0(D.replay.totals.passed)], ["earned share in the replay", pc(B.gated.earned_share, 1)], ["share reviewed needed, cautious end", pc(needLow, 1)]],
+    ["replay lines paid", n0(D.replay.totals.passed)], ["earned share in the replay", pc(B.gated.earned_share, 1)], ["share reviewed needed, cautious end", pc(needLow, 1)], netWord],
   rfp: [["lines it would have paid", n0(B.paid)], ["lines that needed a correction", n0(B.wrong)], ["worst likely case", pc(chosen.held_out.precision_lower, 2)],
     ["worst likely case allowing for orders", pc(E.clustering.clustered_lower, 2)], ["label moved: post-clearing corrections", pc(E.sensitivity.post_clear_lower, 2)],
     ["replay lines paid", n0(D.replay.totals.passed)], ["earned share in the replay", pc(B.gated.earned_share, 1)], ["share reviewed needed, cautious end", pc(needLow, 1)],
-    ["blind-check lines a kind a window", n0(B.blind.n)], ["supplier whitelist to beat, worst likely case", pc(E.vendor.rows.find((r) => r.key === E.vendor.picked).lower, 2)]],
+    ["blind-check lines a kind a window", n0(B.blind.n)], ["supplier whitelist to beat, worst likely case", pc(E.vendor.rows.find((r) => r.key === E.vendor.picked).lower, 2)],
+    needNet > 1 ? ["decision at the defaults", "Not at these inputs"] : ["decision at the defaults", pc(needNet, 1)]],
 };
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
