@@ -583,17 +583,17 @@ async function boot() {
     const res = await fetch("data.json");
     if (!res.ok) throw new Error(res.status);
     d = await res.json();
+    // Drawn inside the try, so data that parses but lacks a field shows the message, not "Loading" for ever.
+    main.innerHTML = build(d).join("");
+    const names = DOC === "case"
+      ? { s1: "Summary", s2: "Return", s3: "Findings", s4: "Approvals" }
+      : { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost lines", s12: "Proposers", ap: "Appendices" };
+    $("#toc").innerHTML = Object.entries(names).map(([id, n]) => `<li><a href="#${id}"><i class="lamp"></i>${id === "ap" ? '<span aria-hidden="true">A</span>' : `<span><span class="sr">Section </span>${id.slice(1)}</span>`} ${n}</a></li>`).join("");
+    wire(d);
   } catch (e) {
     main.innerHTML = `<p class="loading">The data could not be loaded (${esc(e.message)}). Reload the page to try again.</p>`;
     return;
   }
-  const parts = build(d);
-  main.innerHTML = parts.join("");
-  const names = DOC === "case"
-    ? { s1: "Summary", s2: "Return", s3: "Findings", s4: "Approvals" }
-    : { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost lines", s12: "Proposers", ap: "Appendices" };
-  $("#toc").innerHTML = Object.entries(names).map(([id, n]) => `<li><a href="#${id}"><i class="lamp"></i>${id === "ap" ? '<span aria-hidden="true">A</span>' : `<span><span class="sr">Section </span>${id.slice(1)}</span>`} ${n}</a></li>`).join("");
-  wire(d);
   const links = [...document.querySelectorAll(".cues a, .tabs a[href^='#']")];
   const obs = new IntersectionObserver((entries) => entries.forEach((en) => {
     if (!en.isIntersecting) return;

@@ -1015,20 +1015,21 @@ function closeDrawer() { for (const el of document.body.children) el.inert = fal
 /* ---------- Boot ---------- */
 async function boot() {
   const main = $("#content");
+  let d;
   try {
     const res = await fetch("data.json");
     if (!res.ok) throw new Error(res.status);
-    DATA = await res.json();
+    d = DATA = await res.json();
+    // Drawn inside the try, so data that parses but lacks a field shows the message, not "Loading" for ever.
+    main.innerHTML = [q1, q2, q3, q4, q5, q6, q7, q8, biz, method].map((f) => f(d)).join("");
+    wireBiz(d);
+    wireExplorer(d);
+    wireJourney();
+    wireRace();
   } catch (e) {
     main.innerHTML = `<p class="loading">The findings data could not be loaded (${esc(e.message)}). Reload the page to try again.</p>`;
     return;
   }
-  const d = DATA;
-  main.innerHTML = [q1, q2, q3, q4, q5, q6, q7, q8, biz, method].map((f) => f(d)).join("");
-  wireBiz(d);
-  wireExplorer(d);
-  wireJourney();
-  wireRace();
   const t = d.replay.timeline;
   let cum = [];
   t.reduce((acc, x, i) => (cum[i] = { p: acc.p + x.passed, w: acc.w + x.wrong }), { p: 0, w: 0 });

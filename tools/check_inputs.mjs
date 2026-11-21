@@ -89,6 +89,19 @@ for (const [page, p] of CALCS) {
   }
 }
 
+// F4: data that parses but lacks its fields shows the page's "could not be loaded" message, not "Loading…" for ever.
+for (const page of ["./", "case.html", "rfp.html"]) {
+  stub = "{}";
+  await send("Page.navigate", { url: new URL(page, base).href });
+  let msg = "";
+  for (let i = 0; i < 20 && !msg; i++) {
+    await sleep(250);
+    msg = await ev(`(() => { const e = document.querySelector("#content .loading"); return e && !e.hasAttribute("data-loading") ? e.textContent : ""; })()`);
+  }
+  check(/could not be loaded/.test(msg), `${page} with data.json "{}": ${msg ? `shows "${msg}"` : "still loading"}`);
+  stub = null;
+}
+
 ws.close();
 proc.kill();
 console.log(`${checks - fails}/${checks} input checks passed`);
