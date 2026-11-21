@@ -396,7 +396,7 @@ function build(d) {
     ["5", "Meets the need fully, with strong evidence, and lowers a risk in section 9"],
   ], "fit")}
   ${list([
-    `<strong>Price.</strong> Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price. The evaluated price is the total of every cost line in section 11 the proposer prices, over the pilot at its longest (${maxWeeks} weeks). A price far below the others is checked for what it leaves out before it is scored.`,
+    `<strong>Price.</strong> Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price. The evaluated price is the total of every cost line in section 11 the proposer prices, over the pilot at its longest (${maxWeeks} weeks). Fees that depend on volume are priced at ${fill("the issuer's stated volume, e.g. the order lines a year in section 11")}, with every kind paid on its own from the start of Phase 2, so every proposal is priced on the same volume. A price far below the others is checked for what it leaves out before it is scored.`,
     `<strong>Minimum.</strong> A proposal scoring below 3 on "How the controls are run" or "Approach and measurement", or below ${fill("e.g. 60")} points in all, is not shortlisted (my proposal; the issuer sets its own).`,
     "<strong>Tie-break.</strong> On equal points, the higher score on \"How the controls are run\" wins; then the lower evaluated price.",
   ])}
