@@ -389,7 +389,7 @@ function build(d) {
   <div><span class="small">Earned share needed to repay the pilot in its first year after</span><span class="big" data-out="need"></span><span class="small" data-out="need-note"></span></div>
   <div><span class="small">Lines paid that need a correction a year, at the full on-paper volume</span><span class="big" data-out="wrong-yr"></span><span class="small">Order lines, at the cautious rate above. Each is paid before a needed fix; it is not money lost.</span></div>
   </div>
-  <p class="warn" data-out="roi-warn" role="status"></p>
+  <p class="small note-int" data-out="roi-warn" role="status"></p>
   ${tbl("Return in the first year after the pilot, if it earns a share of the on-paper volume (scenarios, not forecasts; benefit during the pilot not counted)", ["Share earned", "Lines paid alone a year", "Needing a correction a year", "Gross saving", "Net yearly benefit", "First-year return on the pilot (ROI)", "Payback"],
     scenRows(g).map(([x, why], k) => [`${pct(x, x && x < 0.1 ? 1 : 0)}${why ? `<span class="small">${why}</span>` : ""}`, `<span data-out="sc-checks-${k}"></span>`, `<span data-out="sc-wrong-${k}"></span>`, `<span data-out="sc-gross-${k}"></span>`, `<span data-out="sc-net-${k}"></span>`, `<span data-out="sc-roi-${k}"></span>`, `<span data-out="sc-pay-${k}"></span>`]), "scen")}
   ${tbl("How each figure is worked out", ["Figure", "Formula"], [
@@ -465,7 +465,7 @@ function build(d) {
   const topShareWrong = b.top10.wrong_value / b.value.wrong, topSharePaid = b.top10.paid_value / b.value.paid;
   const dcard = (id, title, found, visual, why, ask, tag = "Recommended, not tested") => `<article class="dcard"><p class="dcard-id">${id} · ${tag}</p><h3>${title}</h3><p><strong>What I found:</strong> ${found}</p>${visual}<p><strong>Why it matters:</strong> ${why}</p><p class="dcard-ask"><strong>What I ask proposers:</strong> ${ask}</p></article>`;
   cs.push(sec("s3", "3", "Special findings: the desirable requirements, and why I recommend them", `
-  <p class="headline">The mandatory requirements keep the pilot under control. These four come from things I saw in the study. The blind check is now mandatory (M9); I would score the other three.</p>
+  <p class="headline">The mandatory requirements keep the pilot under control. These three come from things I saw in the study. The blind check is mandatory (M9); I would score the other two.</p>
   <p class="small">Each is a recommendation drawn from the evidence, not a tested result. None changes the verdict: no approach proved the 99% bar.</p>
   <div class="dcards">
   ${dcard("D1", "Send the largest invoices to a person", `the largest tenth of the invoices the rulebook paid (${usd(b.top10.line * f.R)} and up) held ${pct(b.top10.wrong / b.wrong, 0)} of its mistakes (${int(b.top10.wrong)} of ${int(b.wrong)}) but ${pct(topShareWrong, 0)} of their value. That tenth also held ${pct(topSharePaid, 0)} of all the value paid, so the mistakes' value is more concentrated than the money paid, but not by as much as ${pct(topShareWrong, 0)} alone suggests.`,
@@ -474,7 +474,7 @@ function build(d) {
     "set the limit from the company's own policy or earlier months, before the pilot, and test it there.")}
   ${dcard("M9", "Check a sample of paid invoices blind, window by window", `when reviewers copied the AI ${Math.round(+AGREE * 10)} times in 10 (a simulation with assumed behaviour), trusting it on agreement let through about ${half(ag.wrong_median)} lines that needed a correction, against ${int(t.wrong)} when trust was earned on outcomes, though it paid far more (about ${int(ag.passed_median)} against ${int(t.passed)}), so a lower rate per invoice.`,
     "", "reviewers who can see the AI's answer tend to agree with it. A blind check, where the reviewer does not see the AI's call, measures the AI, not the reviewer.",
-    "describe the sample size, who checks, and how the AI's answer is hidden from them.", "Mandatory since this issue (it was D2), not tested")}
+    "describe the sample size, who checks, and how the AI's answer is hidden from them.", "Mandatory, not tested")}
   ${dcard("D4", "Plan the exit, and keep the data portable", `three rulebooks the same AI drafted from the same inputs landed between ${pct(Math.min(...rates), 2)} and ${pct(Math.max(...rates), 2)} fine on the same invoices: consistent, but not independent checks.`,
     "", "a new rulebook or a new AI model can behave differently. The company needs to be able to retest, switch supplier or stop, without losing the record of every call.",
     "describe the exit steps, the data the company keeps, and how every version of the decision component is retested before use.")}
@@ -560,15 +560,17 @@ function wire(d) {
     const upper = v.sh === null ? " Share reviewed not entered, so every line counts as reviewed today: an upper limit." : "";
     const blindTxt = ` It counts blind checks on ${kTxt}, costed at M9's shortest (monthly) window (${usd(x.blindYr)} a year).`;
     set("need-note", (x.ask <= 1 ? `of the on-paper volume, with a late fix at $${int(x.M)}. Below this, the first year after the pilot does not repay it.` : `With a late fix at $${int(x.M)}, even the full on-paper volume does not repay the pilot in a year.`) + blindTxt + upper);
-    set("roi-warn", v.hasInt ? "" : "Integration cost not entered: return and payback are hidden until you enter your integration cost above (0 is allowed).");
+    // With no integration cost entered, the ROI and payback columns are hidden and one note says why (no repeated cells).
+    set("roi-warn", v.hasInt ? "" : "The first-year return and payback columns appear once you enter your integration cost above (0 is allowed).");
+    document.querySelectorAll("table.scen").forEach((tb) => tb.classList.toggle("no-int", !v.hasInt));
     scenRows(B.g).forEach(([e], j) => {
       const r = x.row(e);
       set(`sc-checks-${j}`, int(r.lines));
       set(`sc-wrong-${j}`, int(r.wrong));
       set(`sc-gross-${j}`, usd(r.gross));
       set(`sc-net-${j}`, Calc.signed(r.net));
-      set(`sc-roi-${j}`, !v.hasInt ? "enter integration cost" : r.roi === null ? "n/a (pilot under $1k)" : `${r.roi < 0 ? "−" : ""}${int(Math.abs(r.roi) * 100)}%`);
-      set(`sc-pay-${j}`, !v.hasInt ? "enter integration cost" : r.pay ? `${r.pay.toFixed(1)} months` : "does not pay back");
+      set(`sc-roi-${j}`, !v.hasInt ? "" : r.roi === null ? "n/a (pilot under $1k)" : `${r.roi < 0 ? "−" : ""}${int(Math.abs(r.roi) * 100)}%`);
+      set(`sc-pay-${j}`, !v.hasInt ? "" : r.pay ? `${r.pay.toFixed(1)} months` : "does not pay back");
     });
   });
 }

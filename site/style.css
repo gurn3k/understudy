@@ -402,6 +402,10 @@ table.scen { min-width: 600px; }
 }
 .warn { font-weight: 700; color: var(--standby); margin: 12px 0 0; }
 .warn:empty { display: none; }
+/* The internal case's return table: its ROI and payback columns wait for an integration cost; one note says so. */
+table.scen.no-int th:nth-child(n+6), table.scen.no-int td:nth-child(n+6) { display: none; }
+.note-int { margin: 12px 0 0; }
+.note-int:empty { display: none; }
 .tline { margin: 8px 0 20px; }
 .tline-bar { display: flex; gap: 3px; min-height: 58px; }
 .tline .seg { min-width: 5.2em; display: flex; flex-direction: column; justify-content: center; padding: 6px 8px; min-width: 0; color: #fff; overflow: hidden; }

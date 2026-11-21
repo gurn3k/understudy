@@ -82,6 +82,8 @@ const FORBIDDEN = [
   [/Rulebook Owner|sign off each rulebook version|rulebook's say-so/i, "the requirements are outcomes on the decision component, any approach; the rulebook is the reference design (Appendix E)", "review round, Should 9"],
   [/Beat a supplier whitelist that the issuer|post hoc, to be confirmed|to be confirmed on later data/i, "the September check failed the shortlist on test (a): M11 now refits the rule in Phase 0", "ADR 0029, amendment 1"],
   [/this default of mine|the money in section 11 does not include it/i, "the requirements say only what the pilot shall do; the reasons are in the request's Appendix F", "batch 7, go-live"],
+  [/Mandatory since this issue|it was D2\)/i, "revision history belongs in the change log, not a requirement's label", "batch 7, go-live"],
+  [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -345,6 +347,8 @@ const BOTH = ["lines it would have paid", "lines that needed a correction", "wor
 let absent = 0, nreq = 0;
 for (const l of [...CASE_ONLY, ...BOTH]) if (!REQUIRED.rfp.some(([x]) => x === l)) { absent++; console.log(`SPLIT LABEL NOT FOUND: ${l}`); }
 REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.includes(l));
+REQUIRED.case.push(["one note for the hidden return columns", "The first-year return and payback columns appear once you enter your integration cost"], ["M9 card label", "M9 · Mandatory, not tested"]);
+REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay, in the decision record's words"]);
 REQUIRED.rfp = REQUIRED.rfp.filter(([l]) => !CASE_ONLY.includes(l));
 REQUIRED.caseHead = [["og:url", "https://understudy.gurn3k.com/case.html"], ["og:title", "Understudy: internal business case for a pilot"], ["og:image", "https://understudy.gurn3k.com/og.png"]];
 REQUIRED.readme.push(["README: internal case", "`site/case.html`"]);

@@ -129,13 +129,13 @@ function biz(d) {
   <p data-out="anchor"></p>
   <h3>4. What the first months really look like</h3>
   <p>The figures above assume the rulebook is trusted from day one. In the week-by-week replay (<a href="#q5">Q5</a>) it had to earn trust instead: it practised while people checked everything, paid a kind of invoice on its own only once that kind's outcomes proved the bar, and lost it when results slipped. While trusted it paid ${int(t.passed)} lines, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}): ${pct(g.earned_share, 1)} of what it would have paid on paper. Outcomes arrive weeks after invoices, so the window was too short to show the steady state, and I do not estimate it.</p>
-  <details class="detail"><summary>The same, in the decision record's words</summary>
-  <p class="small">"The written policy" is the rulebook; its weeks are ISO weeks, so week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
-  <p>${esc(eventSentence(d))}</p></details>
   <div class="tablewrap"><table class="score num money"><caption>Gross saving less late fixes a year, before running costs, at your inputs, by share of lines the rulebook earns the right to pay</caption><thead><tr><th scope="col">Share earned</th><th scope="col">Lines paid on its own</th><th scope="col">Gross saving</th><th scope="col">Late fixes</th><th scope="col">Net before running costs</th></tr></thead><tbody>
   ${[["0%", "none earned yet", 0], [pct(g.earned_share, 1), "observed in the replay; window too short", g.earned_share], ["100%", "every line it would pay on paper", 1]].map(([lab, why, x], i) => `<tr><th scope="row">${lab} <span class="small">(${why})</span></th><td>${int(x * mb.linesYr)}</td><td data-out="gn-g-${i}"></td><td data-out="gn-f-${i}"></td><td data-out="gn-n-${i}"></td></tr>`).join("")}
   </tbody></table></div>
   <p class="small" data-out="gn-note"></p>
+  <details class="detail"><summary>The replay, in the decision record's words</summary>
+  <p class="small">"The written policy" is the rulebook; its weeks are ISO weeks, so week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
+  <p>${esc(eventSentence(d))}</p></details>
   <h3>5. Why agreement is not proof</h3>
   <p>A tempting shortcut is to trust the AI once the people checking its work usually agree with it. In a simulation where reviewers copied its suggestion 9 times in 10, trusting it on agreement paid a median of ${half(ag.passed_median)} invoices, ${half(ag.wrong_median)} of them wrong, against ${int(t.passed)} and ${int(t.wrong)} when trust was earned on outcomes. The problem is not the count: the agreement measured the reviewers, so it says nothing about whether the AI is right. The reviewers' behaviour is assumed, not studied (<a href="#q6">Q6</a>).</p>
   <h3>6. A value limit to try in the pilot (proposed, not tested)</h3>
