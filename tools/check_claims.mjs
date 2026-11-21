@@ -354,6 +354,7 @@ for (const l of [...CASE_ONLY, ...BOTH]) if (!REQUIRED.rfp.some(([x]) => x === l
 REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.includes(l));
 REQUIRED.case.push(["one note for the hidden return columns", "The first-year return and payback columns appear once you enter your integration cost"], ["M9 card label", "M9 · Mandatory, not tested"]);
 REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay, in the decision record's words"]);
+REQUIRED.q9.push(["in brief: no pay at the defaults (gate C3, M2)", "At my default inputs it does not pay its way even if a person reviews every line today"]);
 // Q9 section 5 keeps the rates beside the totals and the agreement-vs-outcomes break-even (batch 2 Must 14; batch 7 ruling, Must 5).
 const AG9 = D.agreement.alphas["0.9"], RT = D.replay.totals;
 REQUIRED.q9.push(["section 5: rates beside totals", "a lower rate per line paid"],

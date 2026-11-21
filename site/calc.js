@@ -171,5 +171,8 @@ const Calc = (() => {
     draw();
   }
 
-  return { PH, DEF, WINDOWS_YR, TT, PROC, basis, html, wire, needTxt, usd, signed };
+  /* The share reviewed today needed to pay its way, at my default inputs (for prose that states the default verdict). */
+  const needAtDefaults = (d) => compute(basis(d), { s: null, sh: null, m: DEF.min, r: DEF.rate, fix: DEF.fix, lost: DEF.lost / 100,
+    h: DEF.oh, k: DEF.kinds, hasInt: false, i: 0 }).needNet;
+  return { PH, DEF, WINDOWS_YR, TT, PROC, basis, html, wire, needTxt, usd, signed, needAtDefaults };
 })();
