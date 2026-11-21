@@ -67,7 +67,7 @@ function build(d) {
   const head = (title, docTitle, howto, extra) => `<section id="s0" aria-labelledby="s0-h"><div class="col">
   <h1 id="s0-h">${title}</h1>
   <p class="jump"><a href="./">&larr; Back to the main report</a></p>
-  <p class="small">This is a model document. I wrote it from my study, to show how a company with a formal process could ask for a pilot. It is not issued by any organisation, and every placeholder in [brackets] is for the company that adopts it to complete. I wrote it after every result was known (decision record 0020); it changes no result.</p>
+  <p class="small">This is a model document. I wrote it from my study, to show how a company with a formal process could ${isCase ? "make the internal case for a pilot" : "ask for a pilot"}. It is not issued by any organisation, and every placeholder in [brackets] is for the company that adopts it to complete. I wrote it after every result was known (decision record 0020); it changes no result.</p>
   <div class="callout rec howto" role="note" aria-label="How to use this document"><p><strong>How to use this document.</strong></p>
   ${list(howto)}</div>
   ${tbl("Document control", ["Item", "Entry"], [
