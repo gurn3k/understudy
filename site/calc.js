@@ -11,7 +11,7 @@ const Calc = (() => {
   const WINDOWS_YR = 12; // blind-check windows a year at the cost default: monthly, M9's shortest window (ADR 0025)
   const int = (n) => Math.round(n).toLocaleString("en-US");
   const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
-  const usd = (x) => (x >= 1e6 ? `$${(x / 1e6).toFixed(2)}M` : x >= 1e4 ? `$${int(Math.round(x / 1000))}k` : `$${int(x)}`);
+  const usd = (x) => (x >= 1e9 ? `$${(x / 1e9).toFixed(2)}B` : x >= 1e6 ? `$${(x / 1e6).toFixed(2)}M` : x >= 1e4 ? `$${int(Math.round(x / 1000))}k` : `$${int(x)}`);
   const signed = (x) => (x < 0 ? "−" : "") + usd(Math.abs(x));
 
   /* Blank or unreadable gives the default; out of range is held to the field's limits. */
@@ -39,7 +39,7 @@ const Calc = (() => {
     ["lost", "Share of a wrongly paid line's value never recovered (%)", `type="number" min="0" max="100" step="0.5" value="${DEF.lost}" inputmode="decimal"`],
     ["oh", "Oversight hours a week during the pilot", `type="number" min="0" max="80" step="1" value="${DEF.oh}" inputmode="numeric"`],
     ["kinds", "Kinds of invoice paid on their own (for blind checks)", `type="number" min="0" max="50" step="1" value="${DEF.kinds}" inputmode="numeric"`],
-    ["int", "Your one-off integration cost (US$)", `type="number" min="0" step="1000" value="" placeholder="not entered" inputmode="numeric"`],
+    ["int", "Your one-off integration cost (US$)", `type="number" min="0" max="1000000000" step="1000" value="" placeholder="not entered" inputmode="numeric"`],
   ].map(([k, lab, attrs]) => k === "min"
     ? `<label>${lab} <select id="${p}-min">${[2, 5, 10].map((m) => `<option value="${m}"${m === DEF.min ? " selected" : ""}>${m}</option>`).join("")}</select></label>`
     : `<label>${lab} <input id="${p}-${k}" ${attrs}><span class="clamp small" data-clamp="${p}-${k}"></span></label>`).join("");
@@ -68,7 +68,7 @@ const Calc = (() => {
   }
 
   /* Field limits, shared by read() and the notes that say when an entry was held at a limit. */
-  const LIMITS = { share: [0, 100], rate: [1, 500], fix: [0, 100000], lost: [0, 100], oh: [0, 80], kinds: [0, 50], int: [0, Infinity] };
+  const LIMITS = { share: [0, 100], rate: [1, 500], fix: [0, 100000], lost: [0, 100], oh: [0, 80], kinds: [0, 50], int: [0, 1e9] };
   function clampNote(el, k, used) {
     const raw = el.value.trim(), n = Number(raw), [lo, hi] = LIMITS[k];
     if (raw === "" || !Number.isFinite(n)) return "";
@@ -86,7 +86,7 @@ const Calc = (() => {
       fix: readNum(el("fix"), ...LIMITS.fix, DEF.fix), lost: readNum(el("lost"), ...LIMITS.lost, DEF.lost) / 100,
       h: readNum(el("oh"), ...LIMITS.oh, DEF.oh), k: Math.round(readNum(el("kinds"), ...LIMITS.kinds, DEF.kinds)),
       hasInt: raw("int") !== "" && Number.isFinite(Number(raw("int"))) };
-    v.i = v.hasInt ? Math.max(0, Number(raw("int"))) : 0;
+    v.i = v.hasInt ? Math.min(LIMITS.int[1], Math.max(0, Number(raw("int")))) : 0;
     const changed = (k, d) => raw(k) !== "" && Number(raw(k)) !== d;
     v.costDefault = !changed("min", DEF.min) && !changed("rate", DEF.rate);
     v.fixDefault = !changed("fix", DEF.fix) && !changed("lost", DEF.lost);

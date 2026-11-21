@@ -21,7 +21,7 @@ jobs:
         run: python -m unittest -v
       - name: Term scan
         run: python tools/term_scan.py
-      - name: Claims check (serves site/ and reads both pages in headless Chrome)
+      - name: Claims and input checks (serve site/ and read the pages in headless Chrome)
         env:
           CHROME: google-chrome
           # The runner's Chrome can't use its sandbox on Ubuntu 24.04; the page served is this repo's own site/.
@@ -31,3 +31,4 @@ jobs:
           for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8765/ && break; sleep 1; done
           google-chrome --version
           node tools/check_claims.mjs http://127.0.0.1:8765/
+          node tools/check_inputs.mjs http://127.0.0.1:8765/
