@@ -88,6 +88,7 @@ const FORBIDDEN = [
   [/\b0\.76%/, "the agreement shortcut's rate is the pooled rate from data.json (0.74%), one figure in text and tables, not the ratio of the medians", "gate C3 M3 / C4 N3"],
   [/whitelist|shortlist rule/i, "one name for the baseline: the supplier shortlist, named once in section 4", "gate C3, M4"],
   [/the issuer's inputs until Phase 0/i, "the assumptions table holds my defaults, not inputs the issuer has set", "gate C3, M5"],
+  [/picked the same way it already missed 99%/i, "say which rule and which lines: the supplier rule, on lines created and first invoiced in the same month", "gate C3, M6"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
@@ -358,6 +359,7 @@ REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.inclu
 REQUIRED.case.push(["one note for the hidden return columns", "The first-year return and payback columns appear once you enter your integration cost"], ["M9 card label", "M9 · Mandatory, not tested"]);
 REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay, in the decision record's words"]);
 REQUIRED.rfp.push(["assumptions: my defaults, measured in Phase 0 (gate C3, M5)", "(my defaults; Phase 0 measures the issuer's own)"]);
+REQUIRED.page.push(["September check: the supplier rule on its own lines, against Q3 (gate C3, M6)", `the supplier rule already missed 99% (lower end ${pc(D.confirm.june_august.approaches.shortlist.main.interval[0], 2)}, against ${pc(E.vendor.rows.find((r) => r.key === E.vendor.picked).lower, 2)} on all test lines in Q3)`]);
 REQUIRED.q9.push(["in brief: no pay at the defaults (gate C3, M2)", "At my default inputs it does not pay its way even if a person reviews every line today"]);
 // Q9 section 5 keeps the rates beside the totals and the agreement-vs-outcomes break-even (batch 2 Must 14; batch 7 ruling, Must 5).
 const AG9 = D.agreement.alphas["0.9"], RT = D.replay.totals;
