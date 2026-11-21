@@ -369,6 +369,9 @@ table.scen td { text-align: right; }
 table.scen { min-width: 600px; }
 .blank { display: inline-block; min-width: 7em; border-bottom: 1px dashed var(--ink-2); color: var(--ink-2); font-style: italic; line-height: 1.3; }
 @media print {
+  /* One column on paper: the contents rail is hidden, so the grid must not keep its width (landscape, scaled print). */
+  .stage { display: block !important; }
+  .script { padding: 0 !important; }
   /* Paper is always light: the light tokens win over a dark theme or a dark system setting. */
   :root, :root[data-theme], :root:not([data-theme="light"]) {
     --paper: #fff; --ink: #16202e; --ink-2: #3a4656; --rule: #c9ced6; --wash: #eceee8;
