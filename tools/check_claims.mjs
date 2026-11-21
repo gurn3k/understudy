@@ -361,6 +361,8 @@ REQUIRED.case.push(["one note for the hidden return columns", "The first-year re
 REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay, in the decision record's words"]);
 REQUIRED.rfp.push(["assumptions: my defaults, measured in Phase 0 (gate C3, M5)", "(my defaults; Phase 0 measures the issuer's own)"]);
 REQUIRED.page.push(["September check: the supplier rule on its own lines, against Q3 (gate C3, M6)", `the supplier rule already missed 99% (lower end ${pc(D.confirm.june_august.approaches.shortlist.main.interval[0], 2)}, against ${pc(E.vendor.rows.find((r) => r.key === E.vendor.picked).lower, 2)} on all test lines in Q3)`]);
+REQUIRED.page.push(["Method limits: the B follow-up (gate C3 L2)", `the ${n0(D.b2.b_alone.n)}-invoice follow-up did not prove 99% either (lower bound ${pc(D.b2.b_alone.lower, 1)})`]);
+REQUIRED.readme.push(["limits: the B follow-up (gate C4 N9)", `the ${n0(D.b2.b_alone.n)}-invoice follow-up did not prove 99% either (lower bound ${pc(D.b2.b_alone.lower, 1)})`]);
 REQUIRED.q9.push(["in brief: no pay at the defaults (gate C3, M2)", "At my default inputs it does not pay its way even if a person reviews every line today"]);
 // Q9 section 5 keeps the rates beside the totals and the agreement-vs-outcomes break-even (batch 2 Must 14; batch 7 ruling, Must 5).
 const AG9 = D.agreement.alphas["0.9"], RT = D.replay.totals;
