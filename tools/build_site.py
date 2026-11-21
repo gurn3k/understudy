@@ -1,6 +1,7 @@
 """Build site/data.json from the analysis outputs. Every figure on the page comes from here.
 
-Usage: python tools/build_site.py
+Usage: python tools/build_site.py [--retime]
+--retime re-measures the rulebook's run time; without it the committed value in site/data.json is kept.
 Reads %LOCALAPPDATA%/understudy/data; writes site/data.json.
 """
 import json
@@ -22,7 +23,7 @@ from understudy.replay import replay  # noqa: E402
 import money  # noqa: E402  (tools/money.py)
 import evidence  # noqa: E402  (tools/evidence.py)
 
-DATA = Path(os.environ["LOCALAPPDATA"]) / "understudy" / "data"
+DATA = Path(os.environ.get("LOCALAPPDATA", "")) / "understudy" / "data"
 OUT = ROOT / "site" / "data.json"
 KEYS = ("precision", "coverage", "precision_lower")
 
@@ -78,7 +79,18 @@ def b2_summary(cost):
     return {**res, "cost": cost(meta)}
 
 
-def main():
+def kept_run_time(measured, path=OUT, retime=False):
+    """The run time is re-measured on every build and differs only by noise, so the committed value stays
+    unless --retime is passed (or there is none yet)."""
+    if not retime and path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))["cost"]["c_run_s_all_held_out"]
+        except (KeyError, TypeError, ValueError):
+            pass
+    return round(measured, 3)
+
+
+def main(retime=False):
     verify(DATA / "invoice_triage_heldout.jsonl", "heldout.sha256")
     verify(DATA / "sample.jsonl", "sample.sha256")
     held = list(iter_jsonl(DATA / "invoice_triage_heldout.jsonl"))
@@ -322,7 +334,7 @@ def main():
               "lower": wilson(sum(b_dec.values()) - compare["B_vs_C_sample"]["B_errors"], sum(b_dec.values()))[0]},
         "c_sample": {"passed": len(c_sample_pass), "errors": compare["B_vs_C_sample"]["C_errors"]},
         "b_vs_c": compare["B_vs_C_sample"],
-        "cost": {"b": cost(b_meta), "c": cost(c_meta), "c_run_s_all_held_out": round(run_s, 3)},
+        "cost": {"b": cost(b_meta), "c": cost(c_meta), "c_run_s_all_held_out": kept_run_time(run_s, retime=retime)},
         "replay": {"weeks": [x["week"] for x in again["timeline"]], "timeline": again["timeline"],
                    "events": again["events"], "totals": again["totals"], "first": again["first_promotion"],
                    "cue_types": cue_types, "c_passes_by_type": {t: c_types[t] for t in cue_types},
@@ -343,4 +355,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(retime="--retime" in sys.argv[1:])
