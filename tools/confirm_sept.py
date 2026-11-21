@@ -277,7 +277,10 @@ def test_b(sept, base):
 
 
 def reading(sept, base):
-    """Both tests on the main figure and on the worst case. A test whose verdict differs between them is unsettled."""
+    """Both tests on the main figure and on the worst case. A test whose verdict differs between them is unsettled,
+    and so are both tests when either figure has no lines (an approach that paid nothing, or only stuck lines)."""
+    if sept["main"] is None or sept["worst"] is None:
+        return {"a_main": None, "a_worst": None, "a": "unsettled", "b_main": None, "b_worst": None, "b": "unsettled"}
     a = {c: test_a(sept[c]) for c in ("main", "worst")}
     b = {c: test_b(sept[c], base[c]) for c in ("main", "worst")}
     return {"a_main": a["main"], "a_worst": a["worst"],

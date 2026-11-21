@@ -180,6 +180,13 @@ class Readings(unittest.TestCase):
         self.assertEqual((r["a_main"], r["a_worst"], r["a"]), (True, False, "unsettled"))
         self.assertEqual((r["b_main"], r["b_worst"], r["b"]), ("did better", "held up", "unsettled"))
 
+    def test_paying_nothing_leaves_both_tests_unsettled(self):
+        base = {"main": iv(10000, 100, 0.988, 0.992), "worst": iv(10000, 100, 0.988, 0.992)}
+        r = S.reading({"main": None, "worst": None}, base)
+        self.assertEqual((r["a"], r["b"]), ("unsettled", "unsettled"))
+        r = S.reading({"main": None, "worst": iv(5, 5, 0.0, 0.0)}, base)   # paid only stuck lines
+        self.assertEqual((r["a"], r["b"]), ("unsettled", "unsettled"))
+
     def test_settled_reading(self):
         base = {"main": iv(10000, 100, 0.988, 0.992), "worst": iv(10000, 100, 0.988, 0.992)}
         sept = {"main": iv(1000, 30, 0.960, 0.985), "worst": iv(1000, 30, 0.960, 0.985)}

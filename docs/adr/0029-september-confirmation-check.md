@@ -55,7 +55,7 @@ Applied separately to the rulebook and the shortlist, on their pooled figures, e
   - **did better** if it lies wholly below.
   
   Overlap is checked first; two intervals that don't overlap put September's wholly on one side of June to August's rate. "Held up" means no detectable shift, not proof of no shift.
-- A test whose verdict is the same on the main figure and the worst case takes that verdict. Otherwise it is **unsettled**. If an approach pays no September line, both tests are unsettled.
+- A test whose verdict is the same on the main figure and the worst case takes that verdict. Otherwise it is **unsettled**. If an approach pays no September line, or pays only stuck lines (so the main figure has no lines), both tests are unsettled.
 
 ### 7. What each result changes
 The headline never changes: it stays "not proven". Only supporting lines change, and only as follows. The write-up goes in a new Method section, "A later check: September 2018", whatever the result.
