@@ -127,3 +127,27 @@ The rest are in the lock file. An earlier lock, written before an outside sign-o
 - The run is `python tools/confirm_sept.py run`. It writes `confirm_sept_result.json` in the data folder, with the readings and what they change.
 - The write-up follows section 7. A new decision record, or an amendment here, carries the result, and the changes-after-results table gets a row.
 - An independent reviewer signs off this record before the run, and rules on the write-up after it.
+
+## Amendment 1 (2026-11-20, after the run): the result
+The run went once, on the locked lists and script, with no error and no change afterwards. Full output: `docs/confirm/sept-2018-result.json`.
+
+**Main set:** 4,227 lines created and first invoiced in September 2018, with the 109-day window. Compared with June to August picked the same way (14,598 lines).
+
+| Approach | Paid | Stuck (share) | Main figure | Main interval | Worst case | Worst-case interval | Test (a) | Test (b) |
+|---|---|---|---|---|---|---|---|---|
+| Rulebook (policy 2) | 1,870 | 74 (3.96%) | 19 wrong of 1,796, 98.94% | 97.72% to 99.72% | 93 of 1,870, 95.03% | 91.63% to 97.98% | fail | held up |
+| Supplier shortlist | 267 | 21 (7.87%) | 0 wrong of 246, 100% | 98.46% to 100% (Wilson, no wrong line) | 21 of 267, 92.13% | 75.81% to 100% | fail | held up |
+| Paying everything (context) | 4,227 | 286 (6.77%) | 189 wrong of 3,941, 95.20% | 92.65% to 97.14% | 475 of 4,227, 88.76% | 85.33% to 91.87% | none | none |
+
+- Both tests gave the same verdict on the main figure and the worst case, so neither is unsettled. Against the locked test file, which is reported only, the readings are the same.
+- **What changed (section 7):**
+  - The headline stays "not proven".
+  - The rulebook's test (a) did not pass and its test (b) held up, so no supporting line on the page changes.
+  - The shortlist failed test (a), so the pilot request's requirement M11 becomes "beat the same shortlist rule, refitted on the issuer's own recent data in Phase 0".
+  - The fail came from test (a) alone, on 267 paid lines, 246 of them settled and none wrong: too few lines to prove 99% even with no mistake. Test (b) held up, so September gives no sign that the shortlist did worse.
+  - As section 7 expected, the refit follows from too few lines, not from a September finding.
+- **Stuck lines** were concentrated in one kind: 264 of the 286 (14.1% of its 1,875 lines) were "3-way match, invoice before GR / Packaging". Elsewhere it was 22 of 2,352.
+- **The second set (reported only, decides nothing):** 19,708 lines first invoiced in September, created any time. 14,268 of them are in the test file and 931 in the learning file, by line id.
+  - Rulebook: 50 wrong of 8,552, 99.42% (99.13% to 99.65%). Its worst case is 94.84% (92.70% to 96.62%), and on the worst case test (b) reads did worse, so both tests are unsettled.
+  - Shortlist: 4 wrong of 2,176, 99.82% (99.63% to 99.96%). Its worst case is 97.53% (95.53% to 99.14%), so test (a) is unsettled and test (b) held up.
+- **Written up** in the Method section, "A later check: September 2018", and in the changes-after-results table.

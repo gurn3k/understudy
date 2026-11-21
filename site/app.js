@@ -936,6 +936,35 @@ const endState = (states) => { const last = Object.values(states).map((r) => r[r
 const STATES = new Set(["unlit", "standby", "go", "cut"]);
 const PLAIN_STATE = { go: "ON", standby: "PRACTICE", cut: "OFF", unlit: "" };
 
+/* ---------- Method: the later check on September 2018 (ADR 0029) ---------- */
+function laterCheck(d) {
+  const c = d.confirm;
+  if (!c) return "";
+  const s = c.september.approaches, j = c.june_august.approaches, r = c.readings, x = c.secondary;
+  const iv = (f) => (f ? `${pct(f.fine_share, 2)} (${pct(f.interval[0], 2)} to ${pct(f.interval[1], 2)})` : "none");
+  const rows = [["rulebook", "The rulebook"], ["shortlist", "The supplier rule (Q3)"], ["pass_everything", "Paying everything"]].map(([k, name]) => {
+    const a = s[k], t = r[k];
+    return `<tr><th scope="row">${name}</th><td data-label="Paid">${int(a.paid)}</td><td data-label="Stuck">${int(a.stuck)} (${pct(a.stuck_share, 1)})</td>
+    <td data-label="Main figure">${a.main ? `${int(a.main.wrong)} of ${int(a.main.n)}: ` : ""}${iv(a.main)}</td><td data-label="Worst case">${int(a.worst.wrong)} of ${int(a.worst.n)}: ${iv(a.worst)}</td>
+    <td data-label="June to August, main">${iv(j[k].main)}</td><td data-label="Test (a)">${t ? t.a : "context only"}</td><td data-label="Test (b)">${t ? t.b : "context only"}</td></tr>`;
+  }).join("");
+  const sl = s.shortlist;
+  const kinds = Object.entries(c.september.stuck_by_kind).filter(([, v]) => v.lines >= 30).sort((a, b) => b[1].lines - a[1].lines);
+  const kindRows = kinds.map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td data-label="Lines">${int(v.lines)}</td><td data-label="Stuck">${int(v.stuck)}</td><td data-label="Share">${pct(v.stuck_share, 1)}</td></tr>`).join("");
+  const rest = Object.values(c.september.stuck_by_kind).filter((v) => v.lines < 30), restL = rest.reduce((t, v) => t + v.lines, 0), restS = rest.reduce((t, v) => t + v.stuck, 0);
+  const sec = x.approaches, sr = x.readings;
+  const wording = (t) => `test (a) ${t.a}, test (b) ${t.b}`;
+  return `<h3>A later check: September 2018</h3>
+  <p>After an outside review I fixed one more test in advance (decision record 0029) and ran it once: on the ${int(c.september.lines)} order lines both created and first invoiced in September 2018, lines no part of the study had used, did the rulebook and the supplier rule from Q3 still meet the bar? Each line's outcome was read for ${int(c.window_days)} days after its first invoice receipt, the longest every September line can be followed before the log ends. A line with no clearing in that time is "stuck": the main figure leaves stuck lines out, and the worst case counts every one as needing a correction. June to August was re-scored the same way, on the ${int(c.june_august.lines)} lines created and first invoiced in the same month.</p>
+  <div class="tablewrap"><table class="score cards"><caption>September 2018: share fine, with the interval allowing for orders</caption><thead><tr><th scope="col">Approach</th><th scope="col">Paid</th><th scope="col">Stuck</th><th scope="col">Main figure</th><th scope="col">Worst case</th><th scope="col">June to August, main</th><th scope="col">Test (a)</th><th scope="col">Test (b)</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="small">Test (a): the lower end of the interval reaches 99%. Test (b): against June to August, "held up" if the two intervals overlap, "did worse" if September's lies wholly above June to August's error rate, "did better" if wholly below. Each test is run on the main figure and on the worst case; if they disagree, the test is "unsettled". With no line needing a correction, the interval is Wilson's, since resampling orders would give 100% to 100%.</p>
+  <p><strong>What it changed.</strong> The answer stays not proven. The rulebook didn't reach 99% on September, and held up against June to August, so no other line on this page changes. The supplier rule failed test (a), so in the pilot request, requirement M11 now asks a proposal to beat the same rule refitted on the issuer's own recent data in Phase 0. That came from test (a) alone, on few lines: it paid ${int(sl.paid)}, ${int(sl.main.n)} of them settled, and none needed a correction, which is too few to prove 99% even with no mistake. Test (b) held up, so September gives no sign that it did worse. On June to August lines picked the same way it already missed 99% (lower end ${pct(j.shortlist.main.interval[0], 2)}), so this was the expected outcome.</p>
+  <details><summary>Stuck lines by kind, September</summary>
+  <div class="tablewrap"><table class="score num cards"><caption>Lines with no clearing within ${int(c.window_days)} days of the first invoice receipt</caption><thead><tr><th scope="col">Kind</th><th scope="col">Lines</th><th scope="col">Stuck</th><th scope="col">Share</th></tr></thead><tbody>${kindRows}
+  <tr><th scope="row">${int(rest.length)} smaller kinds</th><td data-label="Lines">${int(restL)}</td><td data-label="Stuck">${int(restS)}</td><td data-label="Share">${pct(restS / restL, 1)}</td></tr></tbody></table></div></details>
+  <p class="small">Reported only, deciding nothing: all ${int(x.lines)} lines first invoiced in September, created any time. ${int(x.in_test_file)} of them are among the test months' lines and ${int(x.in_learning_file)} among the learning months'. The rulebook: ${iv(sec.rulebook.main)}, worst case ${iv(sec.rulebook.worst)}, so ${wording(sr.rulebook)}. The supplier rule: ${iv(sec.shortlist.main)}, worst case ${iv(sec.shortlist.worst)}, so ${wording(sr.shortlist)}.</p>`;
+}
+
 /* ---------- Method ---------- */
 function method(d) {
   const adrs = d.adrs.map((a) => `<li><span class="n">${esc(a.n)}</span><span class="${a.replaced_by ? "replaced" : ""}">${esc(a.title)}${a.amendments ? ` <em>${int(a.amendments)} amendment${a.amendments > 1 ? "s" : ""}</em>` : ""}${a.replaced_by ? ` <em>partly replaced by ${esc(a.replaced_by)}</em>` : ""}</span></li>`).join("");
@@ -945,6 +974,7 @@ function method(d) {
   <ol class="adrs">${adrs}</ol></details>
   <details open><summary>Changes made after a test result was known</summary>
   ${postTable(d)}</details>
+  ${laterCheck(d)}
   <details><summary>Data checks</summary><ul>
   <li>${int(d.log.excluded.bad_date_events)} events dated outside 2017\u20132019 removed.</li>
   <li>${int(d.log.excluded.duplicate_events)} same-minute identical events collapsed; most were bulk service entries.</li>
