@@ -346,7 +346,7 @@ def main(retime=False):
         "built": time.strftime("%Y-%m-%d"),
         "evidence": ev,
         "controls": controls,
-        "post_result": [[k, w, r, h.format(base=f"{pe_rate:.1%}"), e] for k, w, r, h, e in POST_RESULT],
+        "post_result": [[k, w, r, h.format(base=f"{pe_rate:.2%}"), e] for k, w, r, h, e in POST_RESULT],
         "business": business,
         "source": {"name": "BPI Challenge 2019", "licence": "CC BY 4.0",
                    "doi": "10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1"},

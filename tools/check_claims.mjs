@@ -90,6 +90,7 @@ const FORBIDDEN = [
   [/the issuer's inputs until Phase 0/i, "the assumptions table holds my defaults, not inputs the issuer has set", "gate C3, M5"],
   [/picked the same way it already missed 99%/i, "say which rule and which lines: the supplier rule, on lines created and first invoiced in the same month", "gate C3, M6"],
   [/from facts known at the moment it arrived/i, "B also saw earlier-month rates that include outcomes landing later (the look-ahead limit)", "gate C4, N4"],
+  [/base rate \(96\.8%\)/, "the base rate is 96.85% everywhere else on the page (53,144 / 54,874)", "gate C3 L4 / C4 N5"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
