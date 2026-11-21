@@ -357,7 +357,7 @@ function build(d) {
     [`Oversight, phases 1 to 3<span class="small">My assumption</span>`, `<span data-out="oh-basis"></span>`, `<span data-out="oh-cost"></span>`],
     [`Blind checks<span class="small">${req("M9, sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. ${blindSizing(true)}`, `<span data-out="blind-cost"></span> a kind a window; <span data-out="blind-pilot"></span> in the pilot`],
     [`Weekly reconciliation of calls against outcomes<span class="small">${req("Yours to estimate")}</span>`, "Hours a week × the weeks of the pilot", fill("US$ amount")],
-    [`Writing the rulebook (the reference design, ${isCase ? '<a href="rfp.html#ap">the request\'s Appendix E</a>' : "Appendix E"})<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line. A proposal prices its own design in the lines below", `$${cOnce.toFixed(2)}`],
+    [`Writing the rulebook (the reference design, ${isCase ? '<a href="rfp.html#app-e">the request\'s Appendix E</a>' : "Appendix E"})<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line. A proposal prices its own design in the lines below", `$${cOnce.toFixed(2)}`],
     [`Integration and data access<span class="small">${req("Yours to enter above")}</span>`, "One-off", `<span data-out="int-cost"></span>`],
     [`Supplier fees<span class="small">${req("Proposer to price")}</span>`, `Fixed and variable (${rq(11)})`, fill("US$ amount")],
     [`Model or API use<span class="small">${req("Proposer to price")}</span>`, "Per call or per version, with any model named", fill("US$ amount")],
@@ -403,7 +403,7 @@ function build(d) {
     ["Not included", "The required lines still blank, discounting, tax, seasonality, benefit during the pilot"],
   ])}
   <p class="small">The ${pct(g.earned_share, 1)} row is what the replay earned on the same test lines; its window was too short to show the steady state, so it is a floor seen once, not an estimate. ${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling. None of these rows changes the verdict: no approach proved the 99% bar.</p>
-  <p class="small">The baseline measures that replace these inputs are listed in <a href="rfp.html#ap">the request's Appendix C</a>; Phase 0 collects them before Gate 1.</p>`));
+  <p class="small">The baseline measures that replace these inputs are listed in <a href="rfp.html#app-c">the request's Appendix C</a>; Phase 0 collects them before Gate 1.</p>`));
 
   out.push(sec("s12", "12", "Instructions to proposers, timetable and evaluation", `
   <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer every M and D requirement in section 6 one by one, and state every assumption it changes.</p>
@@ -503,12 +503,12 @@ function build(d) {
   ])}
   <h3>B. Where each figure comes from</h3>
   ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017; evidence per rulebook version: 0026; calls hidden in practice mode, and the override rate dropped: 0027.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "The controls in sections 3, 6, 7 and 8 (promotion, switch-off, blind checks, intervals, data protection, roles, Gate 4): 0025.", "Who reads which sections, the ask, outcome requirements and how proposals are scored: 0028.", "The later check on September 2018, and M11's refitted supplier shortlist: 0029.", "This request kept apart from the issuer's internal case (approval, cost and return, sign-off): 0030.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
-  <h3>C. Benchmarks to collect</h3>
+  <h3 id="app-c">C. Benchmarks to collect</h3>
   <p>I quote no outside figure. Published accounts-payable benchmarks vary widely with definitions and sample, so the pilot measures the issuer's own, per order line, in Phase 0 and before Gate 1. A proposal states how it supports each measure.</p>
   ${tbl("Baseline measures", ["Measure", "The issuer's figure", "Source and date"], ["Order lines per invoice document", "Cost to process one order line", "Share of order lines a person actually reviews before payment (not just clears)", "Minutes per review", "Share of order lines needing a correction before payment", "Minutes to resolve an exception", "Work to fix a line after it was paid", "Share of a wrongly paid line's value never recovered", "Share of lines corrected after payment", "Order lines per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}
   <h3>D. Change log</h3>
   ${tbl("Changes", ["Version", "Date", "Change", "Approved by"], [["1.0", esc(d.built), "First issue as a model document", fill("Name, role")]])}
-  <h3>E. Reference design: the study's rulebook</h3>
+  <h3 id="app-e">E. Reference design: the study's rulebook</h3>
   <p>This is the design the study tested, given for reference. A proposer may offer it, adapt it or offer another approach; the requirements in section 6 apply the same way to each.</p>
   ${tbl("The reference design", ["Item", "What the study did"], [
     ["What it is", "An AI model writes a rulebook once from past records: rules for when a line may be paid without a check. Ordinary software then applies the rules to each line. No model is called per invoice."],
