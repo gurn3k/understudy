@@ -1,0 +1,2 @@
+wrote %LOCALAPPDATA%\understudy\data\confirm_sept_result.json
+exit=0 
