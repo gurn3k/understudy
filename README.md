@@ -9,7 +9,7 @@ Live report: https://understudy.gurn3k.com
 Understudy is a findings report built on a real enterprise purchase-to-pay event log: 251,734 purchase-order lines and 1.6 million events. It finds where people spend their time, picks the most repetitive decision (whether an invoice can be paid with no one checking it), and tests three AI "understudies" for that job against what actually happened:
 
 - **A, a plain rule** fitted on earlier months.
-- **B, Claude judging each invoice** from facts known at the moment it arrived.
+- **B, Claude judging each invoice** from its facts as they stood when it arrived, plus earlier-month rates (see Limits).
 - **C, Claude writing a policy**: rules in a small language that code checks and then runs on every invoice.
 
 Each understudy is held to a trust bar: the 95% lower bound on how often its straight-through calls are right must be at least 99%. An earned-autonomy replay grants autonomy per case type, week by week, only once outcomes prove it, and withdraws it when results slip. A labelled simulation shows what happens when reviewer agreement is the gate instead of outcomes.
