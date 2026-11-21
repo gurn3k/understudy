@@ -136,7 +136,7 @@ const Calc = (() => {
       : full.net >= 0 ? `Pays its way at your ${pct(v.sh, 1)} share reviewed, with everything earned.` : `Doesn't pay its way at your ${pct(v.sh, 1)} share reviewed, even with everything earned.`);
     set("r-net", signed(full.net));
     set("s-net", tag(true, cost, fix, run));
-    set("n-net", "100% earned, after late fixes, oversight and blind checks");
+    set("n-net", "100% earned, after late fixes, oversight and blind checks; before the pilot's one-off cost");
     set("r-down", signed(down.net));
     set("s-down", tag(true, cost, fix, run));
     set("n-down", `${pct(B.g.earned_share, 1)} earned, as in the replay (window too short)`);
