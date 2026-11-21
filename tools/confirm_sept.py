@@ -276,6 +276,16 @@ def test_b(sept, base):
     raise ValueError("June to August's error rate lies outside its own interval")
 
 
+def check_inside(base, name):
+    """Before September is scored: June to August's error rate must lie inside its own deciding interval, for each
+    tested approach, on the main figure and the worst case. Otherwise test (b) could fail mid-run."""
+    for a in TESTED:
+        for c in ("main", "worst"):
+            x = base["approaches"][a]["pooled"][c]
+            if x is None or not (1 - x["interval"][1] <= x["error_rate"] <= 1 - x["interval"][0]):
+                raise SystemExit(f"{name} June to August, {a}, {c}: the error rate is not inside its own interval")
+
+
 def reading(sept, base):
     """Both tests on the main figure and on the worst case. A test whose verdict differs between them is unsettled,
     and so are both tests when either figure has no lines (an approach that paid nothing, or only stuck lines)."""
@@ -463,6 +473,11 @@ def run(data):
     # under the window, is reported alongside.
     base = score_all(matched_june_august(iter_jsonl(data / "cases.jsonl")), dec)
     base_file = score_all(windowed, dec)
+    check_inside(base, "matched")
+    check_inside(base_file, "test-file")
+    # Context: each comparator read against itself shows what the tests say about June to August.
+    itself = {name: {a: reading(b["approaches"][a]["pooled"], b["approaches"][a]["pooled"]) for a in TESTED}
+              for name, b in (("matched", base), ("test_file", base_file))}
     main_lines, all_lines = september_lines(data, main_ids, all_ids)
     sept = score_all(main_lines, dec)
     read = {a: reading(sept["approaches"][a]["pooled"], base["approaches"][a]["pooled"]) for a in TESTED}
@@ -473,7 +488,7 @@ def run(data):
     all_scored = score_all(all_lines, dec)
     return {"month": MONTH, "window_days": WINDOW_DAYS, "lock": [list(e) for e in entries],
             "june_august": base, "june_august_test_file": base_file, "september": sept, "readings": read,
-            "readings_against_test_file": read_file,
+            "readings_against_test_file": read_file, "june_august_against_itself": itself,
             "consequences": consequences(read["rulebook"], read["shortlist"]),
             "secondary_all_invoiced_in_september": {
                 "note": "Reported only; decides nothing. Lines first invoiced in September 2018, created any time.",

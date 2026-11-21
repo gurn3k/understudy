@@ -187,6 +187,16 @@ class Readings(unittest.TestCase):
         r = S.reading({"main": None, "worst": iv(5, 5, 0.0, 0.0)}, base)   # paid only stuck lines
         self.assertEqual((r["a"], r["b"]), ("unsettled", "unsettled"))
 
+    def test_june_august_rate_must_sit_inside_its_interval_before_the_run(self):
+        good = {"approaches": {a: {"pooled": {"main": iv(10000, 100, 0.988, 0.992), "worst": iv(10000, 200, 0.975, 0.985)}}
+                               for a in S.TESTED}}
+        S.check_inside(good, "matched")
+        bad = {"approaches": {a: {"pooled": {"main": iv(10000, 100, 0.988, 0.992), "worst": iv(10000, 200, 0.990, 0.995)}}
+                              for a in S.TESTED}}
+        with self.assertRaises(SystemExit) as e:
+            S.check_inside(bad, "matched")
+        self.assertIn("worst", str(e.exception))
+
     def test_settled_reading(self):
         base = {"main": iv(10000, 100, 0.988, 0.992), "worst": iv(10000, 100, 0.988, 0.992)}
         sept = {"main": iv(1000, 30, 0.960, 0.985), "worst": iv(1000, 30, 0.960, 0.985)}
