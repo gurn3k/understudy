@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import confirm_sept as S  # noqa: E402
@@ -218,7 +219,32 @@ class Readings(unittest.TestCase):
         self.assertEqual(S.consequences(ok, {"a": "fail", "b": "unsettled"})["rfp"][0]["shortlist_requirement"], S.REFIT_REQ)
 
 
+class Consequences(unittest.TestCase):
+    def test_rulebook_pass_and_did_worse_both_apply(self):
+        out = S.consequences({"a": "pass", "b": "did worse"}, {"a": "pass", "b": "held up"})
+        self.assertEqual(out["page"], [{"add_line": S.PASS_LINE, "rfp_pass_marks": "unchanged"}, {"soften": S.WORSE_NOTE}])
+
+    def test_shortlist_unsettled_a_with_did_worse_means_refit(self):
+        out = S.consequences({"a": "fail", "b": "held up"}, {"a": "unsettled", "b": "did worse"})
+        self.assertEqual(out["rfp"], [{"shortlist_requirement": S.REFIT_REQ}])
+
+
 class Lock(unittest.TestCase):
+    def test_run_refuses_before_reading_the_log(self):
+        calls = []
+
+        def spy(path):
+            calls.append(Path(path).name)
+            return iter([])
+
+        with tempfile.TemporaryDirectory() as d, \
+                mock.patch.object(S, "LOCK", Path(d) / "none.lock"), mock.patch.object(S, "iter_jsonl", spy), \
+                mock.patch.object(S, "load_inputs", lambda _data: ({"rules": []}, [], [])):
+            with self.assertRaises(BaseException) as e:
+                S.run(Path(d))
+            self.assertEqual(calls, [])
+            self.assertIn("no lock", str(e.exception))
+
     def test_refuses_without_a_lock(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(SystemExit) as e:
