@@ -79,6 +79,7 @@ const FORBIDDEN = [
   [/Out of scope; existing controls stay/i, "the existing duplicate and fraud checks must run on lines paid on their own (M14)", "review round, Should 18"],
   [/overrule|rising override rate|show the override rate|The AI suggests, and a person still decides/i, "the AI's calls are hidden in practice mode, so there is nothing to overrule; the override rate is dropped", "ADR 0027"],
   [/Rulebook Owner|sign off each rulebook version|rulebook's say-so/i, "the requirements are outcomes on the decision component, any approach; the rulebook is the reference design (Appendix E)", "review round, Should 9"],
+  [/Beat a supplier whitelist that the issuer|post hoc, to be confirmed/i, "the September check failed the shortlist on test (a): M11 now refits the rule in Phase 0", "ADR 0029, amendment 1"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -207,7 +208,7 @@ REQUIRED.rfp.push(
   ["fixed count budget", "a fixed count"], ["the replay's count budget", `the count would have been ${n0(K.budget_count_replay)}`],
   ["quarterly sensitivity in section 1", needNetQ > 1 ? "With quarterly blind-check windows instead of monthly: still not" : `With quarterly blind-check windows instead of monthly: at ${pc(needNetQ, 1)}`],
   ["the ask funds the measurements", "on award fund Phase 0 to measure the inputs that decide it"], ["Gate 1 money test", "give a positive net after running costs"],
-  ["M11 built by the issuer", "the issuer, not the proposer, builds"],
+  ["M11 built by the issuer", "The issuer, not the proposer, builds it"],
 );
 REQUIRED.q9.push(["quarterly sensitivity in the readout", `With quarterly blind-check windows instead of monthly: ${qTxt}`],
   ["Q9: a rule that holds under weekly looks", "by a rule that holds when checked every week"], ["Q9: blind checks", "Check a sample of what it pays on its own, blind"],
@@ -272,6 +273,30 @@ const cP = chosen.held_out.precision, bA = D.b2.b_alone;
 REQUIRED.page = [["Q1 lane: rulebook exact", `${n0(cP[1])} of ${n0(D.held_out_n)} paid; ${n0(cP[1] - cP[0])} needed fixing (1 in ${n0(cP[1] / (cP[1] - cP[0]))} paid)`],
   ["Q1 lane: B exact", `${n0(bA.passed)} of ${n0(bA.n)} paid; ${n0(bA.wrong)} needed fixing (1 in ${n0(bA.passed / bA.wrong)} paid), on a follow-up sample`],
   ["Q1 lane: simple rule exact", `0 of ${n0(D.held_out_n)} paid`]];
+// The later check on September 2018 (ADR 0029): the Method section's figures and readings, and M11's refit.
+const CF = D.confirm;
+if (CF) {
+  const S9 = CF.september.approaches, R9 = CF.readings, X9 = CF.secondary.approaches;
+  const ivc = (f) => `${pc(f.fine_share, 2)} (${pc(f.interval[0], 2)} to ${pc(f.interval[1], 2)})`;
+  REQUIRED.page.push(["later check heading", "A later check: September 2018"],
+    ["later check: lines and window", `on the ${n0(CF.september.lines)} order lines both created and first invoiced in September 2018`],
+    ["later check: window", `read for ${n0(CF.window_days)} days after its first invoice receipt`],
+    ["later check: rulebook main", `${n0(S9.rulebook.main.wrong)} of ${n0(S9.rulebook.main.n)}: ${ivc(S9.rulebook.main)}`],
+    ["later check: rulebook worst", `${n0(S9.rulebook.worst.wrong)} of ${n0(S9.rulebook.worst.n)}: ${ivc(S9.rulebook.worst)}`],
+    ["later check: shortlist main", `${n0(S9.shortlist.main.wrong)} of ${n0(S9.shortlist.main.n)}: ${ivc(S9.shortlist.main)}`],
+    ["later check: shortlist worst", `${n0(S9.shortlist.worst.wrong)} of ${n0(S9.shortlist.worst.n)}: ${ivc(S9.shortlist.worst)}`],
+    ["later check: stuck shares", `${n0(S9.rulebook.stuck)} (${pc(S9.rulebook.stuck_share, 1)})`],
+    ["later check: rulebook readings", R9.rulebook.a === "fail" && R9.rulebook.b === "held up" ? "The rulebook didn't reach 99% on September, and held up against June to August" : "(readings changed: reword)"],
+    ["later check: shortlist readings", R9.shortlist.a === "fail" && R9.shortlist.b === "held up" ? "The supplier rule failed test (a)" : "(readings changed: reword)"],
+    ["later check: headline stays", "The answer stays not proven."],
+    ["later check: which test", "That came from test (a) alone, on few lines"],
+    ["later check: M11 change", "requirement M11 now asks a proposal to beat the same rule refitted on the issuer's own recent data in Phase 0"],
+    ["later check: secondary", `all ${n0(CF.secondary.lines)} lines first invoiced in September, created any time. ${n0(CF.secondary.in_test_file)} of them are among the test months' lines`],
+    ["later check: secondary rulebook", `The rulebook: ${ivc(X9.rulebook.main)}, worst case ${ivc(X9.rulebook.worst)}, so test (a) ${CF.secondary.readings.rulebook.a}, test (b) ${CF.secondary.readings.rulebook.b}`]);
+  REQUIRED.rfp.push(["M11: refit in Phase 0", "Beat the same shortlist rule, refitted on the issuer's own recent data in Phase 0."],
+    ["section 2: refit", "any proposal must beat the same shortlist rule, refitted on the issuer's own recent data in Phase 0"],
+    ["App. B: 0029", "The later check on September 2018, and M11's refitted shortlist rule: 0029."]);
+}
 let absent = 0, nreq = 0;
 for (const [where, list] of Object.entries(REQUIRED)) {
   const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"], readme: [read("README.md"), "README.md"] }[where];
