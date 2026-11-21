@@ -21,7 +21,7 @@ Under ADR 0028 the page said that sections 1 and 13 were the internal case and t
 
    It links to the request's sections by number ("the request's section 7").
 4. **Checked.** `tools/check_claims.mjs` loads all three pages. Each required figure is checked on the page it belongs to, and some are checked on both. A new banned list for the request alone fails the check on any return wording: return on the pilot, ROI, payback, net a year, "pays its way", "does not pay", "not reachable", "at these inputs", gross saving.
-5. **Navigation.** The main report links to both pages: the opening links, the cue rail and Q9's "Where the evidence is". Each page's top bar links to the other.
+5. **Navigation.** The main report links to both pages: the opening links, the cue rail and Q9's "Where the evidence is". The internal case's top bar links to the request. The request does not link to the internal case, so a proposer is never one click from the issuer's return.
 
 ## Alternatives considered
 - **One page, with the internal part folded or marked "do not send".** I rejected it. An issuer copying the page could still send the internal part, and a fold does not keep text out of the document.

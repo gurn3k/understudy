@@ -116,7 +116,7 @@ async function pageText(u) {
   }
   if (!loaded) return null;
   await sleep(300);
-  const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '', extra: [...document.querySelectorAll('meta[content]')].map((m) => m.content).concat([...document.querySelectorAll('svg desc, svg title')].map((e) => e.textContent), [...document.querySelectorAll('[aria-label]')].map((e) => e.getAttribute('aria-label')), [...document.querySelectorAll('img[alt]')].map((e) => e.alt)).join(' | '), meta: [...document.querySelectorAll('meta[content]:not([property=\"og:image:alt\"])')].map((m) => m.content).join(' | ') })", returnByValue: true });
+  const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '', extra: [...document.querySelectorAll('meta[content]')].map((m) => m.content).concat([...document.querySelectorAll('svg desc, svg title')].map((e) => e.textContent), [...document.querySelectorAll('[aria-label]')].map((e) => e.getAttribute('aria-label')), [...document.querySelectorAll('img[alt]')].map((e) => e.alt)).join(' | '), links: [...document.querySelectorAll('main [href]')].map((a) => a.getAttribute('href')).join(' '), meta: [...document.querySelectorAll('meta[content]:not([property=\"og:image:alt\"])')].map((m) => m.content).join(' | ') })", returnByValue: true });
   return JSON.parse(res.result.result.value || "{}");
 }
 const pageAll = await pageText(url), rfpAll = await pageText(new URL("rfp.html", url).href), caseAll = await pageText(new URL("case.html", url).href);
@@ -156,6 +156,8 @@ for (const [name, t] of Object.entries(texts)) {
 const VENDOR_FORBIDDEN = [
   [/return on the pilot|first-year return|\bROI\b|payback|pays? back|net yearly benefit|net a year|pays? (its|their) way|pays off|does(n't| not) (pay|repay)|repays? itself|not reachable|at (these|your) inputs|gross saving|on-paper saving/i, "a return figure or verdict in the request sent to proposers", "ADR 0030"],
 ];
+// The request never links to the internal case, in its source or its drawn text (batch 7 ruling, Must 1).
+if (read("site/rfp.html").includes("case.html") || (rfpAll.links || "").includes("case.html") || (rfpAll.main || "").includes("case.html")) { banned++; console.log("FORBIDDEN on rfp (ADR 0030): a link to case.html (a proposer must not be one click from the issuer's return)"); }
 for (const name of ["rfp", "rfp head and labels"]) {
   const text = norm(texts[name] || "");
   for (const [re, why, src] of VENDOR_FORBIDDEN) {
