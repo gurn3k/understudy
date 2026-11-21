@@ -140,7 +140,7 @@ function biz(d) {
   <p class="small">"The written policy" is the rulebook; its weeks are ISO weeks, so week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
   <p>${esc(eventSentence(d))}</p></details>
   <p>While trusted it paid ${int(t.passed)} lines on its own, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar). On the same test lines, that is ${pct(g.earned_share, 1)} of the ${int(b.paid)} it would have paid on paper. Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion. The test window was too short to show the steady state, so ${pct(g.earned_share, 1)} understates it, and I do not estimate it here.</p>
-  <div class="tablewrap"><table class="score num money"><caption>Gross and net a year, at your inputs, by share of lines the rulebook earns the right to pay</caption><thead><tr><th scope="col">Share earned</th><th scope="col">Lines paid on its own</th><th scope="col">Gross saving</th><th scope="col">Late fixes</th><th scope="col">Net</th></tr></thead><tbody>
+  <div class="tablewrap"><table class="score num money"><caption>Gross saving less late fixes a year, before running costs, at your inputs, by share of lines the rulebook earns the right to pay</caption><thead><tr><th scope="col">Share earned</th><th scope="col">Lines paid on its own</th><th scope="col">Gross saving</th><th scope="col">Late fixes</th><th scope="col">Net before running costs</th></tr></thead><tbody>
   ${[["0%", "none earned yet", 0], [pct(g.earned_share, 1), "observed in the replay; window too short", g.earned_share], ["100%", "every line it would pay on paper", 1]].map(([lab, why, x], i) => `<tr><th scope="row">${lab} <span class="small">(${why})</span></th><td>${int(x * mb.linesYr)}</td><td data-out="gn-g-${i}"></td><td data-out="gn-f-${i}"></td><td data-out="gn-n-${i}"></td></tr>`).join("")}
   </tbody></table></div>
   <p class="small" data-out="gn-note"></p>
@@ -231,7 +231,7 @@ function wireBiz(d) {
       set(`gn-f-${i}`, signed(-r.fixes));
       set(`gn-n-${i}`, signed(r.netBefore));
     });
-    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. Net here is before the pilot's own costs; the readout above and the internal case count them. The rows are scenarios, not forecasts.`);
+    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. The last column is before running costs (oversight and blind checks) and before the pilot's own cost, so it is not the readout's net: after running costs, with everything earned, the net a year is ${signed(x.row(1).net)} (the readout above). The rows are scenarios, not forecasts.`);
   });
 }
 

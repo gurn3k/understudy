@@ -254,6 +254,8 @@ REQUIRED.rfp.push(["evidence per version", "Trust belongs to the version that ea
 REQUIRED.rfp.push(["three drafts are not independent", "consistent, but not independent checks"]);
 // People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.
 REQUIRED.q9.push(["saving as capacity", "capacity, not jobs"]);
+// One net (batch 7): Q9 section 4's column is before running costs and says so, so it can't be read as the readout's net.
+REQUIRED.q9.push(["section 4 net is before running costs", "Net before running costs"], ["section 4 note names the readout's net", "so it is not the readout's net"]);
 REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payable staff"], ["consultation in Phase 0", "a works council where there is one"],
   ["deskilling risk", "Staff lose practice on the kinds the AI pays (deskilling)"], ["saving as capacity", "Capacity, not jobs"]);
 // Each approach's own test set (Should 23): B was judged on its follow-up sample, not on all the test invoices.
