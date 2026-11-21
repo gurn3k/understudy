@@ -91,6 +91,7 @@ const FORBIDDEN = [
   [/picked the same way it already missed 99%/i, "say which rule and which lines: the supplier rule, on lines created and first invoiced in the same month", "gate C3, M6"],
   [/from facts known at the moment it arrived/i, "B also saw earlier-month rates that include outcomes landing later (the look-ahead limit)", "gate C4, N4"],
   [/base rate \(96\.8%\)/, "the base rate is 96.85% everywhere else on the page (53,144 / 54,874)", "gate C3 L4 / C4 N5"],
+  [/findings page|Below the bar: not proved|Special findings|about 19,816/i, "small wording fixes from the final read-through", "gates C3 L5, L9, L11, C4 N8"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
@@ -358,12 +359,14 @@ const BOTH = ["lines it would have paid", "lines that needed a correction", "wor
 let absent = 0, nreq = 0;
 for (const l of [...CASE_ONLY, ...BOTH]) if (!REQUIRED.rfp.some(([x]) => x === l)) { absent++; console.log(`SPLIT LABEL NOT FOUND: ${l}`); }
 REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.includes(l));
+REQUIRED.case.push(["preamble: the internal case (gate C3 L8)", "could make the internal case for a pilot"], ["section 3 heading (gate C3 L11)", "Findings behind three requirements, and why I recommend them"], ["M9 card: medians (gate C4 N8)", `(a median of ${D.agreement.alphas["0.9"].passed_median.toLocaleString("en-US")} against ${n0(D.replay.totals.passed)})`]);
 REQUIRED.case.push(["one note for the hidden return columns", "The first-year return and payback columns appear once you enter your integration cost"], ["M9 card label", "M9 · Mandatory, not tested"]);
 REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay, in the decision record's words"]);
 REQUIRED.rfp.push(["assumptions: my defaults, measured in Phase 0 (gate C3, M5)", "(my defaults; Phase 0 measures the issuer's own)"]);
 REQUIRED.page.push(["September check: the supplier rule on its own lines, against Q3 (gate C3, M6)", `the supplier rule already missed 99% (lower end ${pc(D.confirm.june_august.approaches.shortlist.main.interval[0], 2)}, against ${pc(E.vendor.rows.find((r) => r.key === E.vendor.picked).lower, 2)} on all test lines in Q3)`]);
 REQUIRED.page.push(["Method limits: the B follow-up (gate C3 L2)", `the ${n0(D.b2.b_alone.n)}-invoice follow-up did not prove 99% either (lower bound ${pc(D.b2.b_alone.lower, 1)})`]);
 REQUIRED.readme.push(["limits: the B follow-up (gate C4 N9)", `the ${n0(D.b2.b_alone.n)}-invoice follow-up did not prove 99% either (lower bound ${pc(D.b2.b_alone.lower, 1)})`]);
+REQUIRED.rfp.push(["switch-off test: 123 split into scored fine and already counted (gate C3 L6)", `paid lines with a correction after clearing (${n0(E.sensitivity.post_clear)} scored fine, the other ${n0(D.controls.settle.lines - E.sensitivity.post_clear)} already counted as needing one)`]);
 REQUIRED.q9.push(["in brief: no pay at the defaults (gate C3, M2)", "At my default inputs it does not pay its way even if a person reviews every line today"]);
 // Q9 section 5 keeps the rates beside the totals and the agreement-vs-outcomes break-even (batch 2 Must 14; batch 7 ruling, Must 5).
 const AG9 = D.agreement.alphas["0.9"], RT = D.replay.totals;
