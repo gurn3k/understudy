@@ -11,6 +11,7 @@ Drafted 2026-11-18. Ruled ACCEPT WITH CHANGES by an independent reviewer after t
 - ADR 0025: the controls. M1 to M13 replace the first issue's requirements; promotion, switch-off and blind checks are rewritten, blind checks are mandatory (M9, so D2 is retired), and data protection, roles and the Gate 4 box are added.
 - ADR 0026: evidence belongs to the rulebook version that earned it (M5).
 - ADR 0027: the rulebook's calls are hidden in practice mode (M1), and the override rate (D3) is dropped.
+- ADR 0028: the request is split from the internal case, the ask is to issue it, requirements are outcomes on the decision component, and proposals are scored on a published scale and price formula.
 - Review fixes recorded here rather than in a record of their own: M14 (the existing duplicate and fraud checks run on every line paid on its own, and R8 is rated Medium) and M15 (no goods receipt yet means hold; in the test lines, 418 paid with no goods receipt yet, 28 of them needing a correction), the shorter-pilot row now resting on the replay instead of an outside guide, and link-preview tags.
 
 ## Why
