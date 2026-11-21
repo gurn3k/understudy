@@ -188,8 +188,8 @@ function build(d) {
   ${tbl("Assumptions", ["Assumption", "Default", "Why"], [
     ["Unit", "The order line", "The records have no invoice-document field"],
     ["Share of lines a person reviews today", "Not assumed: Phase 0 measures it", "The records show logins and times, not reviews"],
-    ["Minutes per review, hourly cost", `${DEF_MIN} minutes, $${DEF_RATE} (the issuer's inputs until Phase 0 measures them)`, "The records show when work happened, not how long it took"],
-    ["Cost of a late fix", `$${DEF_FIX} of work, plus ${DEF_LOST}% of the line's value never recovered (the issuer's inputs until Phase 0 measures them)`, "The records don't show it"],
+    ["Minutes per review, hourly cost", `${DEF_MIN} minutes, $${DEF_RATE} (my defaults; Phase 0 measures the issuer's own)`, "The records show when work happened, not how long it took"],
+    ["Cost of a late fix", `$${DEF_FIX} of work, plus ${DEF_LOST}% of the line's value never recovered (my defaults; Phase 0 measures the issuer's own)`, "The records don't show it"],
     ["Oversight during the pilot", `${OVERSIGHT_H} hours a week`, "My judgment"],
     ["Phases 0, 2 and 3", `${PH.p0}, ${PH.p2} and ${PH.p3} weeks`, "My judgment"],
     ["Phase 1 (practice mode)", `At least ${firstWk} weeks, at most ${stopWk}`, `The earliest a kind qualified in the replay, under its single-crossing rule; ${m2Line}. Outcomes arrive weeks after invoices. The stop rule ends the pilot at week ${stopWk} (section 7)`],

@@ -87,6 +87,7 @@ const FORBIDDEN = [
   [/shall sign once, at Gate 1/i, "the sponsor must be able to sign the approval asked for now, not only at Gate 1 and Gate 4", "gate C3, M1"],
   [/\b0\.76%/, "the agreement shortcut's rate is the pooled rate from data.json (0.74%), one figure in text and tables, not the ratio of the medians", "gate C3 M3 / C4 N3"],
   [/whitelist|shortlist rule/i, "one name for the baseline: the supplier shortlist, named once in section 4", "gate C3, M4"],
+  [/the issuer's inputs until Phase 0/i, "the assumptions table holds my defaults, not inputs the issuer has set", "gate C3, M5"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
@@ -356,6 +357,7 @@ for (const l of [...CASE_ONLY, ...BOTH]) if (!REQUIRED.rfp.some(([x]) => x === l
 REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.includes(l));
 REQUIRED.case.push(["one note for the hidden return columns", "The first-year return and payback columns appear once you enter your integration cost"], ["M9 card label", "M9 · Mandatory, not tested"]);
 REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay, in the decision record's words"]);
+REQUIRED.rfp.push(["assumptions: my defaults, measured in Phase 0 (gate C3, M5)", "(my defaults; Phase 0 measures the issuer's own)"]);
 REQUIRED.q9.push(["in brief: no pay at the defaults (gate C3, M2)", "At my default inputs it does not pay its way even if a person reviews every line today"]);
 // Q9 section 5 keeps the rates beside the totals and the agreement-vs-outcomes break-even (batch 2 Must 14; batch 7 ruling, Must 5).
 const AG9 = D.agreement.alphas["0.9"], RT = D.replay.totals;
