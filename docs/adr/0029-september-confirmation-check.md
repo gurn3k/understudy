@@ -44,7 +44,7 @@ With no window this is the study's label: on the locked June to August lines, "f
 - If a test's verdict differs between the main figure and the worst case, that test is **unsettled**.
 
 ### 5. The interval
-Each figure has a purchase-order interval by the study's existing method: resampling whole purchase orders (`evidence.po_bootstrap`, seed 20261120, 2,000 draws), giving a 95% interval of the share fine. That bootstrap is the interval both tests use. Wilson on the design-effect sample size (`evidence.clustered_lower`'s method) is reported alongside and decides nothing.
+Each figure has a purchase-order interval by the study's existing method: resampling whole purchase orders (`evidence.po_bootstrap`, seed 20261120, 2,000 draws), giving a 95% interval of the share fine. That bootstrap is the interval both tests use. Wilson on the design-effect sample size (`evidence.clustered_lower`'s method) is reported alongside and decides nothing, with one exception. When a figure has no wrong line, every bootstrap draw is 100% fine and the bootstrap collapses to [100%, 100%]. In that case the design-effect Wilson decides instead, which at zero wrong is plain Wilson. For example, 100 lines with none wrong give a lower end of 96.30%, not 100%.
 
 ### 6. The two tests and the readings
 Applied separately to the rulebook and the shortlist, on their pooled figures, each on the main figure and on the worst case:

@@ -30,7 +30,7 @@ IR1 = ("Record Invoice Receipt", "2018-09-10T09:00:00+00:00")
 
 
 def iv(n, wrong, lo, hi):
-    return {"n": n, "wrong": wrong, "error_rate": wrong / n, "boot": [lo, hi]}
+    return {"n": n, "wrong": wrong, "error_rate": wrong / n, "boot": [lo, hi], "interval": [lo, hi]}
 
 
 class Window(unittest.TestCase):
@@ -133,6 +133,17 @@ class Scoring(unittest.TestCase):
         self.assertEqual((b["worst"]["n"], b["worst"]["wrong"]), (100, 10))
         self.assertAlmostEqual(b["stuck_share"], 0.05)
         self.assertLess(b["worst"]["boot"][0], b["main"]["boot"][0])
+
+    def test_zero_wrong_decides_on_wilson_not_the_bootstrap(self):
+        # With no wrong line every bootstrap draw is 100% fine, an interval of [1, 1]. The deciding interval is then
+        # Wilson on the design-effect sample size, which at p = 0 is plain Wilson.
+        from understudy.evaluate import wilson
+        out = S.interval([f"{i}_00001" for i in range(100)], set())
+        self.assertEqual(out["boot"], [1.0, 1.0])
+        self.assertEqual(out["interval"], list(wilson(100, 100)))
+        self.assertFalse(S.test_a(out))   # 100 of 100 can't prove 99%
+        base = {"n": 10000, "wrong": 100, "error_rate": 0.01, "boot": [0.988, 0.992], "interval": [0.988, 0.992]}
+        self.assertEqual(S.test_b(out, base), "held up")
 
     def test_per_kind_and_stuck_share_by_kind(self):
         rows = self.rows() + [({"id": "7_00001", "category": "c", "spend_area": "d"}, "stuck")]

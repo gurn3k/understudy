@@ -203,8 +203,11 @@ def interval(ids, wrong):
     cl = E.clusters(sorted(ids), wrong)
     n, w = len(ids), len(wrong)
     ne = n / E.design_effect(cl)
+    boot, dw = list(E.po_bootstrap(cl)), list(wilson((1 - w / n) * ne, ne))
+    # The deciding interval is the bootstrap, except with no wrong line: every draw is then 100% fine, so the
+    # design-effect Wilson (plain Wilson at p = 0) decides instead.
     return {"n": n, "wrong": w, "orders": len(cl), "fine_share": 1 - w / n, "error_rate": w / n,
-            "boot": list(E.po_bootstrap(cl)), "deff": E.design_effect(cl), "deff_wilson": list(wilson((1 - w / n) * ne, ne))}
+            "boot": boot, "deff": E.design_effect(cl), "deff_wilson": dw, "interval": dw if w == 0 else boot}
 
 
 def block(rows, boot=True):
@@ -254,7 +257,7 @@ def score_all(lines, dec, boot=True):
 
 def test_a(iv):
     """(a) The lower end of the purchase-order interval reaches 99%."""
-    return iv is not None and iv["boot"][0] >= BAR
+    return iv is not None and iv["interval"][0] >= BAR
 
 
 def test_b(sept, base):
@@ -262,8 +265,8 @@ def test_b(sept, base):
     interval lies wholly above June to August's error rate; did better if wholly below. None if September paid none."""
     if sept is None or base is None:
         return None
-    s_lo, s_hi = 1 - sept["boot"][1], 1 - sept["boot"][0]
-    b_lo, b_hi = 1 - base["boot"][1], 1 - base["boot"][0]
+    s_lo, s_hi = 1 - sept["interval"][1], 1 - sept["interval"][0]
+    b_lo, b_hi = 1 - base["interval"][1], 1 - base["interval"][0]
     if s_lo <= b_hi and b_lo <= s_hi:
         return "held up"
     if s_lo > base["error_rate"]:
