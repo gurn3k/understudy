@@ -185,7 +185,8 @@ const cReview = (5 / 60) * 40, needLow = 100 / (B.lines_per_mistake.gated_cautio
 // late fixes (cautious end), 8 oversight hours a week and monthly blind checks on one kind.
 const linesYr = (B.paid * 12) / B.months, runYr = 8 * 52 * 40 + 12 * ((B.blind.n * 5) / 60) * 40;
 const needNet = (linesYr / B.lines_per_mistake.gated_cautious * 100 + runYr) / (linesYr * cReview);
-const netWord = needNet > 1 ? ["decision at the defaults", "Doesn't pay at these inputs"] : ["decision at the defaults", pc(needNet, 1)];
+// The readout's verdict line leads with it (batch 7).
+const netWord = needNet > 1 ? ["decision at the defaults", "Doesn't pay its way at these inputs"] : ["decision at the defaults", `Pays its way only if a person today reviews at least ${pc(needNet, 1)}`];
 const REQUIRED = {
   q9: [["lines it would have paid", n0(B.paid)], ["lines that needed a correction", n0(B.wrong)], ["worst likely case", pc(chosen.held_out.precision_lower, 2)],
     ["worst likely case allowing for orders", pc(E.clustering.clustered_lower, 1)], ["paying every invoice", pc(D.bar.pass_everything.full.precision[0] / D.bar.pass_everything.full.precision[1], 2)],
@@ -267,6 +268,7 @@ REQUIRED.rfp.push(["three drafts are not independent", "consistent, but not inde
 // People (Should 4): the saving is hours of capacity; staff are consulted; deskilling is a named risk.
 REQUIRED.q9.push(["saving as capacity", "capacity, not jobs"]);
 // One net (batch 7): Q9 section 4's column is before running costs and says so, so it can't be read as the readout's net.
+REQUIRED.q9.push(["readout: break-even pair labelled", "cautious $"], ["readout: one tag per figure, with a legend", "Each figure's tag:"]);
 REQUIRED.q9.push(["section 4 net is before running costs", "Net before running costs"], ["section 4 note names the readout's net", "so it is not the readout's net"]);
 REQUIRED.rfp.push(["R10 renamed", "Roles and workload change for accounts-payable staff"], ["consultation in Phase 0", "a works council where there is one"],
   ["deskilling risk", "Staff lose practice on the kinds the AI pays (deskilling)"], ["saving as capacity", "Capacity, not jobs"]);
