@@ -73,6 +73,22 @@ for (const [page, p] of CALCS) {
   await type(`${p}-int`, "");
 }
 
+// F2: an entry the field cannot read as a number (half typed, or too long to hold) is never replaced silently.
+const DEFS = { rate: 40, fix: 100, lost: 0, oh: 8, kinds: 1 };
+for (const [page, p] of CALCS) {
+  check(await open(page), `${page} loaded`);
+  for (const k of ["share", "rate", "fix", "lost", "oh", "kinds", "int"]) {
+    for (const v of ["1e", "--5", "1e309", "9".repeat(400)]) {
+      await type(`${p}-${k}`, v);
+      const bad = await ev(`document.getElementById("${p}-${k}").validity.badInput`), n = await note(`${p}-${k}`);
+      if (!bad) continue; // the browser read it as a number: F1's limits apply instead
+      const want = k === "share" || k === "int" ? "Not read as a number, so treated as not entered." : `Not read as a number, so the default (${DEFS[k]}) is used.`;
+      check(n === want, `${page} ${k} "${v.length > 12 ? v.slice(0, 12) + "…" : v}": note "${n}"`);
+    }
+    await type(`${p}-${k}`, "");
+  }
+}
+
 ws.close();
 proc.kill();
 console.log(`${checks - fails}/${checks} input checks passed`);

@@ -71,7 +71,8 @@ const Calc = (() => {
   const LIMITS = { share: [0, 100], rate: [1, 500], fix: [0, 100000], lost: [0, 100], oh: [0, 80], kinds: [0, 50], int: [0, 1e9] };
   function clampNote(el, k, used) {
     const raw = el.value.trim(), n = Number(raw), [lo, hi] = LIMITS[k];
-    if (raw === "" || !Number.isFinite(n)) return "";
+    if (el.validity && el.validity.badInput) return (k === "share" || k === "int") ? "Not read as a number, so treated as not entered." : `Not read as a number, so the default (${DEF[k]}) is used.`;
+    if (raw === ""|| !Number.isFinite(n)) return "";
     if (n < lo) return `Held at ${lo}, the lowest allowed.`;
     if (n > hi) return `Held at ${hi.toLocaleString("en-US")}, the highest allowed.`;
     if (k === "kinds" && n !== used) return `Rounded to ${used}.`;
