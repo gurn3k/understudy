@@ -1,0 +1,106 @@
+# 0029. A later check on September 2018, fixed before it runs
+
+## Status
+Accepted 2026-11-20, before the run. Every June to August result was already known. No September outcome had been computed or read when this was written: the September lines were selected and counted by date only. This record fixes the question, the approaches, the outcome window, the tests, what each result changes and the bug rule. It runs once. It changes no study result and not the verdict (ADR 0016) by itself.
+
+## Why
+An outside review asked whether the rulebook (policy 2) and the supplier shortlist checked after the fact (ADR 0024) hold on a month nobody has looked at. The log runs past the test months, but it thins out in December 2018 and effectively stops in January 2019, so later months are censored: many of their lines never clear inside the log. September 2018 is the latest month that can still be followed for a useful length of time, so I use it, with a fixed outcome window and stuck lines handled as bounds.
+
+## Decision
+
+### 1. The question and the frozen approaches
+On order lines first invoiced in September 2018, do the rulebook and the supplier shortlist still meet the bar, and did they do worse or better than on June to August?
+- **Check only.** Nothing is changed before the run. Lessons go into the write-up, not into fixes.
+- **The rulebook:** policy 2 exactly as saved (`responses/c/c_policy_2.json`, the policy the study chose), through `contender_c.decider`.
+- **The supplier shortlist:** exactly as on the page. The key is "supplier, earlier corrections, goods received first"; the cells are those whose January to May 2018 record has a Wilson lower bound of at least 99%, from the same learning-month file (`invoice_triage_fit.jsonl`). The script checks that the study's selection rule still picks that key.
+- **Paying everything** is scored as context only. No test applies to it.
+- **The record** for each line is what was known at its first invoice receipt, with the same fields as the study's records (`triage.py`). On June to August the script rebuilds every locked record and stops if any field differs.
+
+### 2. Which lines
+Every order line whose first invoice receipt falls in September 2018 (UTC month of the first "Record Invoice Receipt"). This reads dates only: 19,708 lines. By creation month (also a date): 1,132 were created in January to May 2018, 14,349 in June to August 2018 and 4,227 in September 2018.
+
+### 3. The outcome window: N = 109 days
+N is the longest window that every September line can fully observe before the log effectively ends. It was set from event dates alone (`tools/confirm_sept.py coverage`):
+- Events per month hold at 120,000 to 140,000 through November 2018, then fall to 92,526 in December and 44,747 in January 2019. After that the log has 7 events in the whole of February to December 2019.
+- The last day with at least 100 events is 2019-01-17 (2,312 events). Only 22 events come after it: 15 on 2019-01-18 and 7 later. Any threshold from 16 to 2,312 events a day picks the same day. So the log effectively ends at 2019-01-18 00:00 UTC.
+- A line first invoiced at the very end of September (any time before 2018-10-01 00:00 UTC) can see 109 whole days before that end. N = 109.
+
+A line's outcome is read only from its first invoice receipt to 109 days after it (inclusive):
+- **Wrong:** a correction (the study's list, `triage.is_corrective`) after the first receipt and before the first clearing after it, within the window.
+- **Fine:** that clearing came within the window, with no correction before it.
+- **Stuck:** no clearing within the window, and no correction in it.
+
+With no window this is the study's label: on the locked June to August lines, "fine" equals the study's "straight through" on every line.
+
+### 4. Stuck lines are bounds
+- **The main figure** leaves stuck lines out.
+- **The worst case** counts every stuck line as wrong.
+- A line with a correction before it got stuck is wrong in both.
+- **The stuck share** is reported for each approach and for each kind (category and spend area), of the lines it paid and of all lines.
+- If a test's verdict differs between the main figure and the worst case, that test is **unsettled**.
+
+### 5. The interval
+Each figure has a purchase-order interval by the study's existing method: resampling whole purchase orders (`evidence.po_bootstrap`, seed 20261120, 2,000 draws), giving a 95% interval of the share fine. That bootstrap is the interval both tests use. Wilson on the design-effect sample size (`evidence.clustered_lower`'s method) is reported alongside and decides nothing.
+
+### 6. The two tests and the readings
+Applied separately to the rulebook and the shortlist, on their pooled figures, each on the main figure and on the worst case:
+- **(a) The bar.** The lower end of September's interval reaches 99% or more. Pass or fail.
+- **(b) Against June to August**, re-scored under the same 109-day window (section 9), main against main and worst case against worst case, in error rates:
+  - **held up** if September's interval and June to August's interval overlap;
+  - **did worse** if September's interval lies wholly above June to August's error rate;
+  - **did better** if it lies wholly below.
+  
+  Overlap is checked first; two intervals that don't overlap put September's wholly on one side of June to August's rate. "Held up" means no detectable shift, not proof of no shift.
+- A test whose verdict is the same on the main figure and the worst case takes that verdict. Otherwise it is **unsettled**. If an approach pays no September line, both tests are unsettled.
+
+### 7. What each result changes
+The headline never changes: it stays "not proven". Only supporting lines change, and only as follows. The write-up goes in a new Method section, "A later check: September 2018", whatever the result.
+
+**The rulebook:**
+- If test (a) reads **pass**, the page gets one line: "On September 2018, a later month nobody had looked at, the rulebook cleared the bar. One month isn't enough to reverse the main test; the pilot is how to find out." The pass marks in the pilot request are unchanged.
+- If test (b) reads **did worse**, the rulebook's evidence lines and its role as the pilot request's reference design are softened.
+- If both happen, both apply.
+- Any other reading (fail, held up, did better, unsettled) changes no supporting line. It is reported in the Method section only.
+
+**The shortlist:**
+- If it **fails either test** (test (a) reads fail, or test (b) reads did worse), the pilot request's requirement becomes: "beat the same shortlist rule, refitted on the issuer's own recent data in Phase 0".
+- If it **holds up** (test (a) reads pass, and test (b) reads held up or did better), 99.51% stays, with the note "held up on a later month".
+- If neither (a test is unsettled and neither fails), 99.51% stays without the note, and the Method section says it was unsettled.
+
+### 8. Bugs
+- Before scoring September, the script must reproduce June to August with no window: policy 2 pays 26,715 lines with 249 wrong, and the shortlist pays 7,532 with 23 wrong. It stops otherwise.
+- The script, the code it imports, its inputs and the September line list are locked by checksum (section 10). The list is selected by date only. The run refuses unless every checksum matches.
+- After the run, a fix is allowed only for a mechanical error that an independent reviewer (Opus) confirms. Both results are then published, with the change explained. There are no other re-runs.
+
+### 9. June to August, re-scored under the same window
+On the 54,874 locked test-month lines (outcomes already known), under the 109-day window:
+
+| Approach | Paid | Stuck (share) | Main figure: wrong / lines, share fine | Main, PO interval | Worst case: wrong / lines, share fine | Worst case, PO interval |
+|---|---|---|---|---|---|---|
+| Rulebook (policy 2) | 26,715 | 864 (3.23%) | 245 / 25,851, 99.05% | 98.82% to 99.26% | 1,109 / 26,715, 95.85% | 94.82% to 96.76% |
+| Supplier shortlist | 7,532 | 219 (2.91%) | 23 / 7,313, 99.69% | 99.50% to 99.85% | 242 / 7,532, 96.79% | 94.32% to 98.33% |
+| Paying everything (context) | 54,874 | 2,270 (4.14%) | 1,695 / 52,604, 96.78% | 96.33% to 97.16% | 3,965 / 54,874, 92.77% | 92.00% to 93.55% |
+
+With no window, the same script gives 26,715 paid and 249 wrong for the rulebook, and 7,532 and 23 for the shortlist, as published. Four of the rulebook's 249 wrong lines were corrected only after day 109 and cleared later still; under the window they are stuck. The full figures, per kind included, are in the data folder (`confirm_baseline.json`); the pooled ones are in `docs/confirm/june-august-window.json`.
+
+### 10. The lock
+`docs/confirm/sept-2018.lock` (committed before this record):
+- September line list (`sept_2018_lines.txt`, 19,708 ids, in the data folder): `fedef8c29ecd44da1996ffde5fd8d6794464a46779259a4378735ed021fdaddc`
+- Scoring script (`tools/confirm_sept.py`, line endings read as `\n`): `9c6687739679632db08864fefbf2fae8bdf94658aa3a045e8f435f509f61289e`
+- Also locked: `tools/evidence.py`, `understudy/contender_c.py`, `understudy/evaluate.py`, `understudy/triage.py`, `understudy/files.py`, the saved policy 2 reply, and the learning-month and test-month record files. Month 2018-09, window 109 days.
+
+## Alternatives
+- **Selecting September by creation month.** Rejected: far fewer of those lines can be followed to a clearing before the log ends than lines selected by invoice month.
+- **A later month, or several.** Rejected: from October on, the window a whole month can observe shrinks quickly, and the share of lines that never clear in the log rises steeply.
+- **No fixed window (follow each line to the log's end).** Rejected: September lines would get a shorter follow-up than June to August lines, which would flatter September.
+- **Only lines also created in September**, so that none could have sat in the learning or test months. Not the selection decided: reported as a secondary breakdown only (below).
+
+## Known limits, fixed now
+- **Overlap with earlier months.** Of the 19,708 lines, 1,132 were created in the learning months and 14,349 in the test months, by creation date. Lines that cleared before the log ended may sit in the learning or test record files, so their outcomes may already have been seen, and test (b) partly compares September with lines it shares with June to August. As a secondary breakdown that decides nothing, the run also reports both tests on the 4,227 lines created in September.
+- **June to August has no never-cleared lines.** Its locked file holds only lines that cleared before the log ended, so its stuck lines all cleared late. September's can include lines that never cleared. This lowers June to August's stuck share against September's, which matters for the worst case only.
+- **The worst case is harsh.** Under the window, June to August's own worst case is 95.85% for the rulebook and 96.79% for the shortlist. If September's stuck share is anything like it, test (a) on the worst case fails, so test (a) can read fail or unsettled but is unlikely to read pass.
+
+## Consequences
+- The run is `python tools/confirm_sept.py run`. It writes `confirm_sept_result.json` in the data folder, with the readings and what they change.
+- The write-up follows section 7. A new decision record, or an amendment here, carries the result, and the changes-after-results table gets a row.
+- An independent reviewer signs off this record before the run, and rules on the write-up after it.
