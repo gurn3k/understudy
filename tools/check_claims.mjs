@@ -83,6 +83,7 @@ const FORBIDDEN = [
   [/Beat a supplier whitelist that the issuer|post hoc, to be confirmed|to be confirmed on later data/i, "the September check failed the shortlist on test (a): M11 now refits the rule in Phase 0", "ADR 0029, amendment 1"],
   [/this default of mine|the money in section 11 does not include it/i, "the requirements say only what the pilot shall do; the reasons are in the request's Appendix F", "batch 7, go-live"],
   [/Mandatory since this issue|it was D2\)/i, "revision history belongs in the change log, not a requirement's label", "batch 7, go-live"],
+  [/D2 in the first issue|now mandatory as M9/i, "the request is a first issue: no revision history in the D-table caption (the reason is in Appendix F)", "batch 7 ruling, Must 3"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
