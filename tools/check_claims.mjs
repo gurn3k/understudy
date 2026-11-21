@@ -352,6 +352,10 @@ for (const l of [...CASE_ONLY, ...BOTH]) if (!REQUIRED.rfp.some(([x]) => x === l
 REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.includes(l));
 REQUIRED.case.push(["one note for the hidden return columns", "The first-year return and payback columns appear once you enter your integration cost"], ["M9 card label", "M9 · Mandatory, not tested"]);
 REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay, in the decision record's words"]);
+// Q9 section 5 keeps the rates beside the totals and the agreement-vs-outcomes break-even (batch 2 Must 14; batch 7 ruling, Must 5).
+const AG9 = D.agreement.alphas["0.9"], RT = D.replay.totals;
+REQUIRED.q9.push(["section 5: rates beside totals", "a lower rate per line paid"],
+  ["section 5: agreement break-even", `come out ahead whenever a late fix costs less than about ${n0((AG9.passed_median - RT.passed) / (AG9.wrong_median - RT.wrong))}`]);
 REQUIRED.rfp = REQUIRED.rfp.filter(([l]) => !CASE_ONLY.includes(l));
 REQUIRED.caseHead = [["og:url", "https://understudy.gurn3k.com/case.html"], ["og:title", "Understudy: internal business case for a pilot"], ["og:image", "https://understudy.gurn3k.com/og.png"]];
 REQUIRED.readme.push(["README: internal case", "`site/case.html`"]);
