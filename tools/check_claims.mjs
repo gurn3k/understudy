@@ -84,6 +84,7 @@ const FORBIDDEN = [
   [/this default of mine|the money in section 11 does not include it/i, "the requirements say only what the pilot shall do; the reasons are in the request's Appendix F", "batch 7, go-live"],
   [/Mandatory since this issue|it was D2\)/i, "revision history belongs in the change log, not a requirement's label", "batch 7, go-live"],
   [/D2 in the first issue|now mandatory as M9/i, "the request is a first issue: no revision history in the D-table caption (the reason is in Appendix F)", "batch 7 ruling, Must 3"],
+  [/shall sign once, at Gate 1/i, "the sponsor must be able to sign the approval asked for now, not only at Gate 1 and Gate 4", "gate C3, M1"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
@@ -299,7 +300,7 @@ REQUIRED.rfp.push(["outcome requirements", "The requirements are outcomes, not a
 REQUIRED.rfp.push(["commercial: payment by work done", "Payment follows the work done to each gate, not the gate's result"], ["commercial: liability", "Liability for lines paid on the system's call"], ["commercial: data return", "every copy is then deleted, including backups"]);
 REQUIRED.rfp.push(["submission block", "Where to submit"], ["questions in writing", "Answers go to every proposer at once"], ["signature authority", "Signed by a person with authority to commit the proposer"]);
 REQUIRED.rfp.push(["price formula", "Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price"], ["points from the scale", "weight × score ÷ 5"], ["no obligation to award", "The issuer is not bound to award a contract"]);
-REQUIRED.rfp.push(["voice is optional", "Voice, optional."], ["sign-off modal", "Each person below shall sign once"]);
+REQUIRED.rfp.push(["voice is optional", "Voice, optional."], ["sign-off: three signatures, the first to approve the ask", "Each person below signs three times: now, to approve issuing the request and funding Phase 0 on award; at Gate 1; and at Gate 4."]);
 // M15's no-goods-receipt counts, counted after the results (ruling 4-6, item 2).
 REQUIRED.rfp.push(["M15: no-GR lines paid", `the rulebook paid ${n0(D.controls.no_gr.paid)} lines with no goods receipt when the invoice arrived`], ["M15: no-GR lines wrong", `${n0(D.controls.no_gr.wrong)} of them (${pc(D.controls.no_gr.wrong / D.controls.no_gr.paid, 1)}) needed a correction`], ["M15: counted after the results", "That was counted after the results were known"]);
 // The requirements say only what the pilot shall do; the study's reasons are in Appendix F, keyed by M number (batch 7).
@@ -343,7 +344,7 @@ if (CF) {
 // The split (ADR 0030): the ask, the cost and return at the reader's inputs, the findings behind the desirable
 // requirements and the sign-off are on the internal case (case.html); some figures are on both.
 const CASE_ONLY = ["share reviewed needed, cautious end", "decision at the defaults", "quarterly sensitivity in section 1", "the ask funds the measurements",
-  "ask: issue the request", "how to use: internal case", "sign-off modal", "largest tenth: share of mistakes by count", "largest tenth: share of value paid",
+  "ask: issue the request", "how to use: internal case", "sign-off: three signatures, the first to approve the ask", "largest tenth: share of mistakes by count", "largest tenth: share of value paid",
   "three drafts are not independent", "saving as capacity", "earned share in the replay"];
 const BOTH = ["lines it would have paid", "lines that needed a correction", "worst likely case", "replay lines paid", "blind-check lines a kind a window",
   "blind-check power at the sized window", "blind-check power at 400 lines", "kinds that reach a full monthly window", "the replay's first kind a month",

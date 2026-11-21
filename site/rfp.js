@@ -482,8 +482,8 @@ function build(d) {
   <p>Under the evaluation weights in ${rq(12)}, D1 counts under "How the controls are run" and D4 under "Exit and portability". M9, like every M requirement, is pass/fail and carries no points.</p>`));
 
   cs.push(sec("s4", "4", "Approvals and sign-off", `
-  <p>Each person below shall sign once, at Gate 1, and again at Gate 4.</p>
-  ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
+  <p>Each person below signs three times: now, to approve issuing the request and funding Phase 0 on award; at Gate 1; and at Gate 4.</p>
+  ${tbl("Sign-off", ["Role", "Name", "Stage", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance"].flatMap((r) => ["Issue", "Gate 1", "Gate 4"].map((st) => [r, fill("Full name, title"), st, "Approve / Reject", fill("Signature"), fill("DD Month YYYY")])))}`));
 
   out.push(sec("ap", "App.", "Appendices", `
   <h3>A. Glossary</h3>
