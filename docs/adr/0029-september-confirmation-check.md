@@ -101,7 +101,13 @@ The per-kind figures are in `docs/confirm/june-august-matched.json`.
 With no window, the same script gives 26,715 paid and 249 wrong for the rulebook, and 7,532 and 23 for the shortlist, as published. Four of the rulebook's 249 wrong lines were corrected only after day 109 and cleared later still; under the window they are stuck. The full figures, per kind included, are in the data folder (`confirm_baseline.json`); the pooled ones are in `docs/confirm/june-august-window.json`.
 
 ### 10. The lock
-`docs/confirm/sept-2018.lock` locks two September lists, both in the data folder: the main list (`sept_2018_main.txt`, 4,227 ids) and the second list (`sept_2018_all.txt`, 19,708 ids). It also locks the scoring script (`tools/confirm_sept.py`, line endings read as `\n`), the code it imports, the saved policy 2 reply, the learning-month and test-month record files, and the parsed log `cases.jsonl` (raw bytes), which is the source of every September record and outcome. The lock's comment lines record the raw log's MD5 (`4eb909242351193a61e1c15b9c3cc814`). Month 2018-09, window 109 days. The checksums are rewritten once these changes are complete.
+`docs/confirm/sept-2018.lock` locks two September lists, both in the data folder: the main list (`sept_2018_main.txt`, 4,227 ids) and the second list (`sept_2018_all.txt`, 19,708 ids). It also locks the scoring script (`tools/confirm_sept.py`, line endings read as `\n`), the code it imports, the saved policy 2 reply, the learning-month and test-month record files, and the parsed log `cases.jsonl` (raw bytes), which is the source of every September record and outcome. The lock's comment lines record the raw log's MD5 (`4eb909242351193a61e1c15b9c3cc814`). Month 2018-09, window 109 days. The checksums (SHA-256):
+- Main list, `sept_2018_main.txt` (4,227): `ab019a8e2ff3ee6e0563ca2e364994a4d834a300b0aa16637f06f745bd3bf973`
+- Second list, `sept_2018_all.txt` (19,708): `fedef8c29ecd44da1996ffde5fd8d6794464a46779259a4378735ed021fdaddc`
+- Scoring script, `tools/confirm_sept.py`: `5dafe4de7040775ed583e23d84990c7c5ed7d16fe058e42bf4ada65e7358ae90`
+- `cases.jsonl`: `098dde8152fa066cee7172ba61981e0c4e06fade7e3b3979fc6e4056e81f2ae6`
+
+The rest are in the lock file. An earlier lock, written before an outside sign-off changed the main set, the comparator and the script, was removed and replaced. History keeps both.
 
 ## Alternatives
 - **Every line first invoiced in September, created any time (19,708).** Not the main set: most were created in the learning or test months, and many sit in those records, so their outcomes have been seen and test (b) would partly compare September with itself. Reported only.
