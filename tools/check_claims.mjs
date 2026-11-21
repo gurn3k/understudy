@@ -86,6 +86,7 @@ const FORBIDDEN = [
   [/D2 in the first issue|now mandatory as M9/i, "the request is a first issue: no revision history in the D-table caption (the reason is in Appendix F)", "batch 7 ruling, Must 3"],
   [/shall sign once, at Gate 1/i, "the sponsor must be able to sign the approval asked for now, not only at Gate 1 and Gate 4", "gate C3, M1"],
   [/\b0\.76%/, "the agreement shortcut's rate is the pooled rate from data.json (0.74%), one figure in text and tables, not the ratio of the medians", "gate C3 M3 / C4 N3"],
+  [/whitelist|shortlist rule/i, "one name for the baseline: the supplier shortlist, named once in section 4", "gate C3, M4"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
@@ -338,9 +339,9 @@ if (CF) {
     ["later check: M11 change", "requirement M11 now asks a proposal to beat the same rule refitted on the issuer's own recent data in Phase 0"],
     ["later check: secondary", `all ${n0(CF.secondary.lines)} lines first invoiced in September, created any time. ${n0(CF.secondary.in_test_file)} of them are among the test months' lines`],
     ["later check: secondary rulebook", `The rulebook: ${ivc(X9.rulebook.main)}, worst case ${ivc(X9.rulebook.worst)}, so test (a) ${CF.secondary.readings.rulebook.a}, test (b) ${CF.secondary.readings.rulebook.b}`]);
-  REQUIRED.rfp.push(["M11: refit in Phase 0", "Beat the same shortlist rule, refitted on the issuer's own recent data in Phase 0."],
-    ["section 2: refit", "any proposal must beat the same shortlist rule, refitted on the issuer's own recent data in Phase 0"],
-    ["App. B: 0029", "The later check on September 2018, and M11's refitted shortlist rule: 0029."]);
+  REQUIRED.rfp.push(["M11: refit in Phase 0", "Beat the same supplier shortlist, refitted on the issuer's own recent data in Phase 0."],
+    ["section 4: baseline named once", "a non-AI rule (the supplier shortlist) grouped by"], ["section 2: refit", "any proposal must beat the same supplier shortlist, refitted on the issuer's own recent data in Phase 0"],
+    ["App. B: 0029", "The later check on September 2018, and M11's refitted supplier shortlist: 0029."]);
 }
 // The split (ADR 0030): the ask, the cost and return at the reader's inputs, the findings behind the desirable
 // requirements and the sign-off are on the internal case (case.html); some figures are on both.
