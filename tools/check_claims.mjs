@@ -1,6 +1,7 @@
 // Checks that every sentence fixed in the decision records appears verbatim on the rendered page, and that
-// wording the records rule out appears on neither the page nor the pilot request (rfp.html), including their meta
-// tags, chart descriptions and labels, nor in README.md. The fixed sentences are removed before that scan, since
+// wording the records rule out appears on neither the page, the pilot request (rfp.html) nor the internal case
+// (case.html), including their meta tags, chart descriptions and labels, nor in README.md. The request goes to
+// proposers, so it must also carry no return verdict (VENDOR_FORBIDDEN). The fixed sentences are removed before that scan, since
 // some of them quote wording that is otherwise ruled out.
 // Usage: node tools/check_claims.mjs <url>   (exit 1 on any missing sentence or forbidden phrase)
 import { spawn } from "node:child_process";
@@ -115,9 +116,10 @@ async function pageText(u) {
   const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '', extra: [...document.querySelectorAll('meta[content]')].map((m) => m.content).concat([...document.querySelectorAll('svg desc, svg title')].map((e) => e.textContent), [...document.querySelectorAll('[aria-label]')].map((e) => e.getAttribute('aria-label')), [...document.querySelectorAll('img[alt]')].map((e) => e.alt)).join(' | ') })", returnByValue: true });
   return JSON.parse(res.result.result.value || "{}");
 }
-const pageAll = await pageText(url), rfpAll = await pageText(new URL("rfp.html", url).href);
-const texts = { page: pageAll && pageAll.main, "page head and labels": pageAll && pageAll.extra, rfp: rfpAll && rfpAll.main, "rfp head and labels": rfpAll && rfpAll.extra, "README.md": read("README.md") };
-if (!pageAll || !rfpAll) {
+const pageAll = await pageText(url), rfpAll = await pageText(new URL("rfp.html", url).href), caseAll = await pageText(new URL("case.html", url).href);
+const texts = { page: pageAll && pageAll.main, "page head and labels": pageAll && pageAll.extra, rfp: rfpAll && rfpAll.main, "rfp head and labels": rfpAll && rfpAll.extra,
+  case: caseAll && caseAll.main, "case head and labels": caseAll && caseAll.extra, "README.md": read("README.md") };
+if (!pageAll || !rfpAll || !caseAll) {
   console.log("PAGE DID NOT LOAD within 30 s: no sentences checked");
   ws.close();
   proc.kill();
@@ -146,7 +148,21 @@ for (const [name, t] of Object.entries(texts)) {
     }
   }
 }
-console.log(`${FORBIDDEN.length} forbidden patterns checked on the page, rfp.html (with meta tags, chart descriptions and labels) and README.md: ${banned} found`);
+// The request goes to every proposer: it must not tell them the issuer's own return verdict (ADR 0030). Those figures
+// and words belong to the internal case.
+const VENDOR_FORBIDDEN = [
+  [/return on the pilot|first-year return|\bROI\b|payback|pays? back|net yearly benefit|net a year|pays? (its|their) way|pays off|does(n't| not) (pay|repay)|repays? itself|not reachable|at (these|your) inputs|gross saving|on-paper saving/i, "a return figure or verdict in the request sent to proposers", "ADR 0030"],
+];
+for (const name of ["rfp", "rfp head and labels"]) {
+  const text = norm(texts[name] || "");
+  for (const [re, why, src] of VENDOR_FORBIDDEN) {
+    for (const m of text.matchAll(new RegExp(re.source, re.flags + "g"))) {
+      banned++;
+      console.log(`FORBIDDEN on ${name} (${src}): "${text.slice(Math.max(0, m.index - 50), m.index + m[0].length + 30)}" (${why})`);
+    }
+  }
+}
+console.log(`${FORBIDDEN.length} forbidden patterns checked on the page, rfp.html, case.html (with meta tags, chart descriptions and labels) and README.md, and ${VENDOR_FORBIDDEN.length} more on rfp.html: ${banned} found`);
 
 // Required figures: the business case (Q9) and the pilot request must each carry the key figures, computed here
 // from site/data.json the same way the pages format them, so the two parts can't drift apart or drop a qualifier.
@@ -255,7 +271,7 @@ REQUIRED.rfp.push(["no goods receipt means hold", "No goods receipt yet means ho
 // Practice calls hidden, override rate dropped (Should 8, ADR 0027).
 REQUIRED.rfp.push(["practice calls hidden", "The decision component's calls are hidden from the people who handle invoices"], ["override rate dropped", "D3, the override rate, is dropped"]);
 // Procurement readiness (Should 9): who reads which sections.
-REQUIRED.rfp.push(["how to use: internal case", "The internal case: sections 1 and 13."], ["how to use: the request", "The request: sections 2 to 12, section 14 and the appendices."], ["ask: issue the request", "approve issuing this request"]);
+REQUIRED.rfp.push(["how to use: internal case", "This is the internal case."], ["how to use: the request", "Sections 1 to 12 and the appendices go to every proposer"], ["ask: issue the request", "approve issuing the request"]);
 REQUIRED.rfp.push(["outcome requirements", "The requirements are outcomes, not a design."], ["decision component defined", "whatever makes the pay-or-hold call on a line"], ["reference design annex", "E. Reference design: the study's rulebook"], ["owner role renamed", "Component Owner"]);
 REQUIRED.rfp.push(["commercial: payment by work done", "Payment follows the work done to each gate, not the gate's result"], ["commercial: liability", "Liability for lines paid on the system's call"], ["commercial: data return", "every copy is then deleted, including backups"]);
 REQUIRED.rfp.push(["submission block", "Where to submit"], ["questions in writing", "Answers go to every proposer at once"], ["signature authority", "Signed by a person with authority to commit the proposer"]);
@@ -298,14 +314,27 @@ if (CF) {
     ["section 2: refit", "any proposal must beat the same shortlist rule, refitted on the issuer's own recent data in Phase 0"],
     ["App. B: 0029", "The later check on September 2018, and M11's refitted shortlist rule: 0029."]);
 }
+// The split (ADR 0030): the ask, the cost and return at the reader's inputs, the findings behind the desirable
+// requirements and the sign-off are on the internal case (case.html); some figures are on both.
+const CASE_ONLY = ["share reviewed needed, cautious end", "decision at the defaults", "quarterly sensitivity in section 1", "the ask funds the measurements",
+  "ask: issue the request", "how to use: internal case", "sign-off modal", "largest tenth: share of mistakes by count", "largest tenth: share of value paid",
+  "three drafts are not independent", "saving as capacity", "earned share in the replay"];
+const BOTH = ["lines it would have paid", "lines that needed a correction", "worst likely case", "replay lines paid", "blind-check lines a kind a window",
+  "blind-check power at the sized window", "blind-check power at 400 lines", "kinds that reach a full monthly window", "the replay's first kind a month",
+  "CC BY: data modified", "B's test set in section 1", "plan length range", "procurement pre-phase", "Gate 1 money test"];
 let absent = 0, nreq = 0;
+for (const l of [...CASE_ONLY, ...BOTH]) if (!REQUIRED.rfp.some(([x]) => x === l)) { absent++; console.log(`SPLIT LABEL NOT FOUND: ${l}`); }
+REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.includes(l));
+REQUIRED.rfp = REQUIRED.rfp.filter(([l]) => !CASE_ONLY.includes(l));
+REQUIRED.caseHead = [["og:url", "https://understudy.gurn3k.com/case.html"], ["og:title", "Understudy: internal business case for a pilot"], ["og:image", "https://understudy.gurn3k.com/og.png"]];
+REQUIRED.readme.push(["README: internal case", "`site/case.html`"]);
 for (const [where, list] of Object.entries(REQUIRED)) {
-  const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"], readme: [read("README.md"), "README.md"] }[where];
+  const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], case: [caseAll.main, "case.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"], caseHead: [caseAll.extra, "case.html head"], readme: [read("README.md"), "README.md"] }[where];
   const text = norm(src[0] || "");
   for (const [label, fig] of list) {
     nreq++;
     if (!text.includes(fig)) { absent++; console.log(`REQUIRED FIGURE MISSING on ${src[1]}: ${label} (${fig})`); }
   }
 }
-console.log(`${nreq - absent}/${nreq} required figures found on the page, in Q9, in rfp.html and its head`);
+console.log(`${nreq - absent}/${nreq} required figures found on the page, in Q9, in rfp.html, in case.html and their heads`);
 process.exit(missing || banned || absent ? 1 : 0);

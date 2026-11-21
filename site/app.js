@@ -117,7 +117,7 @@ function biz(d) {
   <div class="tablewrap"><table class="score num money"><caption>Gross saving a year, on paper, by share of lines reviewed today</caption><thead><tr><th scope="col">Share reviewed</th><th scope="col">Reviews a year</th><th scope="col">Review hours freed a year</th><th scope="col">Gross saving a year</th></tr></thead><tbody>
   ${shareRows.map(([lab, why], i) => `<tr><th scope="row">${lab}${i === 2 ? ` <span data-out="share-lab"></span>` : ""}${why ? ` <span class="small">(${why})</span>` : ""}</th><td data-out="rv-${i}"></td><td data-out="hr-${i}"></td><td data-out="sv-${i}"></td></tr>`).join("")}
   </tbody></table></div>
-  <p class="small">Gross: before late fixes (sections 3 and 4) and before the cost of a pilot (the pilot request). On paper: as if the rulebook were trusted from day one; section 4 shows what it earned.</p>
+  <p class="small">Gross: before late fixes (sections 3 and 4) and before the cost of a pilot (<a href="case.html">the internal case</a>). On paper: as if the rulebook were trusted from day one; section 4 shows what it earned.</p>
   <p>I count the saving as hours of review time freed: capacity, not jobs. What a company does with those hours, such as more time on exceptions and supplier queries, is its own decision, made after consulting the staff affected (the pilot request plans this in Phase 0).</p>
   <h3>2. What it risks</h3>
   <p>Of the ${int(b.paid)} lines it would have paid, ${int(b.wrong)} (${pct(b.wrong / b.paid, 2)}) later needed a correction, such as a price or quantity change, a block or a cancellation. Today these are corrected before payment. With the rulebook, they would be paid first and fixed after.</p>
@@ -174,7 +174,8 @@ function biz(d) {
   <li><a href="#q3">Q3 The test</a> and <a href="#q4">Q4 The bar</a>: how they were tested, and why 99% with proof.</li>
   <li><a href="#q5">Q5 Earning trust</a> and <a href="#q6">Q6 The agreement trap</a>: the replay and the simulation in full.</li>
   <li><a href="#q7">Q7 Cost</a> and <a href="#q8">Q8 Running it</a>: what each approach costs and what to watch once it is live.</li>
-  <li><a href="rfp.html">A model request for a pilot proposal</a>: scope, requirements, gates, owners, risks, costs and sign-off, for a company that wants to run the pilot I recommend.</li>
+  <li><a href="rfp.html">A model request for a pilot proposal</a>: scope, requirements, gates, owners, risks and the cost lines to price, the document a company would send to proposers.</li>
+  <li><a href="case.html">The internal business case for that pilot</a>: the ask, the cost and return at your inputs, and the sign-off, kept apart from the request.</li>
   </ul>
   <p class="small footnote" id="usd-note"><a href="#usd-ref" aria-label="Back to the text">*</a> All money values are in US dollars. Invoice values were recorded in euros and are converted at ${R.toFixed(3)} US dollars per euro, the European Central Bank's average reference rate for 2018. AI costs are at the provider's published US-dollar list prices on the run date.</p>`;
   const detail = `<p>I added this section after every result was known (decision record 0019), and re-based it on order lines after an outside review (decision record 0021). It changes no result: no approach met the 99% bar (Q1).</p>
@@ -230,7 +231,7 @@ function wireBiz(d) {
       set(`gn-f-${i}`, signed(-r.fixes));
       set(`gn-n-${i}`, signed(r.netBefore));
     });
-    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. Net here is before the pilot's own costs; the readout above and the pilot request count them. The rows are scenarios, not forecasts.`);
+    set("gn-note", `${sh === null ? "Share reviewed not entered, so gross is shown as if a person reviewed every line today: an upper limit, not a plan. " : `At your share reviewed (${pct(sh, 1)}). `}Late fixes at the replay's cautious rate, one in ${int(L.gated_cautious)} lines (not the test's one in ${int(L.paper)}), at about $${int(x.M)} each. Net here is before the pilot's own costs; the readout above and the internal case count them. The rows are scenarios, not forecasts.`);
   });
 }
 
@@ -279,7 +280,7 @@ function q1(d) {
   const cs = wilson(d.c_sample.passed - d.c_sample.errors, d.c_sample.passed)[0];
   const no = (t) => `<span class="state standby">${t}</span>`;
   const plain = `<h1 id="q1-h">Can an AI decide which invoices are safe to pay without a person checking?</h1>
-  <p class="jump"><a href="#biz">Here for the business decision? Jump to the business case &rarr;</a><br><a href="rfp.html">Ready to run a pilot? Read the formal pilot request (RFP) &rarr;</a></p>
+  <p class="jump"><a href="#biz">Here for the business decision? Jump to the business case &rarr;</a><br><a href="rfp.html">Ready to run a pilot? Read the formal pilot request (RFP) &rarr;</a><br><a href="case.html">Approving one? Read the internal business case &rarr;</a></p>
   <p class="headline">Not proven at the bar I set. Claude's rulebook paid about half the invoices on its own and got about 99 in 100 of those right, but its worst likely case is under 99%.</p>
   <p>${notProven(d)}</p>
   ${summaryStrip(d)}

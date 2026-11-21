@@ -20,7 +20,7 @@ No contender earned trust at the 99% bar. The fixed rule passes nothing. The pol
 
 ## The business case and the pilot request
 
-The page also carries a business case (Q9) and links to a model request for a pilot proposal (`site/rfp.html`, live at https://understudy.gurn3k.com/rfp.html). The business case counts what the rulebook could save as review hours freed, not jobs, and asks the reader for the inputs the records can't show: the share of order lines a person reviews today, minutes per review, hourly cost and the cost of a late fix. Until those are measured, it recommends only a gated pilot. The pilot request sets out that pilot for an internal team or an outside supplier: practice mode with the AI's calls hidden, promotion of a kind of invoice only on its real outcomes, an automatic switch-off, blind checks, data protection, owners, risks, costs and sign-off. Both are covered by decision records 0019 to 0021 and 0025 to 0028; neither changes a verdict, a bar or a fixed sentence.
+The page also carries a business case (Q9) and links to a model request for a pilot proposal (`site/rfp.html`, live at https://understudy.gurn3k.com/rfp.html). The business case counts what the rulebook could save as review hours freed, not jobs, and asks the reader for the inputs the records can't show: the share of order lines a person reviews today, minutes per review, hourly cost and the cost of a late fix. Until those are measured, it recommends only a gated pilot. The pilot request sets out that pilot for an internal team or an outside supplier: practice mode with the AI's calls hidden, promotion of a kind of invoice only on its real outcomes, an automatic switch-off, blind checks, data protection, owners, risks and the cost lines to price. The issuer's own approval, cost and return at the reader's inputs, and sign-off are in a separate internal business case (`site/case.html`), so the request sent to proposers carries no return verdict. They are covered by decision records 0019 to 0021 and 0025 to 0030; none changes a verdict, a bar or a fixed sentence.
 
 ## How it was kept honest
 
@@ -38,7 +38,7 @@ The page also carries a business case (Q9) and links to a model request for a pi
 | `understudy/` | Parsing, analysis, the contenders, scoring, and the replay (standard-library Python) |
 | `tests/` | Unit tests and fixtures: `python -m unittest` |
 | `tools/` | Runners for each stage, the site build, screenshots and checks |
-| `site/` | The static report (`index.html`, `app.js`), the pilot request (`rfp.html`, `rfp.js`) and the calculator both use (`calc.js`); `site/data.json` is generated |
+| `site/` | The static report (`index.html`, `app.js`), the pilot request and the internal business case (`rfp.html`, `case.html`, both drawn by `rfp.js`) and the calculator (`calc.js`); `site/data.json` is generated |
 | `docs/` | Product brief, research, tickets and decision records (`docs/adr/`) |
 
 ## Reproduce

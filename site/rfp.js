@@ -1,6 +1,9 @@
 "use strict";
-/* Understudy: model request for a pilot proposal (ADR 0020). Every study figure is read from data.json; nothing is typed by hand.
+/* Understudy: model request for a pilot proposal (ADR 0020), split into two documents (ADR 0030): the request that goes to
+   every proposer (rfp.html) and the issuer's internal case (case.html: approval, cost and return, findings, sign-off).
+   The page's <body data-doc> picks which one is drawn. Every study figure is read from data.json; nothing is typed by hand.
    Phase lengths, oversight hours, risk ratings and evaluation weights are the author's assumptions or judgment, and are labelled as such. */
+const DOC = document.body.dataset.doc === "case" ? "case" : "request";
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -57,48 +60,69 @@ function build(d) {
   const m2d = ctl.m2_default, st1 = ctl.second_test[0], sl = ctl.settle, nWeeks = d.replay.weeks.length;
   const m2Line = m2d.promotions === 0 ? `under M2's default the replay would not have promoted any kind in its ${int(nWeeks)} weeks` : `under M2's default the replay's first promotion would have come in ${wkL(m2d.first)}`;
   const cl = d.evidence.clustering, rv = d.evidence.rulebook_by_vendor, wl = d.evidence.vendor.rows.find((r) => r.key === d.evidence.vendor.picked);
-  const out = [];
-
-  /* Document control and 1. summary */
-  out.push(`<section id="s0" aria-labelledby="s0-h"><div class="col">
-  <h1 id="s0-h">Request for Proposals: a controlled pilot of AI-assisted invoice clearing</h1>
+  const out = [], cs = []; // out: the request (rfp.html); cs: the internal case (case.html)
+  const isCase = DOC === "case";
+  // A reference to a section of the request: plain on the request itself, a link from the internal case.
+  const rq = (n) => (isCase ? `<a href="rfp.html#s${n}">the request's section ${n}</a>` : `section ${n}`);
+  const head = (title, docTitle, howto, extra) => `<section id="s0" aria-labelledby="s0-h"><div class="col">
+  <h1 id="s0-h">${title}</h1>
   <p class="jump"><a href="./">&larr; Back to the main report</a></p>
   <p class="small">This is a model document. I wrote it from my study, to show how a company with a formal process could ask for a pilot. It is not issued by any organisation, and every placeholder in [brackets] is for the company that adopts it to complete. I wrote it after every result was known (decision record 0020); it changes no result.</p>
-  <div class="callout rec howto" role="note" aria-label="How to use this document"><p><strong>How to use this document.</strong> It holds two documents on one page.</p>
-  ${list([
-    "<strong>The internal case: sections 1 and 13.</strong> Section 1 asks the sponsor to approve issuing this request, with Phase 0 funded on award; section 13 records the sign-off. They are not sent to proposers.",
-    "<strong>The request: sections 2 to 12, section 14 and the appendices.</strong> These go to every proposer, the same text to each, with the placeholders completed.",
-    "<strong>Requirements are outcomes.</strong> Section 6 asks for results on the decision component, whatever makes the pay-or-hold call on a line; any approach may meet them. The study's rulebook is the reference design in Appendix E. Sections 1, 2 and 4 name the approaches the study tested, including the model; that is evidence, not a requirement.",
-    "<strong>Voice, optional.</strong> I wrote this in the first person, as the study's author. An issuer that sends it formally may replace \"I\" and \"my\" with \"the Issuer\", and \"my assumption\", \"my default\" or \"my proposal\" with \"Issuer to set\". What a proposer must do already reads \"shall\".",
-    "<strong>Before issue.</strong> The issuer completes every placeholder in [brackets], and confirms or replaces every figure marked as my assumption, my default or my proposal: phase lengths, control defaults, evaluation weights and dates.",
-  ])}</div>
+  <div class="callout rec howto" role="note" aria-label="How to use this document"><p><strong>How to use this document.</strong></p>
+  ${list(howto)}</div>
   ${tbl("Document control", ["Item", "Entry"], [
-    ["Title", "Request for Proposals: controlled pilot of AI-assisted invoice clearing"],
+    ["Title", docTitle],
     ["Reference", fill("Procurement reference, e.g. RFP-YYYY-NNN")],
     ["Version and date", `1.0, built ${esc(d.built)}`],
     ["Author", "The author of the Understudy study (first-person statements in this document are mine)"],
     ["Status", "Model document. Text in [brackets] is a placeholder for the adopting company to complete"],
-    ["Classification", fill("e.g. Internal, Confidential")],
+    ...extra,
     ["Owner of this document", fill("Name, role and department")],
   ])}
-  </div><div></div></section>`);
+  </div><div></div></section>`;
+
+  /* Document control: the request */
+  out.push(head("Request for Proposals: a controlled pilot of AI-assisted invoice clearing", "Request for Proposals: controlled pilot of AI-assisted invoice clearing", [
+    "<strong>This is the request.</strong> Sections 1 to 12 and the appendices go to every proposer, the same text to each, with the placeholders completed.",
+    "<strong>The issuer's internal case is a separate document.</strong> The approval to issue this request, the issuer's own cost and return figures, and the sign-off are kept there. It is not sent to proposers.",
+    "<strong>Requirements are outcomes.</strong> Section 6 asks for results on the decision component, whatever makes the pay-or-hold call on a line; any approach may meet them. The study's rulebook is the reference design in Appendix E. Sections 1, 2 and 4 name the approaches the study tested, including the model; that is evidence, not a requirement.",
+    "<strong>Voice, optional.</strong> I wrote this in the first person, as the study's author. An issuer that sends it formally may replace \"I\" and \"my\" with \"the Issuer\", and \"my assumption\", \"my default\" or \"my proposal\" with \"Issuer to set\". What a proposer must do already reads \"shall\".",
+    "<strong>Before issue.</strong> The issuer completes every placeholder in [brackets], and confirms or replaces every figure marked as my assumption, my default or my proposal: phase lengths, control defaults, evaluation weights and dates.",
+  ], [["Classification", fill("e.g. Internal, Confidential")]]));
+  /* Document control: the internal case */
+  cs.push(head("Internal business case: a controlled pilot of AI-assisted invoice clearing", "Internal business case: controlled pilot of AI-assisted invoice clearing", [
+    "<strong>This is the internal case.</strong> It asks the sponsor to approve issuing the pilot request (section 1), works out the cost and the return at your inputs (section 2), explains the desirable requirements (section 3) and records the sign-off (section 4). It is not sent to proposers.",
+    `<strong>The request is a separate document.</strong> <a href="rfp.html">The request for proposals</a>, sections 1 to 12 and the appendices, goes to every proposer. "The request's section 7" here means section 7 of that document.`,
+    "<strong>Before use.</strong> The issuer replaces every figure marked as my assumption or my default with its own, and enters its own inputs in section 2.",
+  ], [["Classification", "Internal: not sent to proposers"]]));
 
   const phases = [["0 Set-up", PH.p0], ["1 Practice mode", firstWk], ["2 Limited autonomy", PH.p2], ["3 Review", PH.p3]];
-  const timeline = `<figure class="tline"><div class="tline-bar" role="img" aria-label="Plan: procurement, about ${PROC} weeks; then ${phases.map(([n, w], i) => `${n}, ${i === 1 ? `${w} to ${stopWk}` : w} weeks`).join("; ")}"><span class="seg pre" style="flex:${PROC}"><b>Procurement</b><i>~${PROC} wk</i></span>${phases.map(([n, w], i) => `<span class="seg s${i}" style="flex:${w}"><b>${n}</b><i>${i === 1 ? `${w}–${stopWk}` : w} wk</i></span>`).join("")}</div><figcaption class="small">Procurement first: about ${PROC} weeks from issue to the award decision (section 12). Then the pilot: at least ${totalWeeks} weeks and at most ${maxWeeks} before the stop rule ends it. Each phase ends at a gate (section 7). Phase 1 ends when a kind of invoice proves the bar under M2. ${firstWk} weeks is the earliest that happened in the replay, under its own single-crossing rule; ${m2Line}. If no kind has qualified by week ${stopWk} of practice mode, the pilot stops, so Phase 1 runs ${firstWk} to ${stopWk} weeks.</figcaption></figure>`;
-  out.push(sec("s1", "1", "Executive summary", `
-  <p class="headline">I ask for approval to procure a controlled pilot, not a roll-out: at least ${totalWeeks} weeks and at most ${maxWeeks} in four gated phases, after about ${PROC} weeks of procurement.</p>
-  ${timeline}
-  ${tbl("Key figures", ["Question", "Answer", "What it means"], [
+  const timeline = `<figure class="tline"><div class="tline-bar" role="img" aria-label="Plan: procurement, about ${PROC} weeks; then ${phases.map(([n, w], i) => `${n}, ${i === 1 ? `${w} to ${stopWk}` : w} weeks`).join("; ")}"><span class="seg pre" style="flex:${PROC}"><b>Procurement</b><i>~${PROC} wk</i></span>${phases.map(([n, w], i) => `<span class="seg s${i}" style="flex:${w}"><b>${n}</b><i>${i === 1 ? `${w}–${stopWk}` : w} wk</i></span>`).join("")}</div><figcaption class="small">Procurement first: about ${PROC} weeks from issue to the award decision (${rq(12)}). Then the pilot: at least ${totalWeeks} weeks and at most ${maxWeeks} before the stop rule ends it. Each phase ends at a gate (${rq(7)}). Phase 1 ends when a kind of invoice proves the bar under M2. ${firstWk} weeks is the earliest that happened in the replay, under its own single-crossing rule; ${m2Line}. If no kind has qualified by week ${stopWk} of practice mode, the pilot stops, so Phase 1 runs ${firstWk} to ${stopWk} weeks.</figcaption></figure>`;
+  const keyStudy = [
     ["What was tested?", `3 pre-registered approaches: the simple rule and the rulebook on ${int(d.held_out_n)} real test invoices, Claude checking each invoice on ${b2 ? int(b2.b_alone.n) + " (a follow-up sample)" : int(d.sample_n)}`, "None proved the 99% bar"],
     ["What did the best one do?", `Rulebook paid ${pct(b.paid / d.held_out_n, 1)}; ${pct(c.held_out.precision[0] / c.held_out.precision[1], 2)} right; worst likely case ${pct(c.held_out.precision_lower, 2)}`, "Below the bar: not proved"],
     ["The saving", `Not known yet. It rests on the share of order lines a person reviews today, which the records can't show. ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step`, "A footprint, not proof of review. Phase 0 measures it"],
     ["The risk", `${int(b.wrong)} of ${int(b.paid)} lines paid needed a fix (${pct(b.wrong / b.paid, 2)}), ${pct(v.wrong / v.paid, 1)} of value (${usd(v.wrong)})`, "Paid before a fix; not money lost"],
     ["Trust earned on outcomes (replay)", `${int(t.passed)} paid, ${int(t.wrong)} needed correction (${pct(t.wrong / t.passed, 1)}), ${d.evidence.replay.kinds === 1 ? "all in one kind" : `in ${int(d.evidence.replay.kinds)} kinds`}, ${int(d.evidence.replay.top_order)} on one order; first kind in week ${firstWk} of the replay (ISO week ${firstIso}) under the replay's own rule; ${m2d.promotions === 0 ? "none under M2's default" : `under M2's default, ${wkL(m2d.first)}`}`, "Not proven either; expect errors in the first months"],
-    ["When it pays off", `<span data-out="pays-off"></span>.<span data-out="pays-off-q"></span>`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate, after oversight and blind checks (section 11)`],
-    ["Pilot cost", `<span data-out="total"></span>: internal oversight and the rulebook (my assumptions), blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window), plus integration if entered`, "Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 11)"],
-    ["Return", `<span data-out="return-line"></span>`, `At your inputs, including blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window)<span data-out="need-int"></span>; scenarios, not forecasts (section 11)`],
+  ];
+  /* 1. The request's summary: what is asked for, and the study's evidence. No cost or return figures. */
+  out.push(sec("s1", "1", "Summary of the request", `
+  <p class="headline">I ask for proposals for a controlled pilot, not a roll-out: at least ${totalWeeks} weeks and at most ${maxWeeks} in four gated phases, after about ${PROC} weeks of procurement.</p>
+  ${timeline}
+  ${tbl("Key figures from the study", ["Question", "Answer", "What it means"], keyStudy, "keys")}
+  <p>A proposal answers sections 2 to 12: the requirements in section 6, the plan and gates in section 7, the cost lines to price in section 11 and the instructions in section 12. Each gate is the issuer's decision, taken on its own measured figures.</p>
+  <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This request asks how a company could find out, under controls, whether its own invoices would.</p>`));
+  /* 1. The internal case's executive summary: the ask, with the cost and return at the reader's inputs. */
+  cs.push(sec("s1", "1", "Executive summary", `
+  <p class="headline">I ask for approval to procure a controlled pilot, not a roll-out: at least ${totalWeeks} weeks and at most ${maxWeeks} in four gated phases, after about ${PROC} weeks of procurement.</p>
+  ${timeline}
+  ${tbl("Key figures", ["Question", "Answer", "What it means"], [
+    ...keyStudy,
+    ["When it pays off", `<span data-out="pays-off"></span>.<span data-out="pays-off-q"></span>`, `At a late fix of <span data-out="late"></span>, on the cautious end of the replay's error rate, after oversight and blind checks (section 2)`],
+    ["Pilot cost", `<span data-out="total"></span>: internal oversight and the rulebook (my assumptions), blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window), plus integration if entered`, `Supplier fees, model use, hosting, outcome scoring, audit, reconciliation and training are required lines still to price (section 2; proposers price theirs in ${rq(11)})`],
+    ["Return", `<span data-out="return-line"></span>`, `At your inputs, including blind checks on <span data-out="kinds-lab"></span> window by window (M9; costed monthly, its shortest window)<span data-out="need-int"></span>; scenarios, not forecasts (section 2)`],
   ], "keys")}
-  <p class="ask"><strong>The decision I ask for:</strong> approve issuing this request, and on award fund Phase 0 to measure the inputs that decide it: the share of lines a person reviews today, minutes per review and the cost of a late fix. <span data-out="ask-note"></span> Gate 1 goes ahead only if those measurements give a positive net after running costs. Every later phase waits for a gate.</p>
+  <p class="ask"><strong>The decision I ask for:</strong> approve issuing <a href="rfp.html">the request</a>, and on award fund Phase 0 to measure the inputs that decide it: the share of lines a person reviews today, minutes per review and the cost of a late fix. <span data-out="ask-note"></span> Gate 1 goes ahead only if those measurements give a positive net after running costs. Every later phase waits for a gate.</p>
   <p class="small">The verdict stands as in the main report: no approach proved the 99% bar. This document asks how a company could find out, under controls, whether its own invoices would.</p>`));
 
   out.push(sec("s2", "2", "Purpose and background", `
@@ -163,9 +187,9 @@ function build(d) {
   <h3>Assumptions (mine; replace them with your own in Phase 0)</h3>
   ${tbl("Assumptions", ["Assumption", "Default", "Why"], [
     ["Unit", "The order line", "The records have no invoice-document field"],
-    ["Share of lines a person reviews today", "Not assumed: you enter it; until then the figures show every line (100%), an upper limit", "The records show logins and times, not reviews"],
-    ["Minutes per review, hourly cost", `${DEF_MIN} minutes, $${DEF_RATE} (inputs in section 11)`, "The records show when work happened, not how long it took"],
-    ["Cost of a late fix", `$${DEF_FIX} of work, plus ${DEF_LOST}% of the line's value never recovered (inputs in section 11)`, "The records don't show it"],
+    ["Share of lines a person reviews today", "Not assumed: Phase 0 measures it", "The records show logins and times, not reviews"],
+    ["Minutes per review, hourly cost", `${DEF_MIN} minutes, $${DEF_RATE} (the issuer's inputs until Phase 0 measures them)`, "The records show when work happened, not how long it took"],
+    ["Cost of a late fix", `$${DEF_FIX} of work, plus ${DEF_LOST}% of the line's value never recovered (the issuer's inputs until Phase 0 measures them)`, "The records don't show it"],
     ["Oversight during the pilot", `${OVERSIGHT_H} hours a week`, "My judgment"],
     ["Phases 0, 2 and 3", `${PH.p0}, ${PH.p2} and ${PH.p3} weeks`, "My judgment"],
     ["Phase 1 (practice mode)", `At least ${firstWk} weeks, at most ${stopWk}`, `The earliest a kind qualified in the replay, under its single-crossing rule; ${m2Line}. Outcomes arrive weeks after invoices. The stop rule ends the pilot at week ${stopWk} (section 7)`],
@@ -216,11 +240,10 @@ function build(d) {
   ${tbl("Desirable requirements (blind checks, D2 in the first issue, are now mandatory as M9; D3, the override rate, is dropped)", ["Ref", "The pilot should", "Why"], [
     ["D1", "Set a value limit above which a person always checks.", "Most of the mistakes' value sat in the largest invoices in the study. A proposal I did not test."],
     ["D4", "Provide an exit plan and keep the data portable.", "A supplier or model may change."],
-  ])}
-  <p class="jump"><a href="#s14">The findings behind D1, D4 and M9 are in section 14 &rarr;</a></p>`));
+  ])}`));
 
   const ph = [
-    ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; consult the accounts-payable staff and their representatives (a works council where there is one) on how roles and workload change, and plan redeployment of freed hours; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget, and Phase 0's measured share reviewed, minutes per review and late-fix cost give a positive net after running costs (section 11); otherwise stop"],
+    ["0 Mobilise", `${PH.p0} (my assumption)`, "Name owners; consult the accounts-payable staff and their representatives (a works council where there is one) on how roles and workload change, and plan redeployment of freed hours; measure the baseline (share of lines a person reviews, minutes per review, cost of a late fix as the work plus the share of value never recovered, mistake rate); have an accounts-payable reviewer sign off the list of corrections that count as a mistake, deciding explicitly on Change Approval for PO; write the bar and the budget for lines paid that need a correction down; test the kill switch.", "G1: sponsor and finance approve the bar and the budget, and Phase 0's measured share reviewed, minutes per review and late-fix cost give a positive net after running costs (worked out in the issuer's internal case); otherwise stop"],
     ["1 Practice mode", `At least ${firstWk}, at most ${stopWk} under the stop rule (the replay's first kind qualified in week ${firstWk} of the replay, ISO week ${firstIso}, under its own single-crossing rule, and was switched off again later; ${m2Line}); it ends when G2 holds, and depends on your volume per kind`, "The decision component makes calls on every kind; people handle every invoice without seeing those calls (M1); every call is scored when its outcome arrives.", "G2: at least one kind meets the bar on its outcomes"],
     ["2 Limited autonomy", `${PH.p2} (my assumption)`, "Qualified kinds only. Automatic switch-off stays on. Blind checks run window by window (one month to one quarter) on each kind paid on its own (M9).", "G3: results review; the correction budget was respected"],
     ["3 Review", `${PH.p3} (my assumption)`, "Compare real figures with the assumptions; decide the next step.", "G4: formal decision to expand, extend or stop"],
@@ -232,7 +255,7 @@ function build(d) {
   <p>The Pilot Owner shall recommend stopping, and the sponsor shall decide, if any of these holds:</p>
   ${list([
     "The correction budget fixed at Gate 1 is exceeded. This also switches every kind off at once (M7).",
-    "The pilot's own measured cost of a late fix exceeds the break-even in section 11, recalculated at the pilot's own measured mistake rate.",
+    "The pilot's own measured cost of a late fix exceeds the break-even in the issuer's internal case, recalculated at the pilot's own measured mistake rate.",
     `No kind of invoice has qualified by week ${stopWk} of practice mode (my judgment: twice the replay's ${firstWk}; the issuer sets its own). Under M2's default this may end the pilot: on the study's data no kind qualified in ${int(nWeeks)} weeks.`,
     "Outcome data, including corrections after payment, cannot be obtained.",
     "A control in section 10 cannot be met.",
@@ -243,8 +266,8 @@ function build(d) {
   ${list([
     "At least one kind of invoice is still paid on its own at the end of Phase 2.",
     "Lines that needed a correction stayed within the budget, in count and in value.",
-    "The pilot's measured cost of a late fix is below the break-even in section 11, recalculated at the pilot's own measured error rate.",
-    `The share of the on-paper volume it earned is above the share needed to repay the pilot in its first year after (section 11; <span data-out="need-g4"></span>).`,
+    "The pilot's measured cost of a late fix is below the break-even in the issuer's internal case, recalculated at the pilot's own measured error rate.",
+    "The share of the on-paper volume it earned is above the share the issuer's internal case needs to repay the pilot in its first year after, worked out on the pilot's own measured figures.",
   ], "ol")}
   <p class="small">Anything less is a stop or an extension, decided at Gate 4; it is not a roll-out.</p></div>`));
 
@@ -270,7 +293,7 @@ function build(d) {
 
   const risks = [
     ["R1", "A line that needs a correction is paid", "High", "Medium", `${int(b.wrong)} of ${int(b.paid)} lines on paper; ${int(t.wrong)} of ${int(t.passed)} in the replay`, "M1, M2, M3, M7, M9, M12", "Pilot Owner"],
-    ["R2", "A late fix costs more than the break-even", "Medium", "High", `Cautious break-even: ${int(L.gated_cautious)} lines per mistake × share reviewed × cost of a review (section 11)`, "Measure it in Phase 0; stop rule", "Finance Controller"],
+    ["R2", "A late fix costs more than the break-even", "Medium", "High", `Cautious break-even: ${int(L.gated_cautious)} lines per mistake × share reviewed × cost of a review`, "Measure it in Phase 0; stop rule", "Finance Controller"],
     ["R3", "Mistakes concentrate in one kind of invoice", "Medium", "Medium", `The replay's ${int(t.wrong)} mistakes were ${er.kinds === 1 ? "all in one kind" : `in ${int(er.kinds)} kinds`}, ${int(er.top_order)} of them on one order`, "Promote kind by kind; M3; M12", "Pilot Owner"],
     ["R4", "The decision component goes stale", "High", "Medium", "Suppliers, prices and buying habits change", "M5: a rewrite that changes a kind's rules restarts its practice mode, so changes follow a schedule the evidence can keep up with; retest before each", "Component Owner"],
     ["R5", "Mistakes found after payment go unnoticed", "Medium", "High", "Not in the study's records", "M6", "Finance Controller"],
@@ -301,21 +324,44 @@ function build(d) {
 
   const bl = b.blind, bad = 1 / L.gated_cautious;
   const req = (t) => `<strong>Required.</strong> ${t}`;
-  out.push(sec("s11", "11", "Cost model and expected benefit", `
+  // How M9's window is sized. The internal case adds what that sizing means for its own cost.
+  const blindSizing = (costed) => `The switch-off test on ${int(bl.n)} lines catches a true ${pct(bl.q, 0)} error rate ${pct(bl.power, 0)} of the time. Power does not rise smoothly with the window: ${int(bl.first_n)} lines already reach 80%, but ${int(1000)} fall back to ${pct(bl.power_1000, 0)}, so I size in steps of 50 to the first that holds. On paper, ${word(ctl.kinds_month_full).toLowerCase()} of the ${int(ctl.kinds_paid)} kinds the rulebook pays reach ${int(bl.n)} lines a month; the replay's first kind pays about ${int(ctl.first_kind_month)} (all of a month's lines reach ${pct(ctl.power_first_kind_month, 0)} power), and ${int(ctl.kind_months.filter((x) => x <= 200).length)} pay 200 or fewer, so for them every line paid alone is checked${costed ? ", which leaves no saving. The cost here is monthly, the cautious end, and never counts more checks than lines paid alone" : ""}. ${int(ctl.small_n)} lines would catch it only ${pct(ctl.power_400, 0)} of the time. Drawn as whole purchase orders, lines on one order are not independent, so this power holds only if the window is enlarged by the kind's own design effect, measured in practice mode${costed ? `; the cost here uses ${int(bl.n)}` : ""}.`;
+  const priced = (t) => `<span class="small">${t}</span>`;
+  /* 11. The request: the cost lines a proposer prices. The issuer's own lines are named but not priced here. */
+  out.push(sec("s11", "11", "Cost lines to price", `
+  <p>A response prices every line marked <em>proposer prices</em>, in this format, with every assumption stated; the evaluated price in section 12 is their total. The issuer's own lines are listed so the whole pilot is in view; the issuer prices them itself and does not share them.</p>
+  ${tbl("Cost lines", ["Line", "Basis", "Amount"], [
+    [`Phase 0: set-up and baseline${priced("Issuer's own line")}`, `Oversight hours a week × ${PH.p0} weeks × hourly cost`, "Not priced by the proposer"],
+    [`Oversight, phases 1 to 3${priced("Issuer's own line")}`, "Oversight hours a week × the weeks of phases 1 to 3 × hourly cost", "Not priced by the proposer"],
+    [`Blind checks (M9)${priced("Issuer's own line")}`, `${int(bl.n)} lines a kind of invoice per check window × minutes per review, run by the accounts-payable team lead (section 8). How the window is sized is below`, "Not priced by the proposer"],
+    [`Weekly reconciliation of calls against outcomes${priced("Issuer's own line")}`, "Hours a week × the weeks of the pilot", "Not priced by the proposer"],
+    [`Audit${priced("Issuer's own line")}`, "Internal Audit's review before Gate 3 (section 10)", "Not priced by the proposer"],
+    [`Training, staff consultation and change management${priced("Issuer's own line")}`, "", "Not priced by the proposer"],
+    [`Integration and data access${priced(req("Proposer prices its part"))}`, "One-off", fill("US$ amount")],
+    [`Supplier fees${priced(req("Proposer prices"))}`, "Fixed and variable", fill("US$ amount")],
+    [`Model or API use${priced(req("Proposer prices"))}`, "Per call or per version, with any model named", fill("US$ amount")],
+    [`Hosting and logging${priced(req("Proposer prices"))}`, "For the pilot and the retention period", fill("US$ amount")],
+    [`Outcome scoring${priced(req("Proposer prices"))}`, "Matching each call to its outcome as it arrives", fill("US$ amount")],
+  ], "cards")}
+  <p class="small">For reference, writing the study's rulebook (the reference design, Appendix E) cost $${cOnce.toFixed(2)} at API list prices on the run date, and nothing per line. A proposal prices its own design in the lines above.</p>
+  <h3>How the blind-check window is sized (M9)</h3>
+  <p>${blindSizing(false)}</p>`));
+  /* 2. The internal case: the cost lines at the reader's inputs, the saving and the return. */
+  cs.push(sec("s2", "2", "Cost model and expected benefit", `
   <p>These figures use your inputs. The defaults are my assumptions, not measurements. Change them to match the company; everything below updates. Every count is in order lines.</p>
   ${Calc.html("in", `The share reviewed is the figure the saving rests on, and the records can't show it: ${pct(iso, 1)} of the lines the rulebook would have paid show a person's own step, a footprint, not proof of review. Until you enter it, results that need it use every line (100%) and say "upper limit". The tables below show the working.`)}
   ${tbl("Cost lines", ["Line", "Basis", "Amount"], [
     [`Phase 0: set-up and baseline<span class="small">My assumption</span>`, `<span data-out="p0-basis"></span>`, `<span data-out="p0-cost"></span>`],
     [`Oversight, phases 1 to 3<span class="small">My assumption</span>`, `<span data-out="oh-basis"></span>`, `<span data-out="oh-cost"></span>`],
-    [`Blind checks<span class="small">${req("M9, sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. The switch-off test on ${int(bl.n)} lines catches a true ${pct(bl.q, 0)} error rate ${pct(bl.power, 0)} of the time. Power does not rise smoothly with the window: ${int(bl.first_n)} lines already reach 80%, but ${int(1000)} fall back to ${pct(bl.power_1000, 0)}, so I size in steps of 50 to the first that holds. On paper, ${word(ctl.kinds_month_full).toLowerCase()} of the ${int(ctl.kinds_paid)} kinds the rulebook pays reach ${int(bl.n)} lines a month; the replay's first kind pays about ${int(ctl.first_kind_month)} (all of a month's lines reach ${pct(ctl.power_first_kind_month, 0)} power), and ${int(ctl.kind_months.filter((x) => x <= 200).length)} pay 200 or fewer, so for them every line paid alone is checked, which leaves no saving. The cost here is monthly, the cautious end, and never counts more checks than lines paid alone. ${int(ctl.small_n)} lines would catch it only ${pct(ctl.power_400, 0)} of the time. Drawn as whole purchase orders, lines on one order are not independent, so this power holds only if the window is enlarged by the kind's own design effect, measured in practice mode; the cost here uses ${int(bl.n)}.`, `<span data-out="blind-cost"></span> a kind a window; <span data-out="blind-pilot"></span> in the pilot`],
+    [`Blind checks<span class="small">${req("M9, sized to catch a doubled error rate")}</span>`, `${int(bl.n)} lines a kind of invoice per check window × your minutes per review = <span data-out="blind-h"></span> a kind a window. ${blindSizing(true)}`, `<span data-out="blind-cost"></span> a kind a window; <span data-out="blind-pilot"></span> in the pilot`],
     [`Weekly reconciliation of calls against outcomes<span class="small">${req("Yours to estimate")}</span>`, "Hours a week × the weeks of the pilot", fill("US$ amount")],
-    [`Writing the rulebook (the reference design, Appendix E)<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line. A proposal prices its own design in the lines below", `$${cOnce.toFixed(2)}`],
+    [`Writing the rulebook (the reference design, ${isCase ? '<a href="rfp.html#ap">the request\'s Appendix E</a>' : "Appendix E"})<span class="small">Measured</span>`, "At API list prices on the run date; nothing per line. A proposal prices its own design in the lines below", `$${cOnce.toFixed(2)}`],
     [`Integration and data access<span class="small">${req("Yours to enter above")}</span>`, "One-off", `<span data-out="int-cost"></span>`],
-    [`Supplier fees<span class="small">${req("Proposer to price")}</span>`, "Fixed and variable", fill("US$ amount")],
+    [`Supplier fees<span class="small">${req("Proposer to price")}</span>`, `Fixed and variable (${rq(11)})`, fill("US$ amount")],
     [`Model or API use<span class="small">${req("Proposer to price")}</span>`, "Per call or per version, with any model named", fill("US$ amount")],
     [`Hosting and logging<span class="small">${req("Proposer to price")}</span>`, "For the pilot and the retention period", fill("US$ amount")],
     [`Outcome scoring<span class="small">${req("Proposer to price")}</span>`, "Matching each call to its outcome as it arrives", fill("US$ amount")],
-    [`Audit<span class="small">${req("Yours to estimate")}</span>`, "Internal Audit's review before Gate 3 (section 10)", fill("US$ amount")],
+    [`Audit<span class="small">${req("Yours to estimate")}</span>`, `Internal Audit's review before Gate 3 (${rq(10)})`, fill("US$ amount")],
     [`Training, staff consultation and change management<span class="small">${req("Yours to estimate")}</span>`, "", fill("US$ amount")],
     ["Total so far", "Phase 0, oversight, the rulebook, blind checks (M9: monthly windows during Phase 2, on the kinds you enter above), and integration if entered. Not the required lines still blank", `<span data-out="total"></span>`],
   ])}
@@ -355,9 +401,7 @@ function build(d) {
     ["Not included", "The required lines still blank, discounting, tax, seasonality, benefit during the pilot"],
   ])}
   <p class="small">The ${pct(g.earned_share, 1)} row is what the replay earned on the same test lines; its window was too short to show the steady state, so it is a floor seen once, not an estimate. ${pct(SCEN[SCEN.length - 1], 0)} is the on-paper ceiling. None of these rows changes the verdict: no approach proved the 99% bar.</p>
-  <h3>Benchmarks to collect from your own records</h3>
-  <p>I quote no outside figure. Published accounts-payable benchmarks vary widely with definitions and sample, so the pilot should measure your own, per order line. Fill in these before Gate 1.</p>
-  ${tbl("Baseline measures", ["Measure", "Your figure", "Source and date"], ["Order lines per invoice document", "Cost to process one order line", "Share of order lines a person actually reviews before payment (not just clears)", "Minutes per review", "Share of order lines needing a correction before payment", "Minutes to resolve an exception", "Work to fix a line after it was paid", "Share of a wrongly paid line's value never recovered", "Share of lines corrected after payment", "Order lines per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}`));
+  <p class="small">The baseline measures that replace these inputs are listed in <a href="rfp.html#ap">the request's Appendix C</a>; Phase 0 collects them before Gate 1.</p>`));
 
   out.push(sec("s12", "12", "Instructions to proposers, timetable and evaluation", `
   <p>A proposer may be an internal team or an outside supplier. A response shall follow the section numbers of this document, answer every M and D requirement in section 6 one by one, and state every assumption it changes.</p>
@@ -394,7 +438,7 @@ function build(d) {
     ["5", "Meets the need fully, with strong evidence, and lowers a risk in section 9"],
   ], "fit")}
   ${list([
-    `<strong>Price.</strong> Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price. The evaluated price is the total of every cost line in section 11 the proposer prices, over the pilot at its longest (${maxWeeks} weeks). Fees that depend on volume are priced at ${fill("the issuer's stated volume, e.g. the order lines a year in section 11")}, with every kind paid on its own from the start of Phase 2, so every proposal is priced on the same volume. A price far below the others is checked for what it leaves out before it is scored.`,
+    `<strong>Price.</strong> Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price. The evaluated price is the total of every cost line in section 11 the proposer prices, over the pilot at its longest (${maxWeeks} weeks). Fees that depend on volume are priced at ${fill("the issuer's stated volume, e.g. order lines a year, set at issue")}, with every kind paid on its own from the start of Phase 2, so every proposal is priced on the same volume. A price far below the others is checked for what it leaves out before it is scored.`,
     `<strong>Minimum.</strong> A proposal scoring below 3 on "How the controls are run" or "Approach and measurement", or below ${fill("e.g. 60")} points in all, is not shortlisted (my proposal; the issuer sets its own).`,
     "<strong>Tie-break.</strong> On equal points, the higher score on \"How the controls are run\" wins; then the lower evaluated price.",
   ])}
@@ -415,14 +459,10 @@ function build(d) {
   ], "cards")}
   <p class="small">Changes to this document follow the change log in Appendix D.</p>`));
 
-  out.push(sec("s13", "13", "Approvals and sign-off", `
-  <p>Each person below shall sign once, at Gate 1, and again at Gate 4.</p>
-  ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
-
   const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
   const topShareWrong = b.top10.wrong_value / b.value.wrong, topSharePaid = b.top10.paid_value / b.value.paid;
   const dcard = (id, title, found, visual, why, ask, tag = "Recommended, not tested") => `<article class="dcard"><p class="dcard-id">${id} · ${tag}</p><h3>${title}</h3><p><strong>What I found:</strong> ${found}</p>${visual}<p><strong>Why it matters:</strong> ${why}</p><p class="dcard-ask"><strong>What I ask proposers:</strong> ${ask}</p></article>`;
-  out.push(sec("s14", "14", "Special findings: the desirable requirements, and why I recommend them", `
+  cs.push(sec("s3", "3", "Special findings: the desirable requirements, and why I recommend them", `
   <p class="headline">The mandatory requirements keep the pilot under control. These four come from things I saw in the study. The blind check is now mandatory (M9); I would score the other three.</p>
   <p class="small">Each is a recommendation drawn from the evidence, not a tested result. None changes the verdict: no approach proved the 99% bar.</p>
   <div class="dcards">
@@ -437,7 +477,11 @@ function build(d) {
     "", "a new rulebook or a new AI model can behave differently. The company needs to be able to retest, switch supplier or stop, without losing the record of every call.",
     "describe the exit steps, the data the company keeps, and how every version of the decision component is retested before use.")}
   </div>
-  <p>Under the evaluation weights in section 12, D1 counts under "How the controls are run" and D4 under "Exit and portability". M9, like every M requirement, is pass/fail and carries no points.</p>`));
+  <p>Under the evaluation weights in ${rq(12)}, D1 counts under "How the controls are run" and D4 under "Exit and portability". M9, like every M requirement, is pass/fail and carries no points.</p>`));
+
+  cs.push(sec("s4", "4", "Approvals and sign-off", `
+  <p>Each person below shall sign once, at Gate 1, and again at Gate 4.</p>
+  ${tbl("Sign-off", ["Role", "Name", "Decision", "Signature", "Date"], ["Executive Sponsor", "Pilot Owner", "Finance Controller or Internal Control", "Internal Audit", "Risk and Compliance"].map((r) => [r, fill("Full name, title"), "Approve / Reject", fill("Signature"), fill("DD Month YYYY")]))}`));
 
   out.push(sec("ap", "App.", "Appendices", `
   <h3>A. Glossary</h3>
@@ -456,9 +500,10 @@ function build(d) {
     ["Blind check", "A person decides on a line the AI paid on its own without seeing the AI's call, so the result measures the AI, not the reviewer (M9)."],
   ])}
   <h3>B. Where each figure comes from</h3>
-  ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017; evidence per rulebook version: 0026; calls hidden in practice mode, and the override rate dropped: 0027.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "The controls in sections 3, 6, 7 and 8 (promotion, switch-off, blind checks, intervals, data protection, roles, Gate 4): 0025.", "Who reads which sections, the ask, outcome requirements and how proposals are scored: 0028.", "The later check on September 2018, and M11's refitted shortlist rule: 0029.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
+  ${list(["The bar and the verdict: decision records 0005, 0010, 0015, 0016.", "Practice mode, promotion and switch-off rules: 0013 and 0017; evidence per rulebook version: 0026; calls hidden in practice mode, and the override rate dropped: 0027.", "The agreement simulation: 0014 and 0017.", "The follow-up run: 0018.", "Savings, break-even and value at stake: 0019, re-based on order lines in 0021.", "The controls in sections 3, 6, 7 and 8 (promotion, switch-off, blind checks, intervals, data protection, roles, Gate 4): 0025.", "Who reads which sections, the ask, outcome requirements and how proposals are scored: 0028.", "The later check on September 2018, and M11's refitted shortlist rule: 0029.", "This request kept apart from the issuer's internal case (approval, cost and return, sign-off): 0030.", "This document: 0020. Money is in US dollars; invoice values are converted from euros at " + f.R.toFixed(3) + ", the ECB's 2018 average."])}
   <h3>C. Benchmarks to collect</h3>
-  <p>See the table at the end of section 11.</p>
+  <p>I quote no outside figure. Published accounts-payable benchmarks vary widely with definitions and sample, so the pilot measures the issuer's own, per order line, in Phase 0 and before Gate 1. A proposal states how it supports each measure.</p>
+  ${tbl("Baseline measures", ["Measure", "The issuer's figure", "Source and date"], ["Order lines per invoice document", "Cost to process one order line", "Share of order lines a person actually reviews before payment (not just clears)", "Minutes per review", "Share of order lines needing a correction before payment", "Minutes to resolve an exception", "Work to fix a line after it was paid", "Share of a wrongly paid line's value never recovered", "Share of lines corrected after payment", "Order lines per month, by kind", "Annual volume trend and seasonal peaks"].map((m) => [m, fill("Value, with unit"), fill("System or report, period")]))}
   <h3>D. Change log</h3>
   ${tbl("Changes", ["Version", "Date", "Change", "Approved by"], [["1.0", esc(d.built), "First issue as a model document", fill("Name, role")]])}
   <h3>E. Reference design: the study's rulebook</h3>
@@ -470,7 +515,7 @@ function build(d) {
     ["Cost in the study", `About $${cOnce.toFixed(2)} to write one rulebook, at the model's API list prices on the run date; nothing per line.`],
     ["Result in the study", `It paid ${pct(b.paid / d.held_out_n, 1)} of the test lines with a worst likely case of ${pct(c.held_out.precision_lower, 2)}: below the 99% bar, not proved (section 4).`],
   ], "fit")}`));
-  return out;
+  return isCase ? cs : out;
 }
 
 function wire(d) {
@@ -497,8 +542,7 @@ function wire(d) {
     set("need", x.ask <= 1 ? pct(x.ask, 1) : "not reachable");
     set("return-line", x.ask <= 1 ? `Repays itself in its first year after the pilot if it earns ${pct(x.ask, 1)} of the on-paper volume` : "Does not repay itself in its first year after the pilot at these inputs, even at the full on-paper volume");
     const qTxt = ` With quarterly blind-check windows instead of monthly: ${x.needNetQ > 1 ? "still not" : `at ${pct(x.needNetQ, 1)}`}.`;
-    set("ask-note", x.needNet > 1 ? "At these inputs it does not pay (section 11); Phase 0 finds out whether the company's real figures change that." : `At these inputs it pays only if a person reviews at least ${pct(x.needNet, 1)} of these lines today; Phase 0 measures that.`);
-    set("need-g4", x.ask <= 1 ? `${pct(x.ask, 1)} at your inputs` : "at your inputs no share is enough");
+    set("ask-note", x.needNet > 1 ? "At these inputs it does not pay (section 2); Phase 0 finds out whether the company's real figures change that." : `At these inputs it pays only if a person reviews at least ${pct(x.needNet, 1)} of these lines today; Phase 0 measures that.`);
     set("pays-off-q", qTxt);
     set("pays-off", x.needNet > 1 ? `Not at these inputs: even with every line reviewed today, late fixes, oversight and blind checks cost more than the time saved (late fixes alone would need ${Calc.needTxt(x.need(B.L.gated_cautious))} reviewed)` : `Only if a person today reviews at least ${pct(x.needNet, 1)} of these lines (late fixes alone: ${Calc.needTxt(x.need(B.L.gated_cautious))})`);
     const upper = v.sh === null ? " Share reviewed not entered, so every line counts as reviewed today: an upper limit." : "";
@@ -530,7 +574,9 @@ async function boot() {
   }
   const parts = build(d);
   main.innerHTML = parts.join("");
-  const names = { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost", s12: "Proposers", s13: "Approvals", s14: "Findings", ap: "Appendices" };
+  const names = DOC === "case"
+    ? { s1: "Summary", s2: "Cost and return", s3: "Findings", s4: "Approvals" }
+    : { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost lines", s12: "Proposers", ap: "Appendices" };
   $("#toc").innerHTML = Object.entries(names).map(([id, n]) => `<li><a href="#${id}"><i class="lamp"></i>${id === "ap" ? '<span aria-hidden="true">A</span>' : `<span><span class="sr">Section </span>${id.slice(1)}</span>`} ${n}</a></li>`).join("");
   wire(d);
   const links = [...document.querySelectorAll(".cues a, .tabs a[href^='#']")];

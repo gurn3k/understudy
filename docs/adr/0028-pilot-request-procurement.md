@@ -15,3 +15,5 @@ The request mixed an internal approval note with a solicitation. A proposer coul
 
 ## Not decided here
 The issuer's contract, its liability and insurance positions, and whether to issue the request in the first person. The page keeps my first person; the box says how an issuer may change it.
+
+Note: ADR 0030 replaces this ADR's decision 1 (two documents on one page) with two pages: the request and the internal business case.
