@@ -1,0 +1,17 @@
+# September 2018 confirmation lock (docs/adr/0029-september-confirmation-check.md).
+# Written before any September outcome was computed. Lines: sha256, where, path.
+# repo files are hashed with \r\n read as \n; list and data files are hashed as raw bytes.
+fedef8c29ecd44da1996ffde5fd8d6794464a46779259a4378735ed021fdaddc  list  sept_2018_lines.txt
+9c6687739679632db08864fefbf2fae8bdf94658aa3a045e8f435f509f61289e  repo  tools/confirm_sept.py
+8751bdafbe889a10124f69b0c5e842687e04309b306441a8dfee194702d773d5  repo  tools/evidence.py
+e76f5e3b214a0fc46c3815d4d33ebe65ffd55681bed3a50d5ea53289eda423e4  repo  understudy/contender_c.py
+051417661566cc097775d87822d9aed4745812d606072cfcfca774908f01391b  repo  understudy/evaluate.py
+55cbf692375350186111d16f3eb2f3feef8342f2746756d57ba554931859a837  repo  understudy/triage.py
+c3c5d90d4a168ad3610aa5eb72df06dbea249dd64a29ee2796083bb1b75f7d6b  repo  understudy/files.py
+6ca71941bcc2c037db0ba1e3265bc668aee4464226c030888065ece8d2e7935e  data  responses/c/c_policy_2.json
+b0e565c2ad69580b010a62f5f4ed4beab75e25d2d64061e1885e106223927ea4  data  invoice_triage_fit.jsonl
+81edfccd8b5c55261cc8f1d9fd1b4af9a62607a0fd2c679ea4ef780c33f260fa  data  invoice_triage_heldout.jsonl
+month 2018-09
+window_days 109
+lines 19708
+created_in_month 4227
