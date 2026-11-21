@@ -589,7 +589,7 @@ async function boot() {
   const parts = build(d);
   main.innerHTML = parts.join("");
   const names = DOC === "case"
-    ? { s1: "Summary", s2: "Cost and return", s3: "Findings", s4: "Approvals" }
+    ? { s1: "Summary", s2: "Return", s3: "Findings", s4: "Approvals" }
     : { s1: "Summary", s2: "Purpose", s3: "Scope", s4: "Evidence", s5: "Assumptions", s6: "Requirements", s7: "Pilot plan", s8: "Governance", s9: "Risks", s10: "Controls", s11: "Cost lines", s12: "Proposers", ap: "Appendices" };
   $("#toc").innerHTML = Object.entries(names).map(([id, n]) => `<li><a href="#${id}"><i class="lamp"></i>${id === "ap" ? '<span aria-hidden="true">A</span>' : `<span><span class="sr">Section </span>${id.slice(1)}</span>`} ${n}</a></li>`).join("");
   wire(d);
