@@ -50,7 +50,8 @@ class Window(unittest.TestCase):
                  case("2_1", ("Create Purchase Order Item", "2018-07-01T09:00:00+00:00"), IR1,
                       ("Record Invoice Receipt", "2018-10-05T00:00:00+00:00")),
                  case("3_1", CR)]
-        ids, by_create = S.select(cases)
+        main, ids, by_create = S.select(cases)
+        self.assertEqual(main, ["1_1"])
         self.assertEqual(ids, ["1_1", "2_1"])
         self.assertEqual(by_create, {"2018-07": 1, "2018-09": 1})
 
@@ -182,30 +183,35 @@ class Lock(unittest.TestCase):
                 S.check_lock(Path(d), Path(d) / "none.lock")
             self.assertIn("no lock", str(e.exception))
 
+    @staticmethod
+    def fake_data(d):
+        (d / S.MAIN_LIST).write_text("1_1\n", encoding="utf-8")
+        (d / S.ALL_LIST).write_text("1_1\n2_1\n", encoding="utf-8")
+        for p in S.LOCKED_DATA:
+            (d / p).parent.mkdir(parents=True, exist_ok=True)
+            (d / p).write_text("x", encoding="utf-8")
+
     def test_refuses_when_a_checksum_differs(self):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
-            (d / S.LIST_NAME).write_text("1_1\n", encoding="utf-8")
-            for p in S.LOCKED_DATA:
-                (d / p).parent.mkdir(parents=True, exist_ok=True)
-                (d / p).write_text("x", encoding="utf-8")
+            self.fake_data(d)
             lock = d / "t.lock"
             good = [f"{h}  {k}  {p}" for h, k, p in S.lock_entries(d)]
-            meta = [f"month {S.MONTH}", f"window_days {S.WINDOW_DAYS}", "lines 1"]
+            meta = [f"month {S.MONTH}", f"window_days {S.WINDOW_DAYS}", "lines 1", "lines_all 2"]
             lock.write_text("\n".join(good + meta) + "\n", encoding="utf-8")
             S.check_lock(d, lock)
-            (d / S.LIST_NAME).write_text("1_1\n1_2\n", encoding="utf-8")
-            with self.assertRaises(SystemExit) as e:
-                S.check_lock(d, lock)
-            self.assertIn(S.LIST_NAME, str(e.exception))
+            for name in (S.MAIN_LIST, S.ALL_LIST):
+                before = (d / name).read_text(encoding="utf-8")
+                (d / name).write_text(before + "9_9\n", encoding="utf-8")
+                with self.assertRaises(SystemExit) as e:
+                    S.check_lock(d, lock)
+                self.assertIn(name, str(e.exception))
+                (d / name).write_text(before, encoding="utf-8")
 
     def test_refuses_when_the_window_differs(self):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
-            (d / S.LIST_NAME).write_text("1_1\n", encoding="utf-8")
-            for p in S.LOCKED_DATA:
-                (d / p).parent.mkdir(parents=True, exist_ok=True)
-                (d / p).write_text("x", encoding="utf-8")
+            self.fake_data(d)
             lock = d / "t.lock"
             good = [f"{h}  {k}  {p}" for h, k, p in S.lock_entries(d)]
             lock.write_text("\n".join(good + [f"month {S.MONTH}", "window_days 90", "lines 1"]) + "\n", encoding="utf-8")

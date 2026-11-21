@@ -40,7 +40,8 @@ SHORTLIST_KEY = "supplier, earlier corrections, goods received first"
 BASELINE = {"rulebook": (26715, 249), "shortlist": (7532, 23)}   # June to August, no window (site/data.json)
 APPROACHES = ("rulebook", "shortlist", "pass_everything")
 TESTED = ("rulebook", "shortlist")                                # pass-everything is context only
-LIST_NAME = "sept_2018_lines.txt"
+MAIN_LIST = "sept_2018_main.txt"   # created and first invoiced in September: the readings come from these
+ALL_LIST = "sept_2018_all.txt"     # first invoiced in September, created any time: reported only
 LOCK = ROOT / "docs" / "confirm" / "sept-2018.lock"
 # Repo files whose bytes the run depends on. Hashed with line endings normalised to \n, so a Windows checkout
 # (core.autocrlf) hashes the same as the committed blob.
@@ -116,13 +117,18 @@ def coverage(cases):
 
 
 def select(cases, month=MONTH):
-    """September's lines, by first-receipt month: (sorted ids, ids per creation month). Dates only."""
-    ids, by_create = [], Counter()
+    """September's lines, dates only: (main ids, all ids, all ids per creation month), each sorted.
+    Main: first receipt AND first creation both in `month`, so no main line can sit in the learning or test months.
+    All: first receipt in `month`, created any time (reported only)."""
+    main, ids, by_create = [], [], Counter()
     for c in cases:
         if receipt_month(c) == month:
             ids.append(c["id"])
-            by_create[creation_month(c)] += 1
-    return sorted(ids), dict(sorted(by_create.items()))
+            cm = creation_month(c)
+            by_create[cm] += 1
+            if cm == month:
+                main.append(c["id"])
+    return sorted(main), sorted(ids), dict(sorted(by_create.items()))
 
 
 # ---- The record and the outcome ---------------------------------------------------------------------------------
@@ -347,7 +353,7 @@ def sha_bytes(path):
 
 
 def lock_entries(data):
-    out = [(sha_bytes(data / LIST_NAME), "list", LIST_NAME)]
+    out = [(sha_bytes(data / p), "list", p) for p in (MAIN_LIST, ALL_LIST)]
     out += [(sha_text(ROOT / p), "repo", p) for p in LOCKED_CODE]
     out += [(sha_bytes(data / p), "data", p) for p in LOCKED_DATA]
     return out
@@ -383,17 +389,17 @@ def check_lock(data, path=LOCK):
 
 
 def write_lock(data):
-    ids, by_create = select(iter_jsonl(data / "cases.jsonl"))
-    (data / LIST_NAME).write_text("".join(i + "\n" for i in ids), encoding="utf-8", newline="\n")
+    main_ids, ids, by_create = select(iter_jsonl(data / "cases.jsonl"))
+    (data / MAIN_LIST).write_text("".join(i + "\n" for i in main_ids), encoding="utf-8", newline="\n")
+    (data / ALL_LIST).write_text("".join(i + "\n" for i in ids), encoding="utf-8", newline="\n")
     LOCK.parent.mkdir(parents=True, exist_ok=True)
     lines = ["# September 2018 confirmation lock (docs/adr/0029-september-confirmation-check.md).",
              "# Written before any September outcome was computed. Lines: sha256, where, path.",
              "# repo files are hashed with \\r\\n read as \\n; list and data files are hashed as raw bytes."]
     lines += [f"{h}  {k}  {p}" for h, k, p in lock_entries(data)]
-    lines += [f"month {MONTH}", f"window_days {WINDOW_DAYS}", f"lines {len(ids)}",
-              f"created_in_month {by_create.get(MONTH, 0)}"]
+    lines += [f"month {MONTH}", f"window_days {WINDOW_DAYS}", f"lines {len(main_ids)}", f"lines_all {len(ids)}"]
     LOCK.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
-    return len(ids), by_create
+    return len(main_ids), len(ids), by_create
 
 
 # ---- Commands ---------------------------------------------------------------------------------------------------
@@ -405,30 +411,46 @@ def baseline_figures(data):
             "windowed": score_all(windowed, dec)}
 
 
-def run(data):
-    entries, meta = check_lock(data)
-    dec, _nowin, windowed = june_august(data)
-    base = score_all(windowed, dec)
-    ids = (data / LIST_NAME).read_text(encoding="utf-8").split()
-    want, lines, created = set(ids), [], {}
+def september_lines(data, main_ids, all_ids):
+    """[(record, status)] for every line first invoiced in September, checking each against the lock's selection."""
+    want, lines, created = set(all_ids), [], {}
     for c in iter_jsonl(data / "cases.jsonl"):
         if c["id"] in want:
             if receipt_month(c) != MONTH:
                 raise SystemExit(f"{c['id']} is on the locked list but was not first invoiced in {MONTH}")
             lines.append((features(c), outcome(c, WINDOW_DAYS)))
             created[c["id"]] = creation_month(c)
-    if len(lines) != int(meta["lines"]) or sorted(r["id"] for r, _ in lines) != ids:
+    if sorted(r["id"] for r, _ in lines) != all_ids:
         raise SystemExit("the September lines differ from the locked list")
-    sept = score_all(lines, dec)
+    if sorted(i for i, m in created.items() if m == MONTH) != main_ids:
+        raise SystemExit("the main September lines differ from the locked list")
+    main_set = set(main_ids)
+    return [x for x in lines if x[0]["id"] in main_set], lines
+
+
+def run(data):
+    entries, meta = check_lock(data, LOCK)
+    main_ids = (data / MAIN_LIST).read_text(encoding="utf-8").split()
+    all_ids = (data / ALL_LIST).read_text(encoding="utf-8").split()
+    if len(main_ids) != int(meta["lines"]) or len(all_ids) != int(meta["lines_all"]):
+        raise SystemExit("the September lists differ from the lock's counts")
+    dec, _nowin, windowed = june_august(data)
+    base = score_all(windowed, dec)
+    main_lines, all_lines = september_lines(data, main_ids, all_ids)
+    sept = score_all(main_lines, dec)
     read = {a: reading(sept["approaches"][a]["pooled"], base["approaches"][a]["pooled"]) for a in TESTED}
-    # Secondary, reported only: lines also created in September (none could sit in the learning or test months).
-    new = [(r, s) for r, s in lines if created[r["id"]] == MONTH]
-    new_scored = score_all(new, dec)
+    # Reported only: every line first invoiced in September, created any time. Many sit in the learning or test files.
+    held_ids = {r["id"] for r in iter_jsonl(data / "invoice_triage_heldout.jsonl")}
+    fit_ids = {r["id"] for r in iter_jsonl(data / "invoice_triage_fit.jsonl")}
+    all_scored = score_all(all_lines, dec)
     return {"month": MONTH, "window_days": WINDOW_DAYS, "lock": [list(e) for e in entries],
             "june_august": base, "september": sept, "readings": read,
             "consequences": consequences(read["rulebook"], read["shortlist"]),
-            "secondary_created_in_september": {"scores": new_scored, "readings": {
-                a: reading(new_scored["approaches"][a]["pooled"], base["approaches"][a]["pooled"]) for a in TESTED}}}
+            "secondary_all_invoiced_in_september": {
+                "note": "Reported only; decides nothing. Lines first invoiced in September 2018, created any time.",
+                "in_test_file": sum(i in held_ids for i in all_ids), "in_learning_file": sum(i in fit_ids for i in all_ids),
+                "scores": all_scored, "readings": {
+                    a: reading(all_scored["approaches"][a]["pooled"], base["approaches"][a]["pooled"]) for a in TESTED}}}
 
 
 def main(argv):
@@ -445,8 +467,8 @@ def main(argv):
     elif cmd == "lock":
         if LOCK.exists():
             sys.exit(f"{LOCK} exists; a lock is written once")
-        n, by_create = write_lock(data)
-        print(json.dumps({"lines": n, "by_creation_month": by_create}, indent=1))
+        n, n_all, by_create = write_lock(data)
+        print(json.dumps({"lines": n, "lines_all": n_all, "all_by_creation_month": by_create}, indent=1))
         print(LOCK.read_text(encoding="utf-8"))
         return
     else:
