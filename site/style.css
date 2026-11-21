@@ -214,6 +214,13 @@ footer.end { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--ru
 .plainlist { margin: 0 0 18px; padding-left: 1.4em; }
 .plainlist li { padding: 3px 0; }
 table.score td:first-child { text-align: left; }
+/* The request's Appendix F: why each requirement is asked, one entry per M number, linked from section 6. */
+.whys { margin: 0; border-bottom: 1px solid var(--rule); }
+.whys > div { display: grid; grid-template-columns: 3.5em minmax(0, 1fr); gap: 0 12px; padding: 10px 0; border-top: 1px solid var(--rule); }
+.whys dt { font: 700 15px/1.5 var(--display); }
+.whys dd { margin: 0; }
+.whys > div:target { background: var(--wash); }
+a.why { white-space: nowrap; font-size: 14px; }
 /* Tables of sentences (Method's changes made after a result): every column reads left to right. */
 table.score.prose td { text-align: left; }
 .budget li.hit .fill { background: var(--standby); }

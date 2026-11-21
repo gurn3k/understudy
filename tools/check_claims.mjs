@@ -81,6 +81,7 @@ const FORBIDDEN = [
   [/overrule|rising override rate|show the override rate|The AI suggests, and a person still decides/i, "the AI's calls are hidden in practice mode, so there is nothing to overrule; the override rate is dropped", "ADR 0027"],
   [/Rulebook Owner|sign off each rulebook version|rulebook's say-so/i, "the requirements are outcomes on the decision component, any approach; the rulebook is the reference design (Appendix E)", "review round, Should 9"],
   [/Beat a supplier whitelist that the issuer|post hoc, to be confirmed|to be confirmed on later data/i, "the September check failed the shortlist on test (a): M11 now refits the rule in Phase 0", "ADR 0029, amendment 1"],
+  [/this default of mine|the money in section 11 does not include it/i, "the requirements say only what the pilot shall do; the reasons are in the request's Appendix F", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -223,7 +224,7 @@ const DF = K.defaults, runYrQ = 8 * 52 * 40 + DF.blind_quarter_windows * ((B.bli
 const needNetQ = (linesYr / B.lines_per_mistake.gated_cautious * 100 + runYrQ) / (linesYr * cReview);
 const qTxt = needNetQ > 1 ? "still doesn't pay" : `needs ${pc(needNetQ, 1)}`;
 REQUIRED.rfp.push(
-  ["M2 default, labelled", `this default of mine: its worst likely case, allowing for orders, at or above ${pc(DF.margin, 1)}`],
+  ["M2 default, labelled", `or my default: its worst likely case, allowing for orders, at or above ${pc(DF.margin, 1)}`],
   ["M2 pass mark", "at or below 5%"], ["M2 default on the replay", K.m2_default.promotions === 0 ? "would not have promoted any kind" : "would have come in"],
   ["calls at M2's default, allowing for orders", `about ${n0(K.clustered_calls[0].margin_clustered)}`],
   ["M12 default, labelled", "(my default; the issuer sets the number at Gate 1)"], ["M12 release", "the order's later lines go to a person"],
@@ -295,6 +296,9 @@ REQUIRED.rfp.push(["price formula", "Cost points = 20 × the lowest evaluated pr
 REQUIRED.rfp.push(["voice is optional", "Voice, optional."], ["sign-off modal", "Each person below shall sign once"]);
 // M15's no-goods-receipt counts, counted after the results (ruling 4-6, item 2).
 REQUIRED.rfp.push(["M15: no-GR lines paid", `the rulebook paid ${n0(D.controls.no_gr.paid)} lines with no goods receipt when the invoice arrived`], ["M15: no-GR lines wrong", `${n0(D.controls.no_gr.wrong)} of them (${pc(D.controls.no_gr.wrong / D.controls.no_gr.paid, 1)}) needed a correction`], ["M15: counted after the results", "That was counted after the results were known"]);
+// The requirements say only what the pilot shall do; the study's reasons are in Appendix F, keyed by M number (batch 7).
+REQUIRED.rfp.push(["App. F: why each requirement", "F. Why each requirement is asked"], ["App. F: M11 refit reason", "so it is refitted on the issuer's data rather than carried over"],
+  ["App. F: M10 worked example", `With no mistakes, ${n0(D.bar.min_calls[0].calls)} independent calls prove 99%`]);
 REQUIRED.rfp.push(["M5: same calls are a check", "read side by side in both versions and signed as such, and, as a check,"]);
 REQUIRED.rfp.push(["price: one volume basis", "so every proposal is priced on the same volume"]);
 REQUIRED.q9.push(["in brief: procurement first", "running the request for proposals (about 8 weeks), then, on award, only Phase 0"]);
