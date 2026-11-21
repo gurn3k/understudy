@@ -79,7 +79,7 @@ const FORBIDDEN = [
   [/Out of scope; existing controls stay/i, "the existing duplicate and fraud checks must run on lines paid on their own (M14)", "review round, Should 18"],
   [/overrule|rising override rate|show the override rate|The AI suggests, and a person still decides/i, "the AI's calls are hidden in practice mode, so there is nothing to overrule; the override rate is dropped", "ADR 0027"],
   [/Rulebook Owner|sign off each rulebook version|rulebook's say-so/i, "the requirements are outcomes on the decision component, any approach; the rulebook is the reference design (Appendix E)", "review round, Should 9"],
-  [/Beat a supplier whitelist that the issuer|post hoc, to be confirmed/i, "the September check failed the shortlist on test (a): M11 now refits the rule in Phase 0", "ADR 0029, amendment 1"],
+  [/Beat a supplier whitelist that the issuer|post hoc, to be confirmed|to be confirmed on later data/i, "the September check failed the shortlist on test (a): M11 now refits the rule in Phase 0", "ADR 0029, amendment 1"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -289,6 +289,7 @@ if (CF) {
     ["later check: rulebook readings", R9.rulebook.a === "fail" && R9.rulebook.b === "held up" ? `The rulebook didn't reach 99% on September, as it hadn't on June to August lines picked the same way (lower end ${pc(CF.june_august.approaches.rulebook.main.interval[0], 2)}), and it held up against June to August` : "(readings changed: reword)"],
     ["later check: shortlist readings", R9.shortlist.a === "fail" && R9.shortlist.b === "held up" ? "The supplier rule failed test (a)" : "(readings changed: reword)"],
     ["later check: headline stays", "The answer stays not proven."],
+    ["Q3: supplier rule after the later check", "a later month, September 2018, had too few lines to confirm it"],
     ["later check: which test", "That came from test (a) alone, on few lines"],
     ["later check: M11 change", "requirement M11 now asks a proposal to beat the same rule refitted on the issuer's own recent data in Phase 0"],
     ["later check: secondary", `all ${n0(CF.secondary.lines)} lines first invoiced in September, created any time. ${n0(CF.secondary.in_test_file)} of them are among the test months' lines`],

@@ -42,7 +42,7 @@ POST_RESULT = [
     ["fix", "Agreement-gate sentences", "ADR 0017, erratum 1", "A misread list corrected after the ruling.", "Wording and two figures."],
     ["added", "The business case and the pilot request", "ADRs 0019, 0020, 0021, 0025, 0026, 0027, 0028", "Written after the verdict, and re-based and tightened after outside reviews.", "None: no verdict, bar or fixed sentence."],
     ["added", "How the page words its limits", "ADRs 0022 to 0024", "Rewritten after an outside review: this table, the sensitivity checks, a supplier baseline checked after the fact, and the plain wording.", "None."],
-    ["added", "A later check on September 2018", "ADR 0029", "Fixed in advance after an outside review and run once on lines no part of the study had used; the comparison months were re-scored under the same window first.", "The pilot request's supplier-rule requirement (M11) now refits the rule in Phase 0. No verdict, bar or fixed sentence."],
+    ["added", "A later check on September 2018", "ADR 0029", "Fixed in advance after an outside review and run once on lines no part of the study had used; the comparison months were re-scored under the same window first.", "The pilot request's supplier-rule requirement (M11) now refits the rule in Phase 0, and Q3's wording on the supplier rule was updated to match. No verdict, bar or fixed sentence."],
 ]
 
 
