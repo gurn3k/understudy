@@ -464,7 +464,7 @@ function build(d) {
   const rates = d.policies.map((p) => p.held_out.precision[0] / p.held_out.precision[1]);
   const topShareWrong = b.top10.wrong_value / b.value.wrong, topSharePaid = b.top10.paid_value / b.value.paid;
   const dcard = (id, title, found, visual, why, ask, tag = "Recommended, not tested") => `<article class="dcard"><p class="dcard-id">${id} · ${tag}</p><h3>${title}</h3><p><strong>What I found:</strong> ${found}</p>${visual}<p><strong>Why it matters:</strong> ${why}</p><p class="dcard-ask"><strong>What I ask proposers:</strong> ${ask}</p></article>`;
-  cs.push(sec("s3", "3", "Special findings: the desirable requirements, and why I recommend them", `
+  cs.push(sec("s3", "3", "Findings behind three requirements, and why I recommend them", `
   <p class="headline">The mandatory requirements keep the pilot under control. These three come from things I saw in the study. The blind check is mandatory (M9); I would score the other two.</p>
   <p class="small">Each is a recommendation drawn from the evidence, not a tested result. None changes the verdict: no approach proved the 99% bar.</p>
   <div class="dcards">
