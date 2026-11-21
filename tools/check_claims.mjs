@@ -156,6 +156,7 @@ for (const [name, t] of Object.entries(texts)) {
 // and words belong to the internal case.
 const VENDOR_FORBIDDEN = [
   [/return on the pilot|first-year return|\bROI\b|payback|pays? back|net yearly benefit|net a year|pays? (its|their) way|pays off|does(n't| not) (pay|repay)|repays? itself|not reachable|at (these|your) inputs|gross saving|on-paper saving/i, "a return figure or verdict in the request sent to proposers", "ADR 0030"],
+  [/[−-]\s?\$\d/, "a signed (negative) money figure: a bare net can reach the request without any banned word", "batch 7 ruling, Should 3"],
 ];
 // The request never links to the internal case, in its source or its drawn text (batch 7 ruling, Must 1).
 if (read("site/rfp.html").includes("case.html") || (rfpAll.links || "").includes("case.html") || (rfpAll.main || "").includes("case.html")) { banned++; console.log("FORBIDDEN on rfp (ADR 0030): a link to case.html (a proposer must not be one click from the issuer's return)"); }
