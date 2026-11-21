@@ -113,7 +113,7 @@ async function pageText(u) {
   }
   if (!loaded) return null;
   await sleep(300);
-  const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '', extra: [...document.querySelectorAll('meta[content]')].map((m) => m.content).concat([...document.querySelectorAll('svg desc, svg title')].map((e) => e.textContent), [...document.querySelectorAll('[aria-label]')].map((e) => e.getAttribute('aria-label')), [...document.querySelectorAll('img[alt]')].map((e) => e.alt)).join(' | ') })", returnByValue: true });
+  const res = await send("Runtime.evaluate", { expression: "JSON.stringify({ main: document.querySelector('main').textContent + ' ' + document.title, biz: (document.querySelector('#biz') || {}).textContent || '', extra: [...document.querySelectorAll('meta[content]')].map((m) => m.content).concat([...document.querySelectorAll('svg desc, svg title')].map((e) => e.textContent), [...document.querySelectorAll('[aria-label]')].map((e) => e.getAttribute('aria-label')), [...document.querySelectorAll('img[alt]')].map((e) => e.alt)).join(' | '), meta: [...document.querySelectorAll('meta[content]:not([property=\"og:image:alt\"])')].map((m) => m.content).join(' | ') })", returnByValue: true });
   return JSON.parse(res.result.result.value || "{}");
 }
 const pageAll = await pageText(url), rfpAll = await pageText(new URL("rfp.html", url).href), caseAll = await pageText(new URL("case.html", url).href);
@@ -162,7 +162,19 @@ for (const name of ["rfp", "rfp head and labels"]) {
     }
   }
 }
-console.log(`${FORBIDDEN.length} forbidden patterns checked on the page, rfp.html, case.html (with meta tags, chart descriptions and labels) and README.md, and ${VENDOR_FORBIDDEN.length} more on rfp.html: ${banned} found`);
+// A link preview's title and description must not ask whether invoices are "safe to pay": the question is allowed
+// on the page and in the image's own text (og:image:alt describes og.png), not in the preview's words (batch 7).
+const META_FORBIDDEN = [[/safe to pay/i, "the preview's title and description name the test, not safety", "batch 7, go-live"]];
+for (const [name, all] of [["page meta tags", pageAll], ["rfp meta tags", rfpAll], ["case meta tags", caseAll]]) {
+  const text = norm(all.meta || "");
+  for (const [re, why, src] of META_FORBIDDEN) {
+    for (const m of text.matchAll(new RegExp(re.source, re.flags + "g"))) {
+      banned++;
+      console.log(`FORBIDDEN on ${name} (${src}): "${text.slice(Math.max(0, m.index - 50), m.index + m[0].length + 30)}" (${why})`);
+    }
+  }
+}
+console.log(`${FORBIDDEN.length} forbidden patterns checked on the page, rfp.html, case.html (with meta tags, chart descriptions and labels) and README.md, ${VENDOR_FORBIDDEN.length} more on rfp.html and ${META_FORBIDDEN.length} on the meta tags: ${banned} found`);
 
 // Required figures: the business case (Q9) and the pilot request must each carry the key figures, computed here
 // from site/data.json the same way the pages format them, so the two parts can't drift apart or drop a qualifier.
@@ -330,8 +342,9 @@ REQUIRED.case = REQUIRED.rfp.filter(([l]) => CASE_ONLY.includes(l) || BOTH.inclu
 REQUIRED.rfp = REQUIRED.rfp.filter(([l]) => !CASE_ONLY.includes(l));
 REQUIRED.caseHead = [["og:url", "https://understudy.gurn3k.com/case.html"], ["og:title", "Understudy: internal business case for a pilot"], ["og:image", "https://understudy.gurn3k.com/og.png"]];
 REQUIRED.readme.push(["README: internal case", "`site/case.html`"]);
+REQUIRED.pageHead = [["og:title matches the page title", "Understudy: can an AI pass invoices straight to payment?"]];
 for (const [where, list] of Object.entries(REQUIRED)) {
-  const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], case: [caseAll.main, "case.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"], caseHead: [caseAll.extra, "case.html head"], readme: [read("README.md"), "README.md"] }[where];
+  const src = { q9: [pageAll.biz, "Q9"], rfp: [rfpAll.main, "rfp.html"], case: [caseAll.main, "case.html"], page: [pageAll.main, "the page"], rfpHead: [rfpAll.extra, "rfp.html head"], caseHead: [caseAll.extra, "case.html head"], pageHead: [pageAll.meta, "the page's meta tags"], readme: [read("README.md"), "README.md"] }[where];
   const text = norm(src[0] || "");
   for (const [label, fig] of list) {
     nreq++;
