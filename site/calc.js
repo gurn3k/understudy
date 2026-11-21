@@ -174,5 +174,8 @@ const Calc = (() => {
   /* The share reviewed today needed to pay its way, at my default inputs (for prose that states the default verdict). */
   const needAtDefaults = (d) => compute(basis(d), { s: null, sh: null, m: DEF.min, r: DEF.rate, fix: DEF.fix, lost: DEF.lost / 100,
     h: DEF.oh, k: DEF.kinds, hasInt: false, i: 0 }).needNet;
-  return { PH, DEF, WINDOWS_YR, TT, PROC, basis, html, wire, needTxt, usd, signed, needAtDefaults };
+  /* The agreement shortcut's rate of lines needing a correction: the pooled rate of its simulation cell in data.json
+     (every run's mistakes over every run's lines paid), so text and tables show one figure. */
+  const agPooled = (d) => { const a = d.agreement.alphas["0.9"]; return d.evidence.sweep.find((x) => x.alpha === 0.9 && x.passed_median === a.passed_median && x.wrong_median === a.wrong_median).pooled_rate; };
+  return { PH, DEF, WINDOWS_YR, TT, PROC, basis, html, wire, needTxt, usd, signed, needAtDefaults, agPooled };
 })();

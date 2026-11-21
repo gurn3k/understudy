@@ -168,7 +168,7 @@ function build(d) {
   ${tbl("How trust was granted, and what it let through", ["Way", "Invoices paid", "Wrong", "Wrong rate", "Note"], [
     ["Trusted from day one (on paper)", int(b.paid), int(b.wrong), pct(b.wrong / b.paid, 2), "The ceiling; never tested live"],
     ["Earned on outcomes (replay)", int(t.passed), int(t.wrong), pct(t.wrong / t.passed, 1), `First kind in week ${firstWk} of the replay's ${d.replay.weeks.length} (ISO week ${firstIso}); all ${int(t.wrong)} mistakes in one kind, ${int(d.evidence.replay.top_order)} on one order; window too short for the steady state`],
-    ["Trusted on agreement (simulation)", half(ag.passed_median), half(ag.wrong_median), `about ${pct(ag.wrong_median / ag.passed_median, 2)}`, `Reviewers copy ${Math.round(+AGREE * 10)} in 10; medians of ${SIM_RUNS} runs; assumed behaviour, not a study of people`],
+    ["Trusted on agreement (simulation)", half(ag.passed_median), half(ag.wrong_median), `${pct(Calc.agPooled(d), 2)} across all runs`, `Reviewers copy ${Math.round(+AGREE * 10)} in 10; medians of ${SIM_RUNS} runs; assumed behaviour, not a study of people`],
   ])}
   ${bars("Lines paid that needed a correction", [["Earned on outcomes", t.wrong, int(t.wrong)], ["Trusted on agreement (simulation, assumed behaviour)", ag.wrong_median, half(ag.wrong_median), true]])}
   <p>In the simulation, trusting on agreement let through about ten times as many lines that needed a correction, at a lower rate per line, because it paid far more. The count is not why requirement M2 forbids it: when reviewers copy, agreement carries no information about whether the AI is right.</p>

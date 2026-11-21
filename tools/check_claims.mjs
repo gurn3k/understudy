@@ -85,6 +85,7 @@ const FORBIDDEN = [
   [/Mandatory since this issue|it was D2\)/i, "revision history belongs in the change log, not a requirement's label", "batch 7, go-live"],
   [/D2 in the first issue|now mandatory as M9/i, "the request is a first issue: no revision history in the D-table caption (the reason is in Appendix F)", "batch 7 ruling, Must 3"],
   [/shall sign once, at Gate 1/i, "the sponsor must be able to sign the approval asked for now, not only at Gate 1 and Gate 4", "gate C3, M1"],
+  [/\b0\.76%/, "the agreement shortcut's rate is the pooled rate from data.json (0.74%), one figure in text and tables, not the ratio of the medians", "gate C3 M3 / C4 N3"],
   [/enter integration cost/i, "one note for the hidden ROI and payback columns, not a placeholder in every cell", "batch 7, go-live"],
   [/mistakes are too rare to show at this scale/i, "the dot chart hid the AI's mistakes: give exact counts per lane", "review round, Should 7"],
 ];
@@ -357,6 +358,10 @@ REQUIRED.q9.push(["section 4's record fold sits at the end, named", "The replay,
 REQUIRED.q9.push(["in brief: no pay at the defaults (gate C3, M2)", "At my default inputs it does not pay its way even if a person reviews every line today"]);
 // Q9 section 5 keeps the rates beside the totals and the agreement-vs-outcomes break-even (batch 2 Must 14; batch 7 ruling, Must 5).
 const AG9 = D.agreement.alphas["0.9"], RT = D.replay.totals;
+const AGP = D.evidence.sweep.find((x) => x.alpha === 0.9 && x.passed_median === AG9.passed_median && x.wrong_median === AG9.wrong_median).pooled_rate;
+// One rate for the agreement shortcut: the pooled rate in data.json, not the ratio of the medians (gates C3 M3, C4 N3).
+REQUIRED.q9.push(["section 5: the pooled agreement rate", `${pc(AGP, 2)} across all the runs`]);
+REQUIRED.rfp.push(["three ways to grant trust: pooled agreement rate", `${pc(AGP, 2)} across all runs`]);
 REQUIRED.q9.push(["section 5: rates beside totals", "a lower rate per line paid"],
   ["section 5: agreement break-even", `come out ahead whenever a late fix costs less than about ${n0((AG9.passed_median - RT.passed) / (AG9.wrong_median - RT.wrong))}`]);
 REQUIRED.rfp = REQUIRED.rfp.filter(([l]) => !CASE_ONLY.includes(l));
