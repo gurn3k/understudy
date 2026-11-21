@@ -309,6 +309,9 @@ def main(retime=False):
         "kinds_paid": len(per_kind), "kinds_month_full": sum(1 for v in per_kind.values() if v / business["months"] >= blind_n),
         "first_kind_month": first_kind_month, "power_first_kind_month": money.switch_off_power(int(first_kind_month), 0.02),
         "kind_months": sorted((v / business["months"] for v in per_kind.values()), reverse=True),
+        # M15 (no goods receipt yet means hold): counted after the results were known; describes the lines, tests no rule.
+        "no_gr": {"paid": sum(1 for r in paid if not r["gr_before_invoice"]),
+                  "wrong": sum(1 for r in paid if not r["gr_before_invoice"] and not r["straight_through"])},
     }
 
     pe_rate = sum(1 for r in held if r["straight_through"]) / len(held)

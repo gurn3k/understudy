@@ -260,6 +260,8 @@ REQUIRED.rfp.push(["commercial: payment by work done", "Payment follows the work
 REQUIRED.rfp.push(["submission block", "Where to submit"], ["questions in writing", "Answers go to every proposer at once"], ["signature authority", "Signed by a person with authority to commit the proposer"]);
 REQUIRED.rfp.push(["price formula", "Cost points = 20 × the lowest evaluated price ÷ this proposal's evaluated price"], ["points from the scale", "weight × score ÷ 5"], ["no obligation to award", "The issuer is not bound to award a contract"]);
 REQUIRED.rfp.push(["voice is optional", "Voice, optional."], ["sign-off modal", "Each person below shall sign once"]);
+// M15's no-goods-receipt counts, counted after the results (ruling 4-6, item 2).
+REQUIRED.rfp.push(["M15: no-GR lines paid", `the rulebook paid ${n0(D.controls.no_gr.paid)} lines with no goods receipt when the invoice arrived`], ["M15: no-GR lines wrong", `${n0(D.controls.no_gr.wrong)} of them (${pc(D.controls.no_gr.wrong / D.controls.no_gr.paid, 1)}) needed a correction`], ["M15: counted after the results", "That was counted after the results were known"]);
 // The README names the business case and the pilot request (Should 20).
 REQUIRED.readme = [["README: business case", "a business case (Q9)"], ["README: pilot request", "`site/rfp.html`"]];
 // Q1's dot chart prints exact counts per lane (Should 7): the dots round the AI's mistakes away.
