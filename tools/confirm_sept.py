@@ -48,7 +48,9 @@ LOCK = ROOT / "docs" / "confirm" / "sept-2018.lock"
 # (core.autocrlf) hashes the same as the committed blob.
 LOCKED_CODE = ("tools/confirm_sept.py", "tools/evidence.py", "understudy/contender_c.py", "understudy/evaluate.py",
                "understudy/triage.py", "understudy/files.py")
-LOCKED_DATA = ("responses/c/c_policy_2.json", "invoice_triage_fit.jsonl", "invoice_triage_heldout.jsonl")
+LOCKED_DATA = ("responses/c/c_policy_2.json", "invoice_triage_fit.jsonl", "invoice_triage_heldout.jsonl",
+               "cases.jsonl")   # the parsed log: the source of every September record and outcome
+XES_MD5 = "4eb909242351193a61e1c15b9c3cc814"   # the raw log, as downloaded and checked when the study began
 
 # What each result changes (ADR 0029, from Gurnek's decisions 5 and 6). The headline stays "not proven" whatever happens.
 PASS_LINE = ("On September 2018, a later month nobody had looked at, the rulebook cleared the bar. One month isn't "
@@ -409,7 +411,8 @@ def write_lock(data):
     LOCK.parent.mkdir(parents=True, exist_ok=True)
     lines = ["# September 2018 confirmation lock (docs/adr/0029-september-confirmation-check.md).",
              "# Written before any September outcome was computed. Lines: sha256, where, path.",
-             "# repo files are hashed with \\r\\n read as \\n; list and data files are hashed as raw bytes."]
+             "# repo files are hashed with \\r\\n read as \\n; list and data files are hashed as raw bytes.",
+             f"# cases.jsonl is parsed from BPI_Challenge_2019.xes, MD5 {XES_MD5}."]
     lines += [f"{h}  {k}  {p}" for h, k, p in lock_entries(data)]
     lines += [f"month {MONTH}", f"window_days {WINDOW_DAYS}", f"lines {len(main_ids)}", f"lines_all {len(ids)}"]
     LOCK.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
