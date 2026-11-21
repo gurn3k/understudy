@@ -1,15 +1,21 @@
 """Fail if a committed file contains a term that must not appear in this repository.
 
 The terms themselves are not written here, so that this file does not break its own rule: each is stored as the
-SHA-256 of its lowercase form, with how it is matched. Text is lowercased and split into runs of letters and digits.
+HMAC-SHA256 of its lowercase form, keyed with the secret in the UNDERSTUDY_TERM_KEY environment variable, with how it
+is matched. The key is never committed (CI reads it from a repository secret), so the list cannot be checked against
+guesses. Text is lowercased and split into runs of letters and digits.
 - "sub":   the term may sit inside a longer word (any substring of a word is checked).
 - "token": the term must be a whole word (for short terms).
 - "words": a phrase of several words, matched on consecutive words.
 
-Usage: python tools/term_scan.py   (scans `git ls-files`; exit 1 on any hit, naming the file and line, not the term)
+Usage: python tools/term_scan.py   (scans `git ls-files`; exit 1 on any hit, naming the file and line, not the term;
+       exit 2 if the key is not set)
+       python tools/term_scan.py --hash-list FILE   (FILE kept outside the repo, one "term<TAB>mode" a line: prints the
+       keyed entries for tools/term_hashes.txt)
 Standard library only.
 """
-import hashlib
+import hmac
+import os
 import re
 import subprocess
 import sys
@@ -18,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 def load_terms(path=ROOT / "tools" / "term_hashes.txt"):
-    """Each line of the list: sha256 of the lowercase term, mode, number of characters (or words, for "words")."""
+    """Each line of the list: keyed hash of the lowercase term, mode, number of characters (or words, for "words")."""
     out = []
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
@@ -28,8 +34,23 @@ def load_terms(path=ROOT / "tools" / "term_hashes.txt"):
     return out
 
 
+KEY_VAR = "UNDERSTUDY_TERM_KEY"
+
+
+class NoKey(Exception):
+    pass
+
+
+def key():
+    k = os.environ.get(KEY_VAR, "")
+    if not k:
+        raise NoKey(f"{KEY_VAR} is not set: the term list is keyed, so the scan cannot run without it. "
+                    "Locally, set it from the key file kept outside the repo; in CI, add it as a repository secret.")
+    return k.encode("utf-8")
+
+
 def sha(s):
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+    return hmac.new(key(), s.encode("utf-8"), "sha256").hexdigest()
 
 
 def term(text, mode):
@@ -71,7 +92,23 @@ def tracked_files():
     return [ROOT / p for p in out.decode("utf-8").split("\0") if p]
 
 
+def hash_list(path):
+    """Print the keyed entries for a local plain list ("term<TAB>mode" a line), for tools/term_hashes.txt."""
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            text, mode = line.rsplit("\t", 1)
+            print("%s %s %d" % term(text, mode.strip()))
+
+
 def main():
+    try:
+        key()
+    except NoKey as e:
+        print(f"term scan: {e}")
+        return 2
+    if sys.argv[1:2] == ["--hash-list"]:
+        hash_list(sys.argv[2])
+        return 0
     terms = load_terms()
     bad = 0
     for p in tracked_files():

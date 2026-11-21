@@ -29,7 +29,7 @@ The page also carries a business case (Q9) and links to a model request for a pi
 - **Checks that fail.** Every check was shown to fail on purpose before it was trusted. Fixtures with hand-worked answers are in `tests/fixtures/`.
 - **Separate recount.** A second program, written separately with no shared code, recounts the raw log, and its totals match.
 - **Claude's output is gated in code.** Invalid or missing answers count as "leave to a person". Policies are validated before they run.
-- **Fixed wording.** `tools/check_claims.mjs` confirms that every sentence fixed in the decision records appears verbatim on the page, that wording the records rule out appears on neither page nor in this README, and that the key figures appear in the business case and the pilot request. It runs in CI with the unit tests and a term scan (`tools/term_scan.py`), against `site/` served locally: `python -m http.server 8765 --bind 127.0.0.1 --directory site`, then `node tools/check_claims.mjs`.
+- **Fixed wording.** `tools/check_claims.mjs` confirms that every sentence fixed in the decision records appears verbatim on the page, that wording the records rule out appears on neither page nor in this README, and that the key figures appear in the business case and the pilot request. It runs in CI with the unit tests, a term scan (`tools/term_scan.py`, whose list is keyed with the `UNDERSTUDY_TERM_KEY` secret and fails without it) and a hostile-input check of the calculators (`tools/check_inputs.mjs`), against `site/` served locally: `python -m http.server 8765 --bind 127.0.0.1 --directory site`, then `node tools/check_claims.mjs` and `node tools/check_inputs.mjs`.
 
 ## Layout
 

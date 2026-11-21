@@ -20,7 +20,12 @@ jobs:
       - name: Unit tests
         run: python -m unittest -v
       - name: Term scan
-        run: python tools/term_scan.py
+        # The term list is keyed; the key lives only in this repository secret. Without it the scan fails, never skips.
+        env:
+          UNDERSTUDY_TERM_KEY: ${{ secrets.UNDERSTUDY_TERM_KEY }}
+        run: |
+          if [ -z "$UNDERSTUDY_TERM_KEY" ]; then echo "::error::The repository secret UNDERSTUDY_TERM_KEY is missing, so the term scan cannot run. Add it under Settings > Secrets and variables > Actions."; exit 1; fi
+          python tools/term_scan.py
       - name: Claims and input checks (serve site/ and read the pages in headless Chrome)
         env:
           CHROME: google-chrome
