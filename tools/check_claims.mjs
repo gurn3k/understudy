@@ -286,7 +286,7 @@ if (CF) {
     ["later check: shortlist main", `${n0(S9.shortlist.main.wrong)} of ${n0(S9.shortlist.main.n)}: ${ivc(S9.shortlist.main)}`],
     ["later check: shortlist worst", `${n0(S9.shortlist.worst.wrong)} of ${n0(S9.shortlist.worst.n)}: ${ivc(S9.shortlist.worst)}`],
     ["later check: stuck shares", `${n0(S9.rulebook.stuck)} (${pc(S9.rulebook.stuck_share, 1)})`],
-    ["later check: rulebook readings", R9.rulebook.a === "fail" && R9.rulebook.b === "held up" ? "The rulebook didn't reach 99% on September, and held up against June to August" : "(readings changed: reword)"],
+    ["later check: rulebook readings", R9.rulebook.a === "fail" && R9.rulebook.b === "held up" ? `The rulebook didn't reach 99% on September, as it hadn't on June to August lines picked the same way (lower end ${pc(CF.june_august.approaches.rulebook.main.interval[0], 2)}), and it held up against June to August` : "(readings changed: reword)"],
     ["later check: shortlist readings", R9.shortlist.a === "fail" && R9.shortlist.b === "held up" ? "The supplier rule failed test (a)" : "(readings changed: reword)"],
     ["later check: headline stays", "The answer stays not proven."],
     ["later check: which test", "That came from test (a) alone, on few lines"],
