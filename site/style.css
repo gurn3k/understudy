@@ -214,6 +214,8 @@ footer.end { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--ru
 .plainlist { margin: 0 0 18px; padding-left: 1.4em; }
 .plainlist li { padding: 3px 0; }
 table.score td:first-child { text-align: left; }
+/* Tables of sentences (Method's changes made after a result): every column reads left to right. */
+table.score.prose td { text-align: left; }
 .budget li.hit .fill { background: var(--standby); }
 .budget .fill.ok { background: var(--go); }
 details.detail { margin-top: 32px; }
