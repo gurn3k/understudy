@@ -19,9 +19,7 @@ const DEF_FIX = Calc.DEF.fix, DEF_LOST = Calc.DEF.lost, WINDOWS_YR = Calc.WINDOW
    where tools/build_site.py also measures what each does on the study's data. */
 const AGREE = "0.9", SIM_RUNS = 20; // the simulation shown: reviewers copy this share; runs per ADR 0017
 const SCEN = [0.1, 0.25, 0.5, 1]; // shares of the on-paper volume, scenarios only
-/* Procurement timetable, in weeks from the issue date (my proposal). Its last step, the award, ends the pre-phase. */
-const TT = [["Issue date", 0], ["Questions close", 2], ["Answers published to all proposers", 3], ["Responses due", 4], ["Shortlist and clarifications", 6], ["Award decision", 8]];
-const PROC = TT[TT.length - 1][1];
+const TT = Calc.TT, PROC = Calc.PROC; // procurement timetable and its length, shared with the main report (calc.js)
 /* Rows of the return table: none earned, the replay's observed share (a truncated window), then the scenarios. */
 const scenRows = (g) => [[0, "none earned yet"], [g.earned_share, "observed in the replay; window too short"], ...SCEN.map((x) => [x, x === 1 ? "the on-paper ceiling" : ""])];
 

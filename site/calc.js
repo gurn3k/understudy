@@ -5,6 +5,9 @@
 const Calc = (() => {
   const PH = { p0: 4, p2: 12, p3: 2 }; // weeks of phases 0, 2 and 3 (phase 1 is the replay's wait for the first kind)
   const DEF = { min: 5, rate: 40, fix: 100, lost: 0, oh: 8, kinds: 1 };
+  /* Procurement timetable, in weeks from the issue date (my proposal). Its last step, the award, ends the pre-phase. */
+  const TT = [["Issue date", 0], ["Questions close", 2], ["Answers published to all proposers", 3], ["Responses due", 4], ["Shortlist and clarifications", 6], ["Award decision", 8]];
+  const PROC = TT[TT.length - 1][1];
   const WINDOWS_YR = 12; // blind-check windows a year at the cost default: monthly, M9's shortest window (ADR 0025)
   const int = (n) => Math.round(n).toLocaleString("en-US");
   const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
@@ -160,5 +163,5 @@ const Calc = (() => {
     draw();
   }
 
-  return { PH, DEF, WINDOWS_YR, basis, html, wire, needTxt, usd, signed };
+  return { PH, DEF, WINDOWS_YR, TT, PROC, basis, html, wire, needTxt, usd, signed };
 })();

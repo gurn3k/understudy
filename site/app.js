@@ -83,7 +83,7 @@ function biz(d) {
   const plain = `<p class="headline">On paper, an AI-written rulebook could have paid about half of invoices without a person checking them, for almost nothing to run. It has not proven the 99% bar, and proof takes months.</p>
   <div class="callout rec" role="note" aria-label="In brief">
   <p><strong>What I recommend:</strong> a gated pilot, not a roll-out. The rulebook runs in practice mode first, and pays a kind of invoice on its own only once real outcomes prove the bar (<a href="rfp.html">the pilot request</a>).</p>
-  <p><strong>What it costs now:</strong> only Phase 0, ${Calc.PH.p0} weeks to measure the share of lines a person reviews today, the minutes per review and the cost of a late fix: <span data-out="rec-p0"></span> of oversight time at your inputs below, plus any integration.</p>
+  <p><strong>What it costs now:</strong> running the request for proposals (about ${Calc.PROC} weeks), then, on award, only Phase 0: ${Calc.PH.p0} weeks to measure the share of lines a person reviews today, the minutes per review and the cost of a late fix: <span data-out="rec-p0"></span> of oversight time at your inputs below, plus any integration.</p>
   <p><strong>What would stop it:</strong> those measurements show no positive net after running costs; lines needing a correction go over the budget fixed before the pilot; or no kind proves the bar by week ${(d.replay.weeks.indexOf(d.replay.first) + 1) * 2} of practice mode.</p>
   </div>
   <p>This section stands on its own: if you read nothing else, read this. It turns my findings into money, risk and a next step. The rest of the report (Q1 to Q8) holds the evidence. All money is in US dollars.<sup><a href="#usd-note" id="usd-ref" aria-label="Note on the money values">*</a></sup></p>
