@@ -34,5 +34,19 @@ class KeptRunTime(unittest.TestCase):
         self.assertEqual(S.kept_run_time(0.5649, self.path), 0.565)
 
 
+class LaterCheck(unittest.TestCase):
+    def test_none_until_the_check_has_run(self):
+        self.assertIsNone(S.confirm_summary(Path(tempfile.gettempdir()) / "no-such-result.json"))
+
+    def test_committed_result_carries_the_readings(self):
+        if not S.CONFIRM.exists():
+            self.skipTest("no committed result")
+        c = S.confirm_summary()
+        self.assertEqual(set(c["readings"]), {"rulebook", "shortlist"})
+        self.assertEqual(c["september"]["lines"], 4227)
+        self.assertEqual(c["consequences"]["headline"], "unchanged (not proven)")
+        self.assertIn("interval", c["september"]["approaches"]["rulebook"]["main"])
+
+
 if __name__ == "__main__":
     unittest.main()

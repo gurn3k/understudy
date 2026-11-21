@@ -42,6 +42,7 @@ POST_RESULT = [
     ["fix", "Agreement-gate sentences", "ADR 0017, erratum 1", "A misread list corrected after the ruling.", "Wording and two figures."],
     ["added", "The business case and the pilot request", "ADRs 0019, 0020, 0021, 0025, 0026, 0027, 0028", "Written after the verdict, and re-based and tightened after outside reviews.", "None: no verdict, bar or fixed sentence."],
     ["added", "How the page words its limits", "ADRs 0022 to 0024", "Rewritten after an outside review: this table, the sensitivity checks, a supplier baseline checked after the fact, and the plain wording.", "None."],
+    ["added", "A later check on September 2018", "ADR 0029", "Fixed in advance after an outside review and run once on lines no part of the study had used; the comparison months were re-scored under the same window first.", "The pilot request's supplier-rule requirement (M11) now refits the rule in Phase 0. No verdict, bar or fixed sentence."],
 ]
 
 
@@ -67,6 +68,32 @@ def adrs():
         rows.append({"n": p.name[:4], "title": title, "amendments": amended, "replaced_by": by.group(1) if by else None,
                      "file": f"docs/adr/{p.name}"})
     return rows
+
+
+CONFIRM = ROOT / "docs" / "confirm" / "sept-2018-result.json"
+
+
+def confirm_summary(path=CONFIRM):
+    """The later check on September 2018 (ADR 0029), from its committed output; None until it has run."""
+    if not path.exists():
+        return None
+    r = load_json(path)
+
+    def fig(x):
+        return None if x is None else {k: x[k] for k in ("n", "wrong", "fine_share", "interval")}
+
+    def pooled(s):
+        return {"lines": s["lines"], "approaches": {a: {k: v["pooled"][k] for k in ("paid", "wrong", "stuck", "stuck_share")}
+                                                     | {"main": fig(v["pooled"]["main"]), "worst": fig(v["pooled"]["worst"])}
+                                                     for a, v in s["approaches"].items()}}
+    sec = r["secondary_all_invoiced_in_september"]
+    return {"month": r["month"], "window_days": r["window_days"],
+            "september": pooled(r["september"]) | {"stuck_by_kind": r["september"]["stuck_by_kind"]},
+            "june_august": pooled(r["june_august"]), "june_august_test_file": pooled(r["june_august_test_file"]),
+            "readings": r["readings"], "readings_against_test_file": r["readings_against_test_file"],
+            "june_august_against_itself": r["june_august_against_itself"], "consequences": r["consequences"],
+            "secondary": pooled(sec["scores"]) | {"readings": sec["readings"], "in_test_file": sec["in_test_file"],
+                                                  "in_learning_file": sec["in_learning_file"]}}
 
 
 def b2_summary(cost):
@@ -351,6 +378,7 @@ def main(retime=False):
         "adrs": adrs(),
         "lookahead": load_json(DATA / "lookahead.json"),
         "b2": b2_summary(cost),
+        "confirm": confirm_summary(),
     }
     OUT.parent.mkdir(exist_ok=True)
     save_json(data, OUT, separators=(",", ":"))
