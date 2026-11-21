@@ -484,6 +484,7 @@ function followUp(d) {
   return `<h3>Follow-up: Claude checking each invoice, on ${int(a.n)} new invoices</h3>
   <p>This follow-up was run after the first results were seen, because the first sample was too small to settle the question. The prompt, model and settings were unchanged, and the invoices were new.</p>
   <p>${outcome}</p>
+  <p class="small">In the decision record's words, "case-by-case" is checking each invoice and "the written policy" is the rulebook.</p>
   <p>${versus}</p>
   <p class="small">In plain terms: checking each invoice was careful but paid only about ${Math.round(a.coverage * 100)} in 100 invoices, and even on those it could not show 99%. The rulebook paid far more for a fraction of the cost.</p>`;
 }
@@ -735,7 +736,7 @@ function q5(d) {
   <p class="small">All ${int(t.wrong)} mistakes came from one kind of invoice, ${word(d.evidence.replay.top_order)} of them on one purchase order, and the records end soon after the second kind was switched on, so ${int(t.passed)} is lower than a full year would give. This replay does not change the answer at the top.</p>
   ${openButton("replay_autonomous", `See the ${int(t.passed)} invoices it paid by itself`)}`;
   const detail = `<p>Each kind of invoice earns trust on its own, not all at once. A kind is switched on once its settled practice calls clear the bar. If even the best likely case (the 95% upper bound) of its last 200 settled calls falls below the bar, it is switched off again. A call only counts as evidence once its outcome is known.</p>
-  <p class="small">The decision records count ISO weeks: week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
+  <p class="small">"The written policy" is the rulebook. The decision records count ISO weeks: week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
   <p>${esc(eventSentence(d))}</p>
   <p class="small">In plain words: the simple rule never earned trust for any kind of invoice. The rulebook earned it for two kinds. The first was switched off again later, after too many of its recent calls were wrong.</p>
   <p>While autonomous it passed ${int(t.passed)} invoices, ${int(t.wrong)} of them wrong (${pct(t.wrong / t.passed, 1)}, worse than the 99% bar), and removed ${int(t.touches_removed)} manual touches.</p>
@@ -789,6 +790,7 @@ function q6(d) {
   <p>Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about ${int(med(gaps9))} weeks sooner (median ${wk(medWeek(a9.first))} against ${wk(d.replay.first)}; range ${int(Math.min(...gaps9))}\u2013${int(Math.max(...gaps9))} weeks across 20 runs) and passed ${half(a9.passed_median)} invoices, ${half(a9.wrong_median)} of them wrong (medians of 20 runs; range ${int(a9.wrong_range[0])}\u2013${int(a9.wrong_range[1])}), against ${int(t.passed)} and ${int(t.wrong)} on outcomes. That is ${word(times)} times the wrong payments, at a lower rate per pass (${pct(a9.wrong_median / a9.passed_median, 2)} against ${pct(t.wrong / t.passed, 1)}).</p>
   <p>At 0.7 it promoted in ${int(a7.promoted_runs)} of 20 runs, the earliest in ${wk(a7.first[0])}, and passed ${half(a7.passed_median)} invoices, ${half(a7.wrong_median)} of them wrong (medians of 20 runs; range ${int(a7.wrong_range[0])}\u2013${int(a7.wrong_range[1])}). At 0.5 it promoted in ${int(a5.promoted_runs)} of 20 runs.</p>
   <p class="small">In plain words: when reviewers copy 7 times in 10, the AI was still switched on in most runs. When they copy half the time, it almost never was, because honest checking caught enough mistakes to keep agreement low.</p>
+  <p class="small">In the decision record's words, "the helper" is the AI being switched on.</p>
   <p>The agreement it promoted on was mostly copied, so it measured the reviewers, not the helper.</p>`;
   return section("q6", "Q6", "What if you trust it because people agree with it?", plain, detail, [
     `This section is a simulation; how often reviewers copy is an assumption, not a measurement of real people`,
