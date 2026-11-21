@@ -49,7 +49,7 @@ Each figure has a purchase-order interval by the study's existing method: resamp
 ### 6. The two tests and the readings
 Applied separately to the rulebook and the shortlist, on their pooled figures, each on the main figure and on the worst case:
 - **(a) The bar.** The lower end of September's interval reaches 99% or more. Pass or fail.
-- **(b) Against June to August**, re-scored under the same 109-day window (section 9), main against main and worst case against worst case, in error rates:
+- **(b) Against June to August**, under the same 109-day window, main against main and worst case against worst case, in error rates. The deciding comparator is June to August picked the same way as the main set: lines created and first invoiced in the same month, June, July or August 2018, including lines that never cleared (section 9). The locked test file, re-scored under the window, is reported alongside and decides nothing.
   - **held up** if September's interval and June to August's interval overlap;
   - **did worse** if September's interval lies wholly above June to August's error rate;
   - **did better** if it lies wholly below.
@@ -78,7 +78,19 @@ The headline never changes: it stays "not proven". Only supporting lines change,
 - After the run, a fix is allowed only for a mechanical error that an independent reviewer (Opus) confirms. Both results are then published, with the change explained. There are no other re-runs.
 
 ### 9. June to August, re-scored under the same window
-On the 54,874 locked test-month lines (outcomes already known), under the 109-day window:
+Outcomes already known. Both comparators are scored under the 109-day window.
+
+**The deciding comparator.** These are the 14,598 lines created and first invoiced in the same month, June, July or August 2018, picked from `cases.jsonl` the way September's main set is, with lines that never cleared included. Each line is scored with the same record and outcome code:
+
+| Approach | Paid | Stuck (share) | Main figure: wrong / lines, share fine | Main, PO interval | Worst case: wrong / lines, share fine | Worst case, PO interval |
+|---|---|---|---|---|---|---|
+| Rulebook (policy 2) | 7,778 | 86 (1.11%) | 88 / 7,692, 98.86% | 98.27% to 99.28% | 174 / 7,778, 97.76% | 96.84% to 98.54% |
+| Supplier shortlist | 2,196 | 81 (3.69%) | 12 / 2,115, 99.43% | 98.94% to 99.81% | 93 / 2,196, 95.77% | 92.99% to 97.94% |
+| Paying everything (context) | 14,598 | 256 (1.75%) | 390 / 14,342, 97.28% | 96.71% to 97.76% | 646 / 14,598, 95.58% | 94.76% to 96.33% |
+
+The per-kind figures are in `docs/confirm/june-august-matched.json`.
+
+**Alongside, deciding nothing: the locked test file.** These are the 54,874 test-month lines:
 
 | Approach | Paid | Stuck (share) | Main figure: wrong / lines, share fine | Main, PO interval | Worst case: wrong / lines, share fine | Worst case, PO interval |
 |---|---|---|---|---|---|---|

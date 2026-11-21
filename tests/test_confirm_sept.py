@@ -56,6 +56,20 @@ class Window(unittest.TestCase):
         self.assertEqual(by_create, {"2018-07": 1, "2018-09": 1})
 
 
+class Matched(unittest.TestCase):
+    def test_same_month_lines_from_june_to_august_including_never_cleared(self):
+        jul = ("Create Purchase Order Item", "2018-07-03T09:00:00+00:00")
+        aug_ir = ("Record Invoice Receipt", "2018-08-02T09:00:00+00:00")
+        cases = [
+            case("1_1", jul, ("Record Invoice Receipt", "2018-07-10T09:00:00+00:00"), ("Clear Invoice", "2018-07-20T09:00:00+00:00")),
+            case("2_1", jul, aug_ir, ("Clear Invoice", "2018-08-20T09:00:00+00:00")),           # created July, invoiced August
+            case("3_1", ("Create Purchase Order Item", "2018-08-01T09:00:00+00:00"), aug_ir),  # never cleared
+            case("4_1", CR, IR1, ("Clear Invoice", "2018-09-20T09:00:00+00:00")),               # September: not June to August
+        ]
+        got = {r["id"]: s for r, s in S.matched_june_august(cases)}
+        self.assertEqual(got, {"1_1": "fine", "3_1": "stuck"})
+
+
 class Outcome(unittest.TestCase):
     def test_clean_clearing_inside_the_window_is_fine(self):
         c = case("1_1", CR, IR1, ("Clear Invoice", "2018-09-20T09:00:00+00:00"))

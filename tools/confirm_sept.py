@@ -42,6 +42,7 @@ APPROACHES = ("rulebook", "shortlist", "pass_everything")
 TESTED = ("rulebook", "shortlist")                                # pass-everything is context only
 MAIN_LIST = "sept_2018_main.txt"   # created and first invoiced in September: the readings come from these
 ALL_LIST = "sept_2018_all.txt"     # first invoiced in September, created any time: reported only
+MATCHED_MONTHS = {"2018-06", "2018-07", "2018-08"}   # June to August, picked the same way as the main set
 LOCK = ROOT / "docs" / "confirm" / "sept-2018.lock"
 # Repo files whose bytes the run depends on. Hashed with line endings normalised to \n, so a Windows checkout
 # (core.autocrlf) hashes the same as the committed blob.
@@ -87,7 +88,9 @@ def receipt_month(case):
 
 
 def creation_month(case):
-    return min(e["ts"] for e in case["events"] if e["act"] == CREATE)[:7]
+    """The UTC month of the line's first creation event, or None."""
+    t = [e["ts"] for e in case["events"] if e["act"] == CREATE]
+    return min(t)[:7] if t else None
 
 
 def effective_end(day_counts, full=FULL_DAY_EVENTS):
@@ -321,6 +324,17 @@ def baseline_lines(data, held):
     return ([(r, lines[r["id"]][0]) for r in held], [(r, lines[r["id"]][1]) for r in held])
 
 
+def matched_june_august(cases, days=WINDOW_DAYS):
+    """The deciding comparator for test (b): lines created and first invoiced in the same month, June to August 2018,
+    picked the way September's main set is (dates only), lines that never cleared included. [(record, status)] by id."""
+    out = []
+    for c in cases:
+        rm = receipt_month(c)
+        if rm in MATCHED_MONTHS and creation_month(c) == rm:
+            out.append((features(c), outcome(c, days)))
+    return sorted(out, key=lambda x: x[0]["id"])
+
+
 def reproduce(fit, held, dec, nowin):
     """No window: policy 2 pays 26,715 with 249 wrong; the shortlist pays 7,532 with 23 wrong; nothing is stuck."""
     if E.vendor_panel(fit, held)["picked"] != SHORTLIST_KEY:
@@ -408,7 +422,8 @@ def baseline_figures(data):
     dec, nowin, windowed = june_august(data)
     return {"window_days": WINDOW_DAYS,
             "no_window": {a: score(nowin, dec[a], boot=False)["pooled"] for a in APPROACHES},
-            "windowed": score_all(windowed, dec)}
+            "windowed": score_all(windowed, dec),
+            "matched": score_all(matched_june_august(iter_jsonl(data / "cases.jsonl")), dec)}
 
 
 def september_lines(data, main_ids, all_ids):
@@ -435,16 +450,21 @@ def run(data):
     if len(main_ids) != int(meta["lines"]) or len(all_ids) != int(meta["lines_all"]):
         raise SystemExit("the September lists differ from the lock's counts")
     dec, _nowin, windowed = june_august(data)
-    base = score_all(windowed, dec)
+    # Test (b)'s comparator: June to August picked the same way as the main set. The locked test file, re-scored
+    # under the window, is reported alongside.
+    base = score_all(matched_june_august(iter_jsonl(data / "cases.jsonl")), dec)
+    base_file = score_all(windowed, dec)
     main_lines, all_lines = september_lines(data, main_ids, all_ids)
     sept = score_all(main_lines, dec)
     read = {a: reading(sept["approaches"][a]["pooled"], base["approaches"][a]["pooled"]) for a in TESTED}
+    read_file = {a: reading(sept["approaches"][a]["pooled"], base_file["approaches"][a]["pooled"]) for a in TESTED}
     # Reported only: every line first invoiced in September, created any time. Many sit in the learning or test files.
     held_ids = {r["id"] for r in iter_jsonl(data / "invoice_triage_heldout.jsonl")}
     fit_ids = {r["id"] for r in iter_jsonl(data / "invoice_triage_fit.jsonl")}
     all_scored = score_all(all_lines, dec)
     return {"month": MONTH, "window_days": WINDOW_DAYS, "lock": [list(e) for e in entries],
-            "june_august": base, "september": sept, "readings": read,
+            "june_august": base, "june_august_test_file": base_file, "september": sept, "readings": read,
+            "readings_against_test_file": read_file,
             "consequences": consequences(read["rulebook"], read["shortlist"]),
             "secondary_all_invoiced_in_september": {
                 "note": "Reported only; decides nothing. Lines first invoiced in September 2018, created any time.",

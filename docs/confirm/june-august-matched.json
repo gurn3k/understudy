@@ -1,0 +1,2416 @@
+{
+ "approaches": {
+  "pass_everything": {
+   "kinds": {
+    "2-way match / CAPEX & SOCS": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       0.0,
+       1.0
+      ],
+      "deff": 2.6666666666666665,
+      "deff_wilson": [
+       0.028077176048879198,
+       0.8964163084359899
+      ],
+      "error_rate": 0.6666666666666666,
+      "fine_share": 0.33333333333333337,
+      "n": 3,
+      "wrong": 2
+     },
+     "paid": 3,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.0,
+       1.0
+      ],
+      "deff": 2.6666666666666665,
+      "deff_wilson": [
+       0.028077176048879198,
+       0.8964163084359899
+      ],
+      "error_rate": 0.6666666666666666,
+      "fine_share": 0.33333333333333337,
+      "n": 3,
+      "wrong": 2
+     },
+     "wrong": 2
+    },
+    "2-way match / Energy": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       0.0,
+       1.0
+      ],
+      "deff": 2.0,
+      "deff_wilson": [
+       0.05462075552885201,
+       0.9453792444711481
+      ],
+      "error_rate": 0.5,
+      "fine_share": 0.5,
+      "n": 2,
+      "wrong": 1
+     },
+     "paid": 3,
+     "stuck": 1,
+     "stuck_share": 0.3333333333333333,
+     "worst": {
+      "boot": [
+       0.0,
+       1.0
+      ],
+      "deff": 2.6666666666666665,
+      "deff_wilson": [
+       0.028077176048879198,
+       0.8964163084359899
+      ],
+      "error_rate": 0.6666666666666666,
+      "fine_share": 0.33333333333333337,
+      "n": 3,
+      "wrong": 2
+     },
+     "wrong": 1
+    },
+    "2-way match / Others": {
+     "fine": 5,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.5655175352168252,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 5,
+      "wrong": 0
+     },
+     "paid": 5,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.5655175352168252,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 5,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "2-way match / Real Estate": {
+     "fine": 39,
+     "main": {
+      "boot": [
+       0.5555555555555556,
+       0.8461538461538461
+      ],
+      "deff": 1.4087841982578826,
+      "deff_wilson": [
+       0.5531383857537215,
+       0.827582022270747
+      ],
+      "error_rate": 0.2909090909090909,
+      "fine_share": 0.7090909090909091,
+      "n": 55,
+      "wrong": 16
+     },
+     "paid": 57,
+     "stuck": 2,
+     "stuck_share": 0.03508771929824561,
+     "worst": {
+      "boot": [
+       0.5384615384615384,
+       0.8166666666666667
+      ],
+      "deff": 1.359851551956815,
+      "deff_wilson": [
+       0.5331788180632434,
+       0.8043125495994942
+      ],
+      "error_rate": 0.3157894736842105,
+      "fine_share": 0.6842105263157895,
+      "n": 57,
+      "wrong": 18
+     },
+     "wrong": 16
+    },
+    "2-way match / Sales": {
+     "fine": 0,
+     "main": {
+      "boot": [
+       0.0,
+       0.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.0,
+       0.7934506856227626
+      ],
+      "error_rate": 1.0,
+      "fine_share": 0.0,
+      "n": 1,
+      "wrong": 1
+     },
+     "paid": 1,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.0,
+       0.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.0,
+       0.7934506856227626
+      ],
+      "error_rate": 1.0,
+      "fine_share": 0.0,
+      "n": 1,
+      "wrong": 1
+     },
+     "wrong": 1
+    },
+    "3-way match, invoice after GR / (none)": {
+     "fine": 19,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8318207759473837,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 19,
+      "wrong": 0
+     },
+     "paid": 19,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8318207759473837,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 19,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Additives": {
+     "fine": 9,
+     "main": {
+      "boot": [
+       0.6666666666666667,
+       1.0
+      ],
+      "deff": 1.1500000000000001,
+      "deff_wilson": [
+       0.5710436995031399,
+       0.9838306844057831
+      ],
+      "error_rate": 0.1,
+      "fine_share": 0.9,
+      "n": 10,
+      "wrong": 1
+     },
+     "paid": 10,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.6666666666666667,
+       1.0
+      ],
+      "deff": 1.1500000000000001,
+      "deff_wilson": [
+       0.5710436995031399,
+       0.9838306844057831
+      ],
+      "error_rate": 0.1,
+      "fine_share": 0.9,
+      "n": 10,
+      "wrong": 1
+     },
+     "wrong": 1
+    },
+    "3-way match, invoice after GR / CAPEX & SOCS": {
+     "fine": 5,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.5655175352168252,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 5,
+      "wrong": 0
+     },
+     "paid": 5,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.5655175352168252,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 5,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Commodity Resins": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       0.0,
+       1.0
+      ],
+      "deff": 2.0,
+      "deff_wilson": [
+       0.05462075552885201,
+       0.9453792444711481
+      ],
+      "error_rate": 0.5,
+      "fine_share": 0.5,
+      "n": 2,
+      "wrong": 1
+     },
+     "paid": 2,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.0,
+       1.0
+      ],
+      "deff": 2.0,
+      "deff_wilson": [
+       0.05462075552885201,
+       0.9453792444711481
+      ],
+      "error_rate": 0.5,
+      "fine_share": 0.5,
+      "n": 2,
+      "wrong": 1
+     },
+     "wrong": 1
+    },
+    "3-way match, invoice after GR / Latex & Monomers": {
+     "fine": 8,
+     "main": {
+      "boot": [
+       0.6666666666666667,
+       1.0
+      ],
+      "deff": 1.125,
+      "deff_wilson": [
+       0.5437413054002257,
+       0.9817194774678674
+      ],
+      "error_rate": 0.1111111111111111,
+      "fine_share": 0.8888888888888888,
+      "n": 9,
+      "wrong": 1
+     },
+     "paid": 9,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.6666666666666667,
+       1.0
+      ],
+      "deff": 1.125,
+      "deff_wilson": [
+       0.5437413054002257,
+       0.9817194774678674
+      ],
+      "error_rate": 0.1111111111111111,
+      "fine_share": 0.8888888888888888,
+      "n": 9,
+      "wrong": 1
+     },
+     "wrong": 1
+    },
+    "3-way match, invoice after GR / Logistics": {
+     "fine": 27,
+     "main": {
+      "boot": [
+       0.8928571428571429,
+       1.0
+      ],
+      "deff": 1.037037037037037,
+      "deff_wilson": [
+       0.819085374171416,
+       0.9938278124968503
+      ],
+      "error_rate": 0.03571428571428571,
+      "fine_share": 0.9642857142857143,
+      "n": 28,
+      "wrong": 1
+     },
+     "paid": 28,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.8928571428571429,
+       1.0
+      ],
+      "deff": 1.037037037037037,
+      "deff_wilson": [
+       0.819085374171416,
+       0.9938278124968503
+      ],
+      "error_rate": 0.03571428571428571,
+      "fine_share": 0.9642857142857143,
+      "n": 28,
+      "wrong": 1
+     },
+     "wrong": 1
+    },
+    "3-way match, invoice after GR / Marketing": {
+     "fine": 4,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.5101091635454027,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 4,
+      "wrong": 0
+     },
+     "paid": 4,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.5101091635454027,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 4,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Others": {
+     "fine": 11,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.7411670330319683,
+       1.0000000000000002
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 11,
+      "wrong": 0
+     },
+     "paid": 11,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.7411670330319683,
+       1.0000000000000002
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 11,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Packaging": {
+     "fine": 91,
+     "main": {
+      "boot": [
+       0.9065420560747663,
+       1.0
+      ],
+      "deff": 1.479908249645092,
+      "deff_wilson": [
+       0.877765800392003,
+       0.9863151878144738
+      ],
+      "error_rate": 0.042105263157894736,
+      "fine_share": 0.9578947368421052,
+      "n": 95,
+      "wrong": 4
+     },
+     "paid": 95,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9065420560747663,
+       1.0
+      ],
+      "deff": 1.479908249645092,
+      "deff_wilson": [
+       0.877765800392003,
+       0.9863151878144738
+      ],
+      "error_rate": 0.042105263157894736,
+      "fine_share": 0.9578947368421052,
+      "n": 95,
+      "wrong": 4
+     },
+     "wrong": 4
+    },
+    "3-way match, invoice after GR / Pigments & Colorants": {
+     "fine": 8,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6755924351161198,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 8,
+      "wrong": 0
+     },
+     "paid": 8,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6755924351161198,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 8,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Sales": {
+     "fine": 74,
+     "main": {
+      "boot": [
+       0.9295774647887324,
+       1.0
+      ],
+      "deff": 1.0525657236183554,
+      "deff_wilson": [
+       0.9065482771664589,
+       0.9929638737300583
+      ],
+      "error_rate": 0.02631578947368421,
+      "fine_share": 0.9736842105263158,
+      "n": 76,
+      "wrong": 2
+     },
+     "paid": 77,
+     "stuck": 1,
+     "stuck_share": 0.012987012987012988,
+     "worst": {
+      "boot": [
+       0.9113924050632911,
+       1.0
+      ],
+      "deff": 1.0685727049363412,
+      "deff_wilson": [
+       0.8883130890716326,
+       0.9870966484588037
+      ],
+      "error_rate": 0.03896103896103896,
+      "fine_share": 0.961038961038961,
+      "n": 77,
+      "wrong": 3
+     },
+     "wrong": 2
+    },
+    "3-way match, invoice after GR / Specialty Resins": {
+     "fine": 2,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "paid": 2,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Trading & End Products": {
+     "fine": 13,
+     "main": {
+      "boot": [
+       0.7692307692307692,
+       1.0
+      ],
+      "deff": 1.1148851148851149,
+      "deff_wilson": [
+       0.6681273495707756,
+       0.9882277861617143
+      ],
+      "error_rate": 0.07142857142857142,
+      "fine_share": 0.9285714285714286,
+      "n": 14,
+      "wrong": 1
+     },
+     "paid": 14,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.7692307692307692,
+       1.0
+      ],
+      "deff": 1.1148851148851149,
+      "deff_wilson": [
+       0.6681273495707756,
+       0.9882277861617143
+      ],
+      "error_rate": 0.07142857142857142,
+      "fine_share": 0.9285714285714286,
+      "n": 14,
+      "wrong": 1
+     },
+     "wrong": 1
+    },
+    "3-way match, invoice after GR / Workforce Services": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "paid": 1,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / (none)": {
+     "fine": 64,
+     "main": {
+      "boot": [
+       0.9193548387096774,
+       1.0
+      ],
+      "deff": 1.0379530600118834,
+      "deff_wilson": [
+       0.8940487726689873,
+       0.9918268191217403
+      ],
+      "error_rate": 0.030303030303030304,
+      "fine_share": 0.9696969696969697,
+      "n": 66,
+      "wrong": 2
+     },
+     "paid": 66,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9193548387096774,
+       1.0
+      ],
+      "deff": 1.0379530600118834,
+      "deff_wilson": [
+       0.8940487726689873,
+       0.9918268191217403
+      ],
+      "error_rate": 0.030303030303030304,
+      "fine_share": 0.9696969696969697,
+      "n": 66,
+      "wrong": 2
+     },
+     "wrong": 2
+    },
+    "3-way match, invoice before GR / Additives": {
+     "fine": 553,
+     "main": {
+      "boot": [
+       0.9363166953528399,
+       0.9720767888307156
+      ],
+      "deff": 1.1603448730351964,
+      "deff_wilson": [
+       0.933186130164005,
+       0.9700503093807076
+      ],
+      "error_rate": 0.044905008635578586,
+      "fine_share": 0.9550949913644214,
+      "n": 579,
+      "wrong": 26
+     },
+     "paid": 583,
+     "stuck": 4,
+     "stuck_share": 0.00686106346483705,
+     "worst": {
+      "boot": [
+       0.9275862068965517,
+       0.967128027681661
+      ],
+      "deff": 1.2079640970143184,
+      "deff_wilson": [
+       0.9250507069295828,
+       0.964949452251717
+      ],
+      "error_rate": 0.051457975986277875,
+      "fine_share": 0.9485420240137221,
+      "n": 583,
+      "wrong": 30
+     },
+     "wrong": 26
+    },
+    "3-way match, invoice before GR / CAPEX & SOCS": {
+     "fine": 823,
+     "main": {
+      "boot": [
+       0.9265010351966874,
+       0.9939516129032258
+      ],
+      "deff": 9.574401077868014,
+      "deff_wilson": [
+       0.9097302677685202,
+       0.9900420224143527
+      ],
+      "error_rate": 0.030624263839811542,
+      "fine_share": 0.9693757361601885,
+      "n": 849,
+      "wrong": 26
+     },
+     "paid": 852,
+     "stuck": 3,
+     "stuck_share": 0.0035211267605633804,
+     "worst": {
+      "boot": [
+       0.9231754161331627,
+       0.9922907488986784
+      ],
+      "deff": 8.923682406186094,
+      "deff_wilson": [
+       0.9079831464134533,
+       0.9878963016005833
+      ],
+      "error_rate": 0.03403755868544601,
+      "fine_share": 0.965962441314554,
+      "n": 852,
+      "wrong": 29
+     },
+     "wrong": 26
+    },
+    "3-way match, invoice before GR / Commodity Resins": {
+     "fine": 16,
+     "main": {
+      "boot": [
+       0.7222222222222222,
+       1.0
+      ],
+      "deff": 1.0588235294117647,
+      "deff_wilson": [
+       0.6644281405710865,
+       0.9699910877553622
+      ],
+      "error_rate": 0.1111111111111111,
+      "fine_share": 0.8888888888888888,
+      "n": 18,
+      "wrong": 2
+     },
+     "paid": 18,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.7222222222222222,
+       1.0
+      ],
+      "deff": 1.0588235294117647,
+      "deff_wilson": [
+       0.6644281405710865,
+       0.9699910877553622
+      ],
+      "error_rate": 0.1111111111111111,
+      "fine_share": 0.8888888888888888,
+      "n": 18,
+      "wrong": 2
+     },
+     "wrong": 2
+    },
+    "3-way match, invoice before GR / Enterprise Services": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "paid": 1,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Latex & Monomers": {
+     "fine": 154,
+     "main": {
+      "boot": [
+       0.8238636363636364,
+       0.9204545454545454
+      ],
+      "deff": 0.9992826940501358,
+      "deff_wilson": [
+       0.8180189114673695,
+       0.9159721458721856
+      ],
+      "error_rate": 0.125,
+      "fine_share": 0.875,
+      "n": 176,
+      "wrong": 22
+     },
+     "paid": 177,
+     "stuck": 1,
+     "stuck_share": 0.005649717514124294,
+     "worst": {
+      "boot": [
+       0.8192090395480226,
+       0.9152542372881356
+      ],
+      "deff": 0.9995075953731778,
+      "deff_wilson": [
+       0.8125792129170658,
+       0.9118197777387153
+      ],
+      "error_rate": 0.12994350282485875,
+      "fine_share": 0.8700564971751412,
+      "n": 177,
+      "wrong": 23
+     },
+     "wrong": 22
+    },
+    "3-way match, invoice before GR / Logistics": {
+     "fine": 6,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6096657120978346,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 6,
+      "wrong": 0
+     },
+     "paid": 6,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6096657120978346,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 6,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Marketing": {
+     "fine": 2,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "paid": 2,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Others": {
+     "fine": 155,
+     "main": {
+      "boot": [
+       0.9299363057324841,
+       0.9921259842519685
+      ],
+      "deff": 1.1030692125258088,
+      "deff_wilson": [
+       0.9182952385608081,
+       0.983437689626614
+      ],
+      "error_rate": 0.037267080745341616,
+      "fine_share": 0.9627329192546584,
+      "n": 161,
+      "wrong": 6
+     },
+     "paid": 161,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9299363057324841,
+       0.9921259842519685
+      ],
+      "deff": 1.1030692125258088,
+      "deff_wilson": [
+       0.9182952385608081,
+       0.983437689626614
+      ],
+      "error_rate": 0.037267080745341616,
+      "fine_share": 0.9627329192546584,
+      "n": 161,
+      "wrong": 6
+     },
+     "wrong": 6
+    },
+    "3-way match, invoice before GR / Packaging": {
+     "fine": 6355,
+     "main": {
+      "boot": [
+       0.976854891661195,
+       0.9868379818238797
+      ],
+      "deff": 2.654340586965474,
+      "deff_wilson": [
+       0.9761709904895125,
+       0.9867627664457878
+      ],
+      "error_rate": 0.01777434312210201,
+      "fine_share": 0.982225656877898,
+      "n": 6470,
+      "wrong": 115
+     },
+     "paid": 6690,
+     "stuck": 220,
+     "stuck_share": 0.03288490284005979,
+     "worst": {
+      "boot": [
+       0.9368390129259695,
+       0.9621200311769291
+      ],
+      "deff": 5.927012407837957,
+      "deff_wilson": [
+       0.9356059437924441,
+       0.9611924655243517
+      ],
+      "error_rate": 0.05007473841554559,
+      "fine_share": 0.9499252615844545,
+      "n": 6690,
+      "wrong": 335
+     },
+     "wrong": 115
+    },
+    "3-way match, invoice before GR / Pigments & Colorants": {
+     "fine": 74,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.9506502206036139,
+       1.0000000000000002
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 74,
+      "wrong": 0
+     },
+     "paid": 76,
+     "stuck": 2,
+     "stuck_share": 0.02631578947368421,
+     "worst": {
+      "boot": [
+       0.9342105263157895,
+       1.0
+      ],
+      "deff": 1.0160522364469733,
+      "deff_wilson": [
+       0.9082721302666464,
+       0.9928190593330788
+      ],
+      "error_rate": 0.02631578947368421,
+      "fine_share": 0.9736842105263158,
+      "n": 76,
+      "wrong": 2
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Sales": {
+     "fine": 4400,
+     "main": {
+      "boot": [
+       0.9597472501755208,
+       0.9826782145236509
+      ],
+      "deff": 6.12327632866022,
+      "deff_wilson": [
+       0.9586634088712411,
+       0.9824825595363255
+      ],
+      "error_rate": 0.02697921273772667,
+      "fine_share": 0.9730207872622734,
+      "n": 4522,
+      "wrong": 122
+     },
+     "paid": 4544,
+     "stuck": 22,
+     "stuck_share": 0.0048415492957746475,
+     "worst": {
+      "boot": [
+       0.9539518900343642,
+       0.9800729040097206
+      ],
+      "deff": 7.0640590748201735,
+      "deff_wilson": [
+       0.9517495648092372,
+       0.9793099635204169
+      ],
+      "error_rate": 0.03169014084507042,
+      "fine_share": 0.9683098591549296,
+      "n": 4544,
+      "wrong": 144
+     },
+     "wrong": 122
+    },
+    "3-way match, invoice before GR / Solvents": {
+     "fine": 130,
+     "main": {
+      "boot": [
+       0.9104477611940298,
+       0.9788732394366197
+      ],
+      "deff": 1.0183007299270073,
+      "deff_wilson": [
+       0.8976975812075797,
+       0.9751891084464163
+      ],
+      "error_rate": 0.051094890510948905,
+      "fine_share": 0.948905109489051,
+      "n": 137,
+      "wrong": 7
+     },
+     "paid": 137,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9104477611940298,
+       0.9788732394366197
+      ],
+      "deff": 1.0183007299270073,
+      "deff_wilson": [
+       0.8976975812075797,
+       0.9751891084464163
+      ],
+      "error_rate": 0.051094890510948905,
+      "fine_share": 0.948905109489051,
+      "n": 137,
+      "wrong": 7
+     },
+     "wrong": 7
+    },
+    "3-way match, invoice before GR / Specialty Resins": {
+     "fine": 95,
+     "main": {
+      "boot": [
+       0.9166666666666666,
+       0.9904761904761905
+      ],
+      "deff": 1.0259708769336495,
+      "deff_wilson": [
+       0.8996436913406152,
+       0.9843558929903916
+      ],
+      "error_rate": 0.04040404040404041,
+      "fine_share": 0.9595959595959596,
+      "n": 99,
+      "wrong": 4
+     },
+     "paid": 99,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9166666666666666,
+       0.9904761904761905
+      ],
+      "deff": 1.0259708769336495,
+      "deff_wilson": [
+       0.8996436913406152,
+       0.9843558929903916
+      ],
+      "error_rate": 0.04040404040404041,
+      "fine_share": 0.9595959595959596,
+      "n": 99,
+      "wrong": 4
+     },
+     "wrong": 4
+    },
+    "3-way match, invoice before GR / Titanium Dioxides": {
+     "fine": 3,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.4385029682449545,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 3,
+      "wrong": 0
+     },
+     "paid": 3,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.4385029682449545,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 3,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Trading & End Products": {
+     "fine": 802,
+     "main": {
+      "boot": [
+       0.9332425068119891,
+       0.9878844361602982
+      ],
+      "deff": 4.490351988967232,
+      "deff_wilson": [
+       0.9308281672065525,
+       0.9849773936048943
+      ],
+      "error_rate": 0.032569360675512665,
+      "fine_share": 0.9674306393244874,
+      "n": 829,
+      "wrong": 27
+     },
+     "paid": 829,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9332425068119891,
+       0.9878844361602982
+      ],
+      "deff": 4.490351988967232,
+      "deff_wilson": [
+       0.9308281672065525,
+       0.9849773936048943
+      ],
+      "error_rate": 0.032569360675512665,
+      "fine_share": 0.9674306393244874,
+      "n": 829,
+      "wrong": 27
+     },
+     "wrong": 27
+    }
+   },
+   "pooled": {
+    "fine": 13952,
+    "main": {
+     "boot": [
+      0.9670951515998323,
+      0.9776370739593157
+     ],
+     "deff": 4.092264762893972,
+     "deff_wilson": [
+      0.9668828171493834,
+      0.9776961096024659
+     ],
+     "error_rate": 0.027192860131083532,
+     "fine_share": 0.9728071398689164,
+     "n": 14342,
+     "wrong": 390
+    },
+    "paid": 14598,
+    "stuck": 256,
+    "stuck_share": 0.017536648856007673,
+    "worst": {
+     "boot": [
+      0.9476439790575917,
+      0.9633335617846618
+     ],
+     "deff": 5.558710465795127,
+     "deff_wilson": [
+      0.9471937300741523,
+      0.9629696330185908
+     ],
+     "error_rate": 0.044252637347581864,
+     "fine_share": 0.9557473626524181,
+     "n": 14598,
+     "wrong": 646
+    },
+    "wrong": 390
+   }
+  },
+  "rulebook": {
+   "kinds": {
+    "3-way match, invoice after GR / Packaging": {
+     "fine": 2,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "paid": 2,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Sales": {
+     "fine": 23,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8568833815495732,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 23,
+      "wrong": 0
+     },
+     "paid": 23,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8568833815495732,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 23,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Trading & End Products": {
+     "fine": 8,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6755924351161198,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 8,
+      "wrong": 0
+     },
+     "paid": 8,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6755924351161198,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 8,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Additives": {
+     "fine": 158,
+     "main": {
+      "boot": [
+       0.9576719576719577,
+       1.0
+      ],
+      "deff": 0.9978422482550166,
+      "deff_wilson": [
+       0.9467084751384169,
+       0.9936362387816337
+      ],
+      "error_rate": 0.018633540372670808,
+      "fine_share": 0.9813664596273292,
+      "n": 161,
+      "wrong": 3
+     },
+     "paid": 162,
+     "stuck": 1,
+     "stuck_share": 0.006172839506172839,
+     "worst": {
+      "boot": [
+       0.9476439790575917,
+       0.9942528735632183
+      ],
+      "deff": 1.0067409897203219,
+      "deff_wilson": [
+       0.9380671637475595,
+       0.9903855801771307
+      ],
+      "error_rate": 0.024691358024691357,
+      "fine_share": 0.9753086419753086,
+      "n": 162,
+      "wrong": 4
+     },
+     "wrong": 3
+    },
+    "3-way match, invoice before GR / CAPEX & SOCS": {
+     "fine": 372,
+     "main": {
+      "boot": [
+       0.8715083798882681,
+       1.0
+      ],
+      "deff": 14.443393064761038,
+      "deff_wilson": [
+       0.8105899148781704,
+       0.9921453384115144
+      ],
+      "error_rate": 0.041237113402061855,
+      "fine_share": 0.9587628865979382,
+      "n": 388,
+      "wrong": 16
+     },
+     "paid": 388,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.8715083798882681,
+       1.0
+      ],
+      "deff": 14.443393064761038,
+      "deff_wilson": [
+       0.8105899148781704,
+       0.9921453384115144
+      ],
+      "error_rate": 0.041237113402061855,
+      "fine_share": 0.9587628865979382,
+      "n": 388,
+      "wrong": 16
+     },
+     "wrong": 16
+    },
+    "3-way match, invoice before GR / Enterprise Services": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "paid": 1,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Latex & Monomers": {
+     "fine": 28,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8793566952341543,
+       0.9999999999999998
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 28,
+      "wrong": 0
+     },
+     "paid": 28,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8793566952341543,
+       0.9999999999999998
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 28,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Marketing": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "paid": 1,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Others": {
+     "fine": 37,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.9059421741627975,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 37,
+      "wrong": 0
+     },
+     "paid": 37,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.9059421741627975,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 37,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Packaging": {
+     "fine": 3906,
+     "main": {
+      "boot": [
+       0.987892838742916,
+       0.9948757366128619
+      ],
+      "deff": 1.5561645348537272,
+      "deff_wilson": [
+       0.9872518462583264,
+       0.9945026925407524
+      ],
+      "error_rate": 0.008377760853008377,
+      "fine_share": 0.9916222391469917,
+      "n": 3939,
+      "wrong": 33
+     },
+     "paid": 4007,
+     "stuck": 68,
+     "stuck_share": 0.01697030197154979,
+     "worst": {
+      "boot": [
+       0.9619249074563723,
+       0.9850347407803314
+      ],
+      "deff": 5.817041362857414,
+      "deff_wilson": [
+       0.9601945252563012,
+       0.9841274741357373
+      ],
+      "error_rate": 0.025205889693037185,
+      "fine_share": 0.9747941103069628,
+      "n": 4007,
+      "wrong": 101
+     },
+     "wrong": 33
+    },
+    "3-way match, invoice before GR / Sales": {
+     "fine": 2592,
+     "main": {
+      "boot": [
+       0.9804703068951773,
+       0.9939531368102796
+      ],
+      "deff": 2.853608133215927,
+      "deff_wilson": [
+       0.9784111277247222,
+       0.9931398784688211
+      ],
+      "error_rate": 0.012195121951219513,
+      "fine_share": 0.9878048780487805,
+      "n": 2624,
+      "wrong": 32
+     },
+     "paid": 2641,
+     "stuck": 17,
+     "stuck_share": 0.006436955698599016,
+     "worst": {
+      "boot": [
+       0.9666177549523111,
+       0.9920514761544285
+      ],
+      "deff": 6.598252364413121,
+      "deff_wilson": [
+       0.9629395392846997,
+       0.9907998207122081
+      ],
+      "error_rate": 0.018553578190079516,
+      "fine_share": 0.9814464218099205,
+      "n": 2641,
+      "wrong": 49
+     },
+     "wrong": 32
+    },
+    "3-way match, invoice before GR / Solvents": {
+     "fine": 35,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.9010990076755959,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 35,
+      "wrong": 0
+     },
+     "paid": 35,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.9010990076755959,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 35,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Specialty Resins": {
+     "fine": 22,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8513451253913791,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 22,
+      "wrong": 0
+     },
+     "paid": 22,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8513451253913791,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 22,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Trading & End Products": {
+     "fine": 419,
+     "main": {
+      "boot": [
+       0.9774647887323944,
+       0.998220640569395
+      ],
+      "deff": 1.235189814820282,
+      "deff_wilson": [
+       0.9735472745843506,
+       0.9966570928052123
+      ],
+      "error_rate": 0.009456264775413711,
+      "fine_share": 0.9905437352245863,
+      "n": 423,
+      "wrong": 4
+     },
+     "paid": 423,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9774647887323944,
+       0.998220640569395
+      ],
+      "deff": 1.235189814820282,
+      "deff_wilson": [
+       0.9735472745843506,
+       0.9966570928052123
+      ],
+      "error_rate": 0.009456264775413711,
+      "fine_share": 0.9905437352245863,
+      "n": 423,
+      "wrong": 4
+     },
+     "wrong": 4
+    }
+   },
+   "pooled": {
+    "fine": 7604,
+    "main": {
+     "boot": [
+      0.9827381736724206,
+      0.9928441139329311
+     ],
+     "deff": 4.376712259872508,
+     "deff_wilson": [
+      0.9824144605295261,
+      0.9925735225855267
+     ],
+     "error_rate": 0.011440457618304731,
+     "fine_share": 0.9885595423816953,
+     "n": 7692,
+     "wrong": 88
+    },
+    "paid": 7778,
+    "stuck": 86,
+    "stuck_share": 0.01105682694780149,
+    "worst": {
+     "boot": [
+      0.9684157543727192,
+      0.9853763987792472
+     ],
+     "deff": 6.61462417489793,
+     "deff_wilson": [
+      0.9674929053358109,
+      0.9846549613471824
+     ],
+     "error_rate": 0.022370789406016972,
+     "fine_share": 0.977629210593983,
+     "n": 7778,
+     "wrong": 174
+    },
+    "wrong": 88
+   }
+  },
+  "shortlist": {
+   "kinds": {
+    "3-way match, invoice after GR / Others": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "paid": 1,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Packaging": {
+     "fine": 2,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "paid": 2,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.3423802275066531,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 2,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Sales": {
+     "fine": 17,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8156818649911483,
+       1.0000000000000002
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 17,
+      "wrong": 0
+     },
+     "paid": 17,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.8156818649911483,
+       1.0000000000000002
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 17,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice after GR / Trading & End Products": {
+     "fine": 8,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6755924351161198,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 8,
+      "wrong": 0
+     },
+     "paid": 8,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.6755924351161198,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 8,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / (none)": {
+     "fine": 1,
+     "main": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "paid": 1,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       1.0,
+       1.0
+      ],
+      "deff": 1.0,
+      "deff_wilson": [
+       0.20654931437723742,
+       1.0
+      ],
+      "error_rate": 0.0,
+      "fine_share": 1.0,
+      "n": 1,
+      "wrong": 0
+     },
+     "wrong": 0
+    },
+    "3-way match, invoice before GR / Packaging": {
+     "fine": 855,
+     "main": {
+      "boot": [
+       0.9835164835164835,
+       1.0
+      ],
+      "deff": 3.248996302369205,
+      "deff_wilson": [
+       0.9755988247687701,
+       0.9986345528585814
+      ],
+      "error_rate": 0.005813953488372093,
+      "fine_share": 0.9941860465116279,
+      "n": 860,
+      "wrong": 5
+     },
+     "paid": 927,
+     "stuck": 67,
+     "stuck_share": 0.07227615965480043,
+     "worst": {
+      "boot": [
+       0.863905325443787,
+       0.965270684371808
+      ],
+      "deff": 8.303376946077359,
+      "deff_wilson": [
+       0.8574846295371087,
+       0.959078498907326
+      ],
+      "error_rate": 0.07766990291262135,
+      "fine_share": 0.9223300970873787,
+      "n": 927,
+      "wrong": 72
+     },
+     "wrong": 5
+    },
+    "3-way match, invoice before GR / Sales": {
+     "fine": 912,
+     "main": {
+      "boot": [
+       0.9870967741935484,
+       0.9987096774193548
+      ],
+      "deff": 1.2332547693785116,
+      "deff_wilson": [
+       0.9846252713279945,
+       0.9972357699118642
+      ],
+      "error_rate": 0.006535947712418301,
+      "fine_share": 0.9934640522875817,
+      "n": 918,
+      "wrong": 6
+     },
+     "paid": 932,
+     "stuck": 14,
+     "stuck_share": 0.015021459227467811,
+     "worst": {
+      "boot": [
+       0.9394785847299814,
+       0.9980563654033042
+      ],
+      "deff": 11.740241875141178,
+      "deff_wilson": [
+       0.9182808976045126,
+       0.9946249608601997
+      ],
+      "error_rate": 0.02145922746781116,
+      "fine_share": 0.9785407725321889,
+      "n": 932,
+      "wrong": 20
+     },
+     "wrong": 6
+    },
+    "3-way match, invoice before GR / Trading & End Products": {
+     "fine": 307,
+     "main": {
+      "boot": [
+       0.9868995633187773,
+       1.0
+      ],
+      "deff": 1.1500144031553987,
+      "deff_wilson": [
+       0.9799768635738654,
+       0.999480983098741
+      ],
+      "error_rate": 0.003246753246753247,
+      "fine_share": 0.9967532467532467,
+      "n": 308,
+      "wrong": 1
+     },
+     "paid": 308,
+     "stuck": 0,
+     "stuck_share": 0.0,
+     "worst": {
+      "boot": [
+       0.9868995633187773,
+       1.0
+      ],
+      "deff": 1.1500144031553987,
+      "deff_wilson": [
+       0.9799768635738654,
+       0.999480983098741
+      ],
+      "error_rate": 0.003246753246753247,
+      "fine_share": 0.9967532467532467,
+      "n": 308,
+      "wrong": 1
+     },
+     "wrong": 1
+    }
+   },
+   "pooled": {
+    "fine": 2103,
+    "main": {
+     "boot": [
+      0.9894259818731118,
+      0.99812734082397
+     ],
+     "deff": 2.0707023526382105,
+     "deff_wilson": [
+      0.9875173260279826,
+      0.9974307651584344
+     ],
+     "error_rate": 0.005673758865248227,
+     "fine_share": 0.9943262411347518,
+     "n": 2115,
+     "wrong": 12
+    },
+    "paid": 2196,
+    "stuck": 81,
+    "stuck_share": 0.036885245901639344,
+    "worst": {
+     "boot": [
+      0.9299242424242424,
+      0.9794383149448345
+     ],
+     "deff": 8.705338409801453,
+     "deff_wilson": [
+      0.9251836626660164,
+      0.9763875475916142
+     ],
+     "error_rate": 0.04234972677595628,
+     "fine_share": 0.9576502732240437,
+     "n": 2196,
+     "wrong": 93
+    },
+    "wrong": 12
+   }
+  }
+ },
+ "lines": 14598,
+ "note": "June to August 2018, picked the same way as September's main set: lines created and first invoiced in the same month, never-cleared lines included; outcomes under the 109-day window. June to August outcomes only (already seen). Written from tools/confirm_sept.py baseline (key 'matched').",
+ "stuck_by_kind": {
+  "2-way match / CAPEX & SOCS": {
+   "lines": 3,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "2-way match / Energy": {
+   "lines": 3,
+   "stuck": 1,
+   "stuck_share": 0.3333333333333333
+  },
+  "2-way match / Others": {
+   "lines": 5,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "2-way match / Real Estate": {
+   "lines": 57,
+   "stuck": 2,
+   "stuck_share": 0.03508771929824561
+  },
+  "2-way match / Sales": {
+   "lines": 1,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / (none)": {
+   "lines": 19,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Additives": {
+   "lines": 10,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / CAPEX & SOCS": {
+   "lines": 5,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Commodity Resins": {
+   "lines": 2,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Latex & Monomers": {
+   "lines": 9,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Logistics": {
+   "lines": 28,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Marketing": {
+   "lines": 4,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Others": {
+   "lines": 11,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Packaging": {
+   "lines": 95,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Pigments & Colorants": {
+   "lines": 8,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Sales": {
+   "lines": 77,
+   "stuck": 1,
+   "stuck_share": 0.012987012987012988
+  },
+  "3-way match, invoice after GR / Specialty Resins": {
+   "lines": 2,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Trading & End Products": {
+   "lines": 14,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice after GR / Workforce Services": {
+   "lines": 1,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / (none)": {
+   "lines": 66,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Additives": {
+   "lines": 583,
+   "stuck": 4,
+   "stuck_share": 0.00686106346483705
+  },
+  "3-way match, invoice before GR / CAPEX & SOCS": {
+   "lines": 852,
+   "stuck": 3,
+   "stuck_share": 0.0035211267605633804
+  },
+  "3-way match, invoice before GR / Commodity Resins": {
+   "lines": 18,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Enterprise Services": {
+   "lines": 1,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Latex & Monomers": {
+   "lines": 177,
+   "stuck": 1,
+   "stuck_share": 0.005649717514124294
+  },
+  "3-way match, invoice before GR / Logistics": {
+   "lines": 6,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Marketing": {
+   "lines": 2,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Others": {
+   "lines": 161,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Packaging": {
+   "lines": 6690,
+   "stuck": 220,
+   "stuck_share": 0.03288490284005979
+  },
+  "3-way match, invoice before GR / Pigments & Colorants": {
+   "lines": 76,
+   "stuck": 2,
+   "stuck_share": 0.02631578947368421
+  },
+  "3-way match, invoice before GR / Sales": {
+   "lines": 4544,
+   "stuck": 22,
+   "stuck_share": 0.0048415492957746475
+  },
+  "3-way match, invoice before GR / Solvents": {
+   "lines": 137,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Specialty Resins": {
+   "lines": 99,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Titanium Dioxides": {
+   "lines": 3,
+   "stuck": 0,
+   "stuck_share": 0.0
+  },
+  "3-way match, invoice before GR / Trading & End Products": {
+   "lines": 829,
+   "stuck": 0,
+   "stuck_share": 0.0
+  }
+ },
+ "window_days": 109
+}
