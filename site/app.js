@@ -156,7 +156,7 @@ function biz(d) {
   <h3>8. Limits to keep in mind</h3>
   <ul class="plainlist">
   <li>One company's records, from 2018: the method carries over; the numbers are theirs.</li>
-  <li>"Fine" leaves out corrections made after clearing; counting them, the worst likely case falls to ${pct(d.evidence.sensitivity.post_clear_lower, 2)} (<a href="#q1">Q1</a>, "If the label moved").</li>
+  <li>"Fine" leaves out corrections made after clearing; counting them, the worst likely case falls to ${pct(d.evidence.sensitivity.post_clear_lower, 2)} (<a href="#q1">Q1</a>, "If the label moved"). Corrections outside these records can't be counted.</li>
   <li>The share reviewed, minutes per review and the cost of a late fix are your inputs, not in the records.</li>
   <li>The records hold no invoice text, so the AI never read an invoice document.</li>
   </ul>
