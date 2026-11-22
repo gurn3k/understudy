@@ -6,7 +6,7 @@
 - "Outcomes arrive weeks after invoices, so most held-out invoices had arrived before the first promotion."
 
 ## Agreement gate (replaces the PRD's "promotes sooner and lets more wrong payments through")
-- "Simulated: with reviewers copying 9 suggestions in 10, the agreement gate promoted about 10 weeks sooner and passed 19,816 invoices, 150.5 of them wrong (medians of 20 runs; range 114–170), against 844 and 15 on outcomes. That is ten times the wrong payments, at a lower rate per pass (0.76% against 1.8%)."
+- "Simulated: with reviewers copying 9 suggestions in 10, the agreement gate promoted about 10 weeks sooner and passed 19,816 invoices, 150.5 of them wrong (medians of 20 runs; range 114–170), against 844 and 15 on outcomes. That is ten times the wrong payments, at a lower rate per pass (0.74% against 1.8%)."
 - "At 0.7 it passed 6,031 with 45.5 wrong (range 0–86), with no earlier promotion; at 0.5 it typically promoted nothing."
 - "The agreement it promoted on was mostly copied, so it measured the reviewers, not the helper."
 
@@ -25,7 +25,7 @@
 
 ## Erratum (2026-11-16)
 The packet behind this ruling misreported the agreement gate's first-promotion weeks. The builder misread a sorted list in which runs with no promotion sorted first. The same reviewer corrected the sentences:
-- "Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about 9 weeks sooner (median week 26 against week 35; range 8–10 weeks across 20 runs) and passed 19,815.5 invoices, 150.5 of them wrong (medians of 20 runs; range 114–170), against 844 and 15 on outcomes. That is ten times the wrong payments, at a lower rate per pass (0.76% against 1.8%)."
+- "Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about 9 weeks sooner (median week 26 against week 35; range 8–10 weeks across 20 runs) and passed 19,815.5 invoices, 150.5 of them wrong (medians of 20 runs; range 114–170), against 844 and 15 on outcomes. That is ten times the wrong payments, at a lower rate per pass (0.74% against 1.8%)."
 - "At 0.7 it promoted in 17 of 20 runs, the earliest in week 26, and passed 6,031.5 invoices, 45.5 of them wrong (medians of 20 runs; range 0–86). At 0.5 it promoted in 1 of 20 runs."
 
 These replace the 0.9 and 0.7/0.5 sentences above. "No earlier promotion" at 0.7, "6,031" and "about 10 weeks" (that was the example run, not the median) were wrong.
@@ -35,3 +35,6 @@ The touches figure counted every manual Clear Invoice and Remove Payment Block e
 - "While autonomous it passed 844 invoices, 15 of them wrong (1.8%, worse than the 99% bar), and removed 785 manual touches."
 
 This replaces the 788 sentence above. No other figure changes.
+
+## Erratum 3 (2026-11-21)
+The agreement gate's rate per pass in the sentences above first read 0.76%. That divided the median wrong (150.5) by the median paid (19,815.5), and those medians come from different runs, so their ratio is not a rate (ADR 0022). The rate is now pooled over all 20 runs: every line needing a correction over every line paid, 0.7379%, shown as 0.74%. That is the figure the page uses in its text and its tables. No other figure changes.

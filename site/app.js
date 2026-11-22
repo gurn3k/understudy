@@ -787,7 +787,7 @@ function q6(d) {
   const detail = `<p>The simulation runs the same replay with agreement as the switch instead of outcomes. A simulated reviewer copies the suggestion some share of the time. Otherwise the reviewer catches a wrong "pay" 4 times in 5, and wrongly flags a right one 1 time in 50. The chart shows one example run with reviewers copying 9 times in 10.</p>
   ${cueSheet("sheet-agree", d, d.agreement.example_states, { label: "Simulated agreement shortcut, one example run, reviewers copying 9 in 10" })}
   <p class="small">The decision records count ISO weeks: week ${Number(d.replay.first.split("-W")[1])} is week ${d.replay.weeks.indexOf(d.replay.first) + 1} of the replay.</p>
-  <p>Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about ${int(med(gaps9))} weeks sooner (median ${wk(medWeek(a9.first))} against ${wk(d.replay.first)}; range ${int(Math.min(...gaps9))}\u2013${int(Math.max(...gaps9))} weeks across 20 runs) and passed ${half(a9.passed_median)} invoices, ${half(a9.wrong_median)} of them wrong (medians of 20 runs; range ${int(a9.wrong_range[0])}\u2013${int(a9.wrong_range[1])}), against ${int(t.passed)} and ${int(t.wrong)} on outcomes. That is ${word(times)} times the wrong payments, at a lower rate per pass (${pct(a9.wrong_median / a9.passed_median, 2)} against ${pct(t.wrong / t.passed, 1)}).</p>
+  <p>Simulated: with reviewers copying 9 suggestions in 10, the agreement gate first promoted about ${int(med(gaps9))} weeks sooner (median ${wk(medWeek(a9.first))} against ${wk(d.replay.first)}; range ${int(Math.min(...gaps9))}\u2013${int(Math.max(...gaps9))} weeks across 20 runs) and passed ${half(a9.passed_median)} invoices, ${half(a9.wrong_median)} of them wrong (medians of 20 runs; range ${int(a9.wrong_range[0])}\u2013${int(a9.wrong_range[1])}), against ${int(t.passed)} and ${int(t.wrong)} on outcomes. That is ${word(times)} times the wrong payments, at a lower rate per pass (${pct(pooledRate(d, a9), 2)} against ${pct(t.wrong / t.passed, 1)}).</p>
   <p>At 0.7 it promoted in ${int(a7.promoted_runs)} of 20 runs, the earliest in ${wk(a7.first[0])}, and passed ${half(a7.passed_median)} invoices, ${half(a7.wrong_median)} of them wrong (medians of 20 runs; range ${int(a7.wrong_range[0])}\u2013${int(a7.wrong_range[1])}). At 0.5 it promoted in ${int(a5.promoted_runs)} of 20 runs.</p>
   <p class="small">In plain words: when reviewers copy 7 times in 10, the AI was still switched on in most runs. When they copy half the time, it almost never was, because honest checking caught enough mistakes to keep agreement low.</p>
   <p class="small">In the decision record's words, "the helper" is the AI being switched on.</p>
@@ -797,6 +797,12 @@ function q6(d) {
     `The low mistake rate per payment comes from a rulebook that is about 99% right. With these settings, an AI wrong 5% of the time would still see about 99.4% agreement when reviewers copy 9 in 10 (arithmetic, not a run)`,
     `In the simulation, real results can still switch the AI off`,
   ], true);
+}
+
+/* The agreement gate's rate per pass: pooled over all runs of the sweep cell behind this setting, never a ratio of two medians (ADR 0017 Erratum 3, ADR 0022). */
+function pooledRate(d, a) {
+  const cell = (d.evidence.sweep || []).find((x) => x.alpha === 0.9 && x.passed_median === a.passed_median && x.wrong_median === a.wrong_median);
+  return cell ? cell.pooled_rate : NaN;
 }
 
 /* ---------- The agreement gate: what the sweep shows (ADR 0022). All figures from data.json (evidence.sweep, agreement). ---------- */
